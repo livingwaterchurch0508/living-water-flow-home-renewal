@@ -1,0 +1,128 @@
+{
+  "Main": {
+    "Info": {
+      "title": "Living Flow Water Church is",
+      "description": "Let him see the light of Jesus.\nIt gets you out of the dark.\nIt opens your eyes by realizing the truth.\nIt fills you with wisdom and ability in life.\nIt allows you to have the power of faith so that you can only go to Jesus."
+    },
+    "Hymn": {
+      "title": "Hymns"
+    },
+    "Spirit": {
+      "title": "Spirits"
+    },
+    "Description": {
+      "message": "When you hear these words, the darkness in your mind, heart, and body leaves you, and the work of healing takes place. The more you listen to the Word, the more your eyes and your ears will open, so the treatment continues. The spiritual world opens and you realize the spiritual principles."
+    },
+    "Sermon": {
+      "title": "Sermons"
+    },
+    "News": {
+      "title": "News"
+    },
+    "Common": {
+      "viewMore": "more",
+      "viewAll": "all"
+    }
+  },
+  "Menu": {
+    "name": "Living Flow Water Church",
+    "youtube": "Youtube",
+    "language": "Language",
+    "Introduce": {
+      "name": "About",
+      "pastor": "Lead Pastor",
+      "introduce": "Church",
+      "worship" : "Service Times"
+    },
+    "Sermon": {
+      "name": "Sermons",
+      "sermon": "Watch Sermons",
+      "soul": "Sermon Notes",
+      "introduce": "Vision",
+      "mission": "Spiritual life",
+      "spirit": "Wise life",
+      "content": "You will immediately encounter your true self when you reflect on these words. \nHe always wins spiritual wars because he has a different purpose in life, a different value, a clear sense of mission, and a clear desire for heaven."
+    },
+    "Hymn": {
+      "name": "Hymns",
+      "hymn": "Watch Hymns",
+      "song": "Pastor's own song",
+      "content": "Shalom! I'm greeting you in the name of the Lord.\nThe Holy Spirit, who makes me praise God's love and grace that has been poured into me for the past 70 years, has given me praise through my heart and lips since one day. I am putting this praise book before the Lord, praying that the Lord's healing and restoration in our lives and that the grace of the hymns in history will be in all souls."
+    },
+    "News": {
+      "name": "News",
+      "service": "Ministry",
+      "event": "Event",
+      "story": "Our Story",
+      "content": "We share what happens in the church."
+    },
+    "Info": {
+      "name": "Info",
+      "place": "Location"
+    }
+  },
+  "Footer": {
+    "sect": "Korean Presbyterian Church",
+    "church": "Living Flow Water Church",
+    "address": "16006 53, Seonggogae-ro, Uiwang-si, Gyeonggi-do, Republic of Korea",
+    "contact": "TEL. 0507-1355-5043\u00A0\u00A0\u00A0E-MAIL. hyeri25@kakao.com",
+    "public": "Transportation Guidance",
+    "location": "Get off at Indeokwon Station on Line 4 - Exit 2 80, 33, 83, village 12, village 13 - Get off the bus stop [Forest Village Complex 1] - 2 minutes on foot to the destination",
+    "youtube": "Youtube",
+    "detail": "in detail",
+    "car": "Guide",
+    "carDesc": "Underground parking lot available in church building when using one's own car"
+  },
+  "Common": {
+    "list": "List",
+    "prev": "Prev",
+    "next": "Next",
+    "comingSoon": "It will be updated soon.",
+    "wait": "It will be updated as soon as possible.\nPlease wait a moment. Thank you.",
+    "detail": "Detail",
+    "close": "Close",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Introduce": {
+    "pastor": {
+      "name": "Rev. Ijin Kim",
+      "overview": "“It teaches reality and leads you to a practical life, leading you to victory with wisdom and ability in the practice of spiritual war.”",
+      "details": "The church where bottled water flows is a church where the spirit is beautifully made by proclaiming the true word of the Lord.\nIt is a church like a hospital that changes the saints who take on inner healing and resemble the image of God and move toward heaven only as the Holy Father of the Lord."
+    },
+    "worship": {
+      "name": "Service",
+      "details": "\uD83D\uDE4F You are a happy man. Who is the people who have gained the salvation of the Lord? - Shin Myung-ki 33:29",
+      "sunday": "Sunday Service",
+      "sunWorship": "11 a.m",
+      "wednesday": "Wednesday Service",
+      "wedWorship": "1 p.m"
+    },
+    "church": {
+      "name": "Introduction to the Church",
+      "content": "It heals your inner self and changes your life.\nIt leads you to the right path of faith.\nLife tells you the way to solve problems, and it also solves them.\nAs your spiritual eyes open, you first see yourself and have a desire to go only with faith.\nYou realize God's will toward you and you fulfill your mission.\nI love God with all my heart.\nAs the purpose of life changes, values change, and a sense of mission becomes clear, heaven's wishes become clear, and he always wins spiritual wars."
+    }
+  },
+  "Search": {
+    "placeholder": "Enter a search term",
+    "shortPlaceholder": "Enter a search term",
+    "noResults": "No results found",
+    "searching": "Searching...",
+    "initial": "Enter a search term"
+  },
+  "Error": {
+    "fetchFailed": "Failed to load data. Please try again.",
+    "loadMore": "Failed to load more items. Please try again."
+  },
+  "time": {
+    "years": "years ago",
+    "months": "months ago",
+    "weeks": "weeks ago",
+    "days": "days ago",
+    "hours": "hours ago",
+    "minutes": "minutes ago",
+    "just_now": "just now"
+  }
+}
