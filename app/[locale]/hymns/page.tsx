@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useInfiniteHymns } from '@/app/hooks/use-hymns';
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
@@ -15,6 +15,7 @@ export default function HymnsPage() {
   const menuT = useTranslations('Menu');
   const searchT = useTranslations('Search');
   const errorT = useTranslations('Error');
+  const locale = useLocale();
   const { state } = useSidebar();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -154,8 +155,8 @@ export default function HymnsPage() {
                 <div key={hymn.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
                   <ContentCard
                     id={hymn.id}
-                    name={hymn.name || ''}
-                    desc={hymn.desc || ''}
+                    name={locale === 'en' ? (hymn.nameEn || hymn.name || '') : (hymn.name || '')}
+                    desc={locale === 'en' ? (hymn.descEn || hymn.desc || '') : (hymn.desc || '')}
                     url={hymn.url || ''}
                     createdAt={hymn.createdAt || ''}
                   />

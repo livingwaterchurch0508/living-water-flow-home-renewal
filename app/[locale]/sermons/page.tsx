@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useInfiniteSermons } from '@/app/hooks/use-sermons';
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
@@ -17,6 +17,7 @@ export default function SermonsPage() {
   const t = useTranslations('Main');
   const menuT = useTranslations('Menu');
   const searchT = useTranslations('Search');
+  const locale = useLocale();
   const { state } = useSidebar();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -139,8 +140,12 @@ export default function SermonsPage() {
                     )}
                   >
                     <div className="space-y-1 sm:space-y-2">
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">{sermon.name}</h3>
-                      <p className="text-base sm:text-base text-muted-foreground">{sermon.desc}</p>
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">
+                        {locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '')}
+                      </h3>
+                      <p className="text-base sm:text-base text-muted-foreground">
+                        {locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '')}
+                      </p>
                     </div>
                   </Link>
                 </MasonryItem>
@@ -176,8 +181,8 @@ export default function SermonsPage() {
             <div key={sermon.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
               <ContentCard
                 id={sermon.id}
-                name={sermon.name || ''}
-                desc={sermon.desc || ''}
+                name={locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '')}
+                desc={locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '')}
                 url={sermon.url || ''}
                 createdAt={sermon.createdAt || ''}
               />

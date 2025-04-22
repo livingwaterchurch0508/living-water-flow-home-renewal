@@ -13,7 +13,7 @@ export interface IHymns {
   totalPages: number;
 }
 
-interface GetHymnsParams extends IPage {
+interface GetHymnsParams extends Required<Pick<IPage, 'limit' | 'offset'>> {
   type: number;
   search?: string;
 }
@@ -25,24 +25,32 @@ export async function getHymns({
   search,
 }: GetHymnsParams): Promise<IHymns | IError> {
   try {
-    const db: NeonHttpDatabase = await getDb();
+    const db = (await getDb()) as NeonHttpDatabase;
+    if (!db) throw new Error('Database connection failed');
 
-    let query = db
+    const baseQuery = db
       .select({
         id: hymns.id,
         name: hymns.name,
+        nameEn: hymns.nameEn,
         desc: hymns.desc,
+        descEn: hymns.descEn,
         url: hymns.url,
         type: hymns.type,
+        viewCount: hymns.viewCount,
         createdAt: hymns.createdAt,
       })
       .from(hymns)
       .where(eq(hymns.type, type));
 
-    // Add search condition if search query exists
-    if (search) {
-      query = query.where(or(ilike(hymns.name, `%${search}%`), ilike(hymns.desc, `%${search}%`)));
-    }
+    const query = search
+      ? baseQuery.where(
+          or(
+            ilike(hymns.name, `%${search}%`),
+            ilike(hymns.desc, `%${search}%`)
+          )
+        )
+      : baseQuery;
 
     const [items, totalResult] = await Promise.all([
       query.orderBy(desc(hymns.createdAt)).limit(limit).offset(offset),
@@ -79,20 +87,31 @@ export interface IHymnsById {
 export type IHymnType = Awaited<IError> | Awaited<IHymnsById> | null;
 
 export async function getHymnsById(id: number, type: HYMN_TAB) {
-  const db: NeonHttpDatabase<Record<string, never>> | null = await getDb();
-
-  if (!db) return null;
-
   try {
+    const db = (await getDb()) as NeonHttpDatabase;
+    if (!db) throw new Error('Database connection failed');
+
     const ids = await db
       .select({ id: hymns.id })
       .from(hymns)
       .orderBy(desc(hymns.createdAt))
       .where(eq(hymns.type, type));
 
-    const hymnsData = await db.select().from(hymns).where(eq(hymns.id, id));
+    const hymnsData = await db
+      .select({
+        id: hymns.id,
+        name: hymns.name,
+        nameEn: hymns.nameEn,
+        desc: hymns.desc,
+        descEn: hymns.descEn,
+        url: hymns.url,
+        type: hymns.type,
+        viewCount: hymns.viewCount,
+        createdAt: hymns.createdAt,
+      })
+      .from(hymns)
+      .where(eq(hymns.id, id));
 
-    // Transform dates using Luxon
     const transformedHymns = hymnsData.map((hymn) => ({
       ...hymn,
       createdAt: hymn.createdAt

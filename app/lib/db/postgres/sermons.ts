@@ -13,7 +13,7 @@ export interface ISermons {
   totalPages: number;
 }
 
-interface GetSermonsParams extends IPage {
+interface GetSermonsParams extends Required<Pick<IPage, 'limit' | 'offset'>> {
   type: number;
   search?: string;
 }
@@ -26,6 +26,7 @@ export async function getSermons({
 }: GetSermonsParams): Promise<ISermons | IError> {
   try {
     const db = (await getDb()) as NeonHttpDatabase;
+    if (!db) throw new Error('Database connection failed');
 
     let whereClause: SQL = eq(sermons.type, type);
     if (search) {
@@ -36,9 +37,12 @@ export async function getSermons({
       .select({
         id: sermons.id,
         name: sermons.name,
+        nameEn: sermons.nameEn,
         desc: sermons.desc,
+        descEn: sermons.descEn,
         url: sermons.url,
         type: sermons.type,
+        viewCount: sermons.viewCount,
         createdAt: sermons.createdAt,
       })
       .from(sermons)
@@ -58,13 +62,10 @@ export async function getSermons({
     return {
       total,
       totalPages,
-      items: items.map((item: (typeof items)[0]) => ({
+      items: items.map((item) => ({
         ...item,
         createdAt: item.createdAt ? DateTime.fromJSDate(item.createdAt).toISO() : null,
-        viewCount: 0,
-        nameEn: '',
-        descEn: '',
-      })) as ISermon[],
+      })),
     };
   } catch (error) {
     console.error('Error in getSermons:', error);
@@ -82,27 +83,37 @@ export interface ISermonsById {
 export type ISermonType = Awaited<IError> | Awaited<ISermonsById> | null;
 
 export async function getSermonsById(id: number, type: number) {
-  const db = (await getDb()) as NeonHttpDatabase;
-
   try {
+    const db = (await getDb()) as NeonHttpDatabase;
+    if (!db) throw new Error('Database connection failed');
+
     const ids = await db
       .select({ id: sermons.id })
       .from(sermons)
       .orderBy(desc(sermons.createdAt))
       .where(eq(sermons.type, type));
 
-    const sermonsData = await db.select().from(sermons).where(eq(sermons.id, id));
+    const sermonsData = await db
+      .select({
+        id: sermons.id,
+        name: sermons.name,
+        nameEn: sermons.nameEn,
+        desc: sermons.desc,
+        descEn: sermons.descEn,
+        url: sermons.url,
+        type: sermons.type,
+        viewCount: sermons.viewCount,
+        createdAt: sermons.createdAt,
+      })
+      .from(sermons)
+      .where(eq(sermons.id, id));
 
-    // Transform dates using Luxon and add missing fields
     const transformedSermons = sermonsData.map((sermon) => ({
       ...sermon,
       createdAt: sermon.createdAt
         ? DateTime.fromJSDate(new Date(sermon.createdAt)).setZone('Asia/Seoul').toISO()
         : null,
-      viewCount: 0,
-      nameEn: '',
-      descEn: '',
-    })) as ISermon[];
+    }));
 
     return {
       ids,

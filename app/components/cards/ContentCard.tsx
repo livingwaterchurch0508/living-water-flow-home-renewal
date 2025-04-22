@@ -80,7 +80,7 @@ export function ContentCard({
                     {name}
                   </h3>
                   <p className="text-xs sm:text-sm text-neutral-200 line-clamp-2">{desc}</p>
-                  <div className="mt-auto pt-2 flex items-center gap-2 text-xs text-neutral-300">
+                  <div className="flex items-center justify-end gap-2 text-xs text-neutral-300">
                     <span>{relativeTime}</span>
                   </div>
                 </div>

@@ -19,12 +19,14 @@ import { MENU_TAB, SERMON_TAB, HYMN_TAB, INTRODUCE_TAB } from '@/app/variables/e
 import Youtube from '@/app/components/icon/Youtube';
 import { buttonVariants } from '@/app/components/ui/button';
 import { MasonryGrid, MasonryItem } from '@/app/components/masonry/masonry-grid';
-
+import { useLocale } from 'next-intl';
 export default function Home() {
   const t = useTranslations('Main');
   const menuT = useTranslations('Menu');
   const errorT = useTranslations('Error');
   const { state } = useSidebar();
+   const locale = useLocale();
+
 
   const {
     data: hymnsData,
@@ -189,8 +191,8 @@ export default function Home() {
                   <CarouselItem key={hymn.id} className="pl-4 basis-auto">
                     <ContentCard
                       id={hymn.id}
-                      name={hymn.name || ''}
-                      desc={hymn.desc || ''}
+                      name={locale === 'en' ? (hymn.nameEn || hymn.name || '') : (hymn.name || '')}
+                      desc={locale === 'en' ? (hymn.descEn || hymn.desc || '') : (hymn.desc || '')}
                       url={hymn.url || ''}
                       createdAt={hymn.createdAt || ''}
                       variant="home"
@@ -241,8 +243,8 @@ export default function Home() {
                   <CarouselItem key={sermon.id} className="pl-4 basis-auto">
                     <ContentCard
                       id={sermon.id}
-                      name={sermon.name || ''}
-                      desc={sermon.desc || ''}
+                      name={locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '')}
+                      desc={locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '')}
                       url={sermon.url || ''}
                       createdAt={sermon.createdAt || ''}
                       variant="home"
@@ -292,8 +294,8 @@ export default function Home() {
                 communities.map((community) => (
                   <CarouselItem key={community.id} className="pl-4 basis-auto">
                     <CommunityCard
-                      name={community.name || ''}
-                      desc={community.desc || ''}
+                      name={locale === 'en' ? (community.nameEn || community.name || '') : (community.name || '')}
+                      desc={locale === 'en' ? (community.descEn || community.desc || '') : (community.desc || '')}
                       url={community.files[0]?.url || ''}
                       createdAt={community.createdAt || ''}
                       caption={Number(community.files[0]?.caption) || 1}
@@ -365,8 +367,8 @@ export default function Home() {
                       )}
                     >
                       <div className="space-y-1 sm:space-y-2">
-                        <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">{sermon.name}</h3>
-                        <p className="text-base sm:text-base text-muted-foreground">{sermon.desc}</p>
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">{locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '')}</h3>
+                        <p className="text-base sm:text-base text-muted-foreground">{locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '')}</p>
                       </div>
                     </Link>
                   </MasonryItem>

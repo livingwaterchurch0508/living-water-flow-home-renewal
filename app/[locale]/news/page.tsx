@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useInfiniteCommunities } from '@/app/hooks/use-communities';
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
@@ -15,6 +15,7 @@ export default function NewsPage() {
   const menuT = useTranslations('Menu');
   const searchT = useTranslations('Search');
   const errorT = useTranslations('Error');
+  const locale = useLocale();
   const { state } = useSidebar();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -124,7 +125,7 @@ export default function NewsPage() {
         </div>
       </section>
 
-      {/* 소식 그리드 */}
+      {/* 뉴스 그리드 */}
       <section
         className={cn(
           'transition-[width] duration-200 px-4 sm:px-6',
@@ -160,8 +161,8 @@ export default function NewsPage() {
               {communities.map((community) => (
                 <CommunityCard
                   key={community.id}
-                  name={community?.name || ''}
-                  desc={community?.desc || ''}
+                  name={locale === 'en' ? (community.nameEn || community.name || '') : (community.name || '')}
+                  desc={locale === 'en' ? (community.descEn || community.desc || '') : (community.desc || '')}
                   url={community.files[0]?.url || ''}
                   createdAt={community.createdAt || ''}
                   caption={Number(community.files[0]?.caption) || 1}
