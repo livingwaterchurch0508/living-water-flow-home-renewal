@@ -14,6 +14,8 @@ interface CommunityCardProps {
   className?: string;
   caption?: number;
   variant?: 'home' | 'page';
+  onDialogClose?: () => void;
+  autoOpen?: boolean;
 }
 
 export function CommunityCard({
@@ -24,6 +26,8 @@ export function CommunityCard({
   className,
   caption = 1,
   variant = 'page',
+  onDialogClose,
+  autoOpen = false,
 }: CommunityCardProps) {
   const { locale } = useParams();
   const relativeTime = getRelativeTime(createdAt, locale as string);
@@ -36,7 +40,13 @@ export function CommunityCard({
 
   return (
     <div className={cn('relative', variant === 'home' ? 'w-[300px]' : 'w-full', className)}>
-      <ImageGalleryDialog images={images} thumbnailIndex={0} title={name}>
+      <ImageGalleryDialog 
+        images={images} 
+        thumbnailIndex={0} 
+        title={name}
+        onClose={onDialogClose}
+        autoOpen={autoOpen}
+      >
         <div className="group relative overflow-hidden rounded-lg">
           <div className={cn('relative aspect-video', variant === 'home' ? 'w-[300px]' : 'w-full')}>
             <Image

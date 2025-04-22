@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from 'framer-motion';
 import { ChevronLeft, ChevronRight, XIcon, ImageIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -19,6 +19,8 @@ interface ImageGalleryProps {
   className?: string;
   children?: React.ReactNode;
   title?: string;
+  onClose?: () => void;
+  autoOpen?: boolean;
 }
 
 const animationVariants = {
@@ -56,19 +58,64 @@ export default function ImageGalleryDialog({
   className,
   children,
   title,
+  onClose,
+  autoOpen = false,
 }: ImageGalleryProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(thumbnailIndex);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const t = useTranslations('Common');
 
-  const handlePrevious = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  const controls = useAnimation();
+  const x = useMotionValue(0);
+  const input = [-200, 0, 200];
+  const opacity = useTransform(x, input, [0, 1, 0]);
+
+  useEffect(() => {
+    if (autoOpen) {
+      setIsOpen(true);
+    }
+  }, [autoOpen]);
+
+  const handleClose = () => {
+    setIsOpen(false);
+    onClose?.();
   };
 
-  const handleNext = (e: React.MouseEvent) => {
+  const handleImageLoad = () => {
+    setIsImageLoaded(true);
+  };
+
+  const handleDragEnd = async (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: { offset: { x: number }; velocity: { x: number } }
+  ) => {
+    const offset = info.offset.x;
+    const velocity = info.velocity.x;
+
+    if (offset < -100 || velocity < -500) {
+      await controls.start({ x: -200, opacity: 0 });
+      setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    } else if (offset > 100 || velocity > 500) {
+      await controls.start({ x: 200, opacity: 0 });
+      setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    } else {
+      controls.start({ x: 0, opacity: 1 });
+    }
+  };
+
+  const handlePrevious = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    await controls.start({ x: 200, opacity: 0 });
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    controls.start({ x: 0, opacity: 1 });
+  };
+
+  const handleNext = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await controls.start({ x: -200, opacity: 0 });
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    controls.start({ x: 0, opacity: 1 });
   };
 
   return (
@@ -79,11 +126,16 @@ export default function ImageGalleryDialog({
       >
         {children || (
           <>
-            <Image
-              src={images[thumbnailIndex].src}
-              alt={images[thumbnailIndex].alt || 'Gallery thumbnail'}
-              className="w-full transition-all duration-200 ease-out group-hover:scale-105 group-hover:brightness-90"
-            />
+            <div className="relative h-48 w-full overflow-hidden md:h-64">
+              <Image
+                src={images[thumbnailIndex].src}
+                alt={images[thumbnailIndex].alt || 'Gallery thumbnail'}
+                className="transition-all duration-200 ease-out group-hover:scale-105 group-hover:brightness-90"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority
+              />
+            </div>
             <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
               <div className="flex items-center gap-2 rounded-full bg-black/50 px-4 py-2 text-sm text-white backdrop-blur-sm">
                 <ImageIcon className="size-4" />
@@ -101,7 +153,7 @@ export default function ImageGalleryDialog({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
+              onClick={handleClose}
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md"
             >
               <motion.div
@@ -111,7 +163,7 @@ export default function ImageGalleryDialog({
                 className="relative mx-4 w-full max-w-3xl md:mx-0"
               >
                 <motion.button
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleClose}
                   className="absolute -top-12 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
                 >
                   <XIcon className="size-5" />
@@ -124,62 +176,97 @@ export default function ImageGalleryDialog({
                     </div>
                   )}
                   <AnimatePresence mode="wait">
-                    <motion.img
+                    <motion.div
                       key={currentIndex}
-                      src={images[currentIndex].src}
-                      alt={images[currentIndex].alt || `Image ${currentIndex + 1}`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="mx-auto max-h-[60vh] w-auto object-contain"
-                    />
+                      className="relative aspect-video w-full touch-pan-y"
+                      initial={{ opacity: 0, x: 0 }}
+                      animate={controls}
+                      style={{ x, opacity }}
+                      drag={images.length > 1 ? "x" : false}
+                      dragConstraints={{ left: 0, right: 0 }}
+                      dragElastic={images.length > 1 ? 1 : 0}
+                      onDragEnd={images.length > 1 ? handleDragEnd : undefined}
+                      transition={{
+                        x: { type: "spring", stiffness: 300, damping: 30 },
+                        opacity: { duration: 0.2 }
+                      }}
+                    >
+                      <Image
+                        src={images[currentIndex].src}
+                        alt={images[currentIndex].alt || `Image ${currentIndex + 1}`}
+                        className={cn(
+                          "object-contain transition-opacity duration-200",
+                          isImageLoaded ? "opacity-100" : "opacity-0"
+                        )}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority
+                        draggable={false}
+                        onLoad={handleImageLoad}
+                      />
+                      {!isImageLoaded && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="h-8 w-8 animate-spin rounded-full border-4 border-neutral-300 border-t-neutral-600" />
+                        </div>
+                      )}
+                    </motion.div>
                   </AnimatePresence>
 
                   {/* Navigation buttons */}
-                  <button
-                    onClick={handlePrevious}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition-transform hover:scale-110"
-                  >
-                    <ChevronLeft className="size-5" />
-                  </button>
-                  <button
-                    onClick={handleNext}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition-transform hover:scale-110"
-                  >
-                    <ChevronRight className="size-5" />
-                  </button>
+                  {images.length > 1 && (
+                    <>
+                      <button
+                        onClick={handlePrevious}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition-transform hover:scale-110"
+                      >
+                        <ChevronLeft className="size-5" />
+                      </button>
+                      <button
+                        onClick={handleNext}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition-transform hover:scale-110"
+                      >
+                        <ChevronRight className="size-5" />
+                      </button>
 
-                  {/* Image counter */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-4 py-2 text-sm text-white backdrop-blur-sm">
-                    {currentIndex + 1} / {images.length}
-                  </div>
+                      {/* Image counter */}
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-4 py-2 text-sm text-white backdrop-blur-sm">
+                        {currentIndex + 1} / {images.length}
+                      </div>
+                    </>
+                  )}
+
                 </div>
 
                 {/* Thumbnails */}
-                <div className="mt-4 flex gap-2 overflow-x-auto rounded-xl bg-white/10 p-2 backdrop-blur-md">
-                  {images.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentIndex(index);
-                      }}
-                      className={cn(
-                        'relative flex-shrink-0 overflow-hidden rounded-md transition-all',
-                        currentIndex === index
-                          ? 'ring-2 ring-white'
-                          : 'opacity-60 hover:opacity-100'
-                      )}
-                    >
-                      <Image
-                        src={image.src}
-                        alt={image.alt || `Thumbnail ${index + 1}`}
-                        className="size-14 object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
+                {images.length > 1 && (
+                  <div className="mt-4 flex gap-2 overflow-x-auto rounded-xl bg-white/10 p-2 backdrop-blur-md">
+                    {images.map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentIndex(index);
+                        }}
+                        className={cn(
+                          'relative flex-shrink-0 overflow-hidden rounded-md transition-all',
+                          currentIndex === index
+                            ? 'ring-2 ring-white'
+                            : 'opacity-60 hover:opacity-100'
+                        )}
+                      >
+                        <div className="relative size-14">
+                          <Image
+                            src={image.src}
+                            alt={image.alt || `Thumbnail ${index + 1}`}
+                            className="object-cover"
+                            fill
+                            sizes="56px"
+                          />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             </motion.div>
           </AnimatePresence>,

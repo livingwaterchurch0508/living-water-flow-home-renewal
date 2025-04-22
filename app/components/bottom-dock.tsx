@@ -1,6 +1,8 @@
+'use client';
+
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { Church, HomeIcon, Music, Newspaper, MapPin } from 'lucide-react';
+import { Church, HomeIcon, Music, Newspaper, MapPin, BookOpen } from 'lucide-react';
 
 import { Dock, DockIcon } from '@/app/components/magicui/dock';
 import { Separator } from '@/app/components/ui/separator';
@@ -57,6 +59,27 @@ export default function BottomDock() {
             </TooltipTrigger>
             <TooltipContent>
               <p>{t('Introduce.name')}</p>
+            </TooltipContent>
+          </Tooltip>
+        </DockIcon>
+        <DockIcon>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href={`/${ROUTER_PATHS[MENU_TAB.SERMON]}?type=0`}
+                className={cn(
+                  buttonVariants({
+                    variant: 'ghost',
+                    size: 'icon',
+                  }),
+                  'size-12'
+                )}
+              >
+                <BookOpen className="size-4" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('Sermon.name')}</p>
             </TooltipContent>
           </Tooltip>
         </DockIcon>

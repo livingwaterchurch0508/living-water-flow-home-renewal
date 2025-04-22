@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Play, XIcon } from 'lucide-react';
 import { cn } from '@/app/lib/utils';
@@ -18,6 +18,8 @@ interface ContentCardProps {
   createdAt: string;
   className?: string;
   variant?: 'home' | 'page';
+  autoOpen?: boolean;
+  onDialogClose?: () => void;
 }
 
 export function ContentCard({
@@ -27,12 +29,25 @@ export function ContentCard({
   createdAt,
   className,
   variant = 'page',
+  autoOpen = false,
+  onDialogClose,
 }: ContentCardProps) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const { locale } = useParams();
   const videoSrc = `${YOUTUBE_URL.EMBED}${url}`;
   const thumbnailSrc = `${YOUTUBE_URL.THUMB_NAIL}${url}/0.jpg`;
   const relativeTime = getRelativeTime(createdAt, locale as string);
+
+  useEffect(() => {
+    if (autoOpen) {
+      setIsVideoOpen(true);
+    }
+  }, [autoOpen]);
+
+  const handleClose = () => {
+    setIsVideoOpen(false);
+    onDialogClose?.();
+  };
 
   return (
     <>
@@ -94,7 +109,7 @@ export function ContentCard({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              onClick={() => setIsVideoOpen(false)}
+              onClick={handleClose}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-md p-4"
             >
@@ -108,7 +123,7 @@ export function ContentCard({
               >
                 <motion.button
                   className="absolute -top-12 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
-                  onClick={() => setIsVideoOpen(false)}
+                  onClick={handleClose}
                 >
                   <XIcon className="size-5" />
                 </motion.button>

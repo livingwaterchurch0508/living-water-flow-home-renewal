@@ -10,7 +10,8 @@ import { useSidebar } from '@/app/components/ui/sidebar';
 import { SERMON_TAB } from '@/app/variables/enums';
 import { BookOpenIcon } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { BentoCard, BentoGrid } from '@/app/components/magicui/bento-grid';
+import { MasonryGrid, MasonryItem } from '@/app/components/masonry/masonry-grid';
+import Link from 'next/link';
 
 export default function SermonsPage() {
   const t = useTranslations('Main');
@@ -105,28 +106,47 @@ export default function SermonsPage() {
     if (currentType === SERMON_TAB.SOUL) {
       return (
         <>
-          <BentoGrid>
+          <MasonryGrid className="gap-2 sm:gap-3 md:gap-4">
             {sermons.map((sermon, index) => {
-              const backgroundPatterns = [
-                'bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900',
-                'bg-gradient-to-br from-zinc-100 to-neutral-200 dark:from-zinc-800 dark:to-neutral-900',
-                'bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-900',
+              const contentLength = (sermon.name?.length || 0) + (sermon.desc?.length || 0);
+              let span = 6; // 기본 크기
+
+              // 화면 크기와 내용 길이에 따라 span 조정
+              if (contentLength > 200) {
+                span = 12;
+              } else if (contentLength > 100) {
+                span = 9;
+              } else if (contentLength < 50) {
+                span = 5;
+              }
+
+              const gradients = [
+                'bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20',
+                'bg-gradient-to-br from-rose-500/10 to-orange-500/10 dark:from-rose-500/20 dark:to-orange-500/20',
+                'bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/20 dark:to-emerald-500/20',
+                'bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 dark:from-violet-500/20 dark:to-fuchsia-500/20',
               ];
-              const backgroundClass = backgroundPatterns[index % 3];
+              const gradientClass = gradients[index % gradients.length];
 
               return (
-                <BentoCard
-                  key={sermon.id}
-                  name={sermon.name || ''}
-                  className={backgroundClass}
-                  description={sermon.desc || ''}
-                  href={`/sermons/${sermon.id}?type=${SERMON_TAB.SOUL}`}
-                  cta={t('Common.viewMore')}
-                  index={index}
-                />
+                <MasonryItem key={sermon.id} span={span}>
+                  <Link
+                    href={`/sermons/${sermon.id}?type=${SERMON_TAB.SOUL}`}
+                    className={cn(
+                      "group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300",
+                      gradientClass,
+                      "hover:shadow-md hover:-translate-y-0.5"
+                    )}
+                  >
+                    <div className="space-y-1 sm:space-y-2">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">{sermon.name}</h3>
+                      <p className="text-base sm:text-base text-muted-foreground">{sermon.desc}</p>
+                    </div>
+                  </Link>
+                </MasonryItem>
               );
             })}
-          </BentoGrid>
+          </MasonryGrid>
 
           {/* 무한 스크롤 로딩 인디케이터 */}
           <div ref={observerTarget} className="mt-8">

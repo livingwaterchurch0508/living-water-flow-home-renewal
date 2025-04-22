@@ -24,6 +24,7 @@ export async function GET(request: Request) {
         .select({
           id: sermons.id,
           name: sermons.name,
+          desc: sermons.desc,
           type: sermons.type,
           url: sermons.url,
           createdAt: sermons.createdAt,
@@ -53,6 +54,7 @@ export async function GET(request: Request) {
           name: communities.name,
           createdAt: communities.createdAt,
           fileUrl: files.url,
+          fileCaption: files.caption,
         })
         .from(communities)
         .leftJoin(files, eq(communities.id, files.communityId))
@@ -79,7 +81,7 @@ export async function GET(request: Request) {
     // Process communities results to match the expected format
     const processedCommunitiesResults = communitiesResults.map((community) => ({
       ...community,
-      files: community.fileUrl ? [{ url: community.fileUrl }] : [],
+      files: community.fileUrl ? [{ url: community.fileUrl, caption: community.fileCaption }] : [],
     }));
 
     return NextResponse.json({
