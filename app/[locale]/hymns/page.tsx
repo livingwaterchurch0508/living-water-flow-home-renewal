@@ -2,14 +2,18 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useInfiniteHymns } from '@/app/hooks/use-hymns';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { MusicIcon } from 'lucide-react';
+
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
-import { cn } from '@/app/lib/utils';
 import { useSidebar } from '@/app/components/ui/sidebar';
-import { MusicIcon } from 'lucide-react';
+import { HeroSection } from '@/app/components/hero-section';
+import { TabSection } from '@/app/components/ui/tab-section';
+
+import { useInfiniteHymns } from '@/app/hooks/use-hymns';
+import { cn } from '@/app/lib/utils';
 import { HYMN_TAB } from '@/app/variables/enums';
-import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function HymnsPage() {
   const menuT = useTranslations('Menu');
@@ -53,70 +57,29 @@ export default function HymnsPage() {
 
   return (
     <div className="min-h-screen py-10 px-2 space-y-16">
-      {/* 히어로 섹션 */}
-      <section
-        className={cn(
-          'relative h-[600px] transition-[width] duration-200 rounded-3xl overflow-hidden',
-          state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
-        )}
-      >
-        {/* 배경 그라데이션 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-orange-500/20 dark:from-rose-500/10 dark:to-orange-500/10" />
+      <HeroSection
+        title={menuT('Hymn.name')}
+        content={menuT('Hymn.content')}
+        bg1="from-rose-500/20"
+        bg2="to-orange-500/20"
+        bgDark1="dark:from-rose-500/10"
+        bgDark2="dark:to-orange-500/10"
+        color1="from-rose-600"
+        color2="to-orange-600"
+        colorDark1="dark:from-rose-400"
+        colorDark2="dark:to-orange-400"
+        icon={<MusicIcon className="w-16 h-16 mb-6 text-rose-500/80" />}
+      />
 
-        {/* 배경 패턴 */}
-        <div className="absolute inset-0 bg-grid-white/10 dark:bg-grid-white/5" />
-
-        {/* 콘텐츠 */}
-        <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-          <MusicIcon className="w-16 h-16 mb-6 text-rose-500/80" />
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-rose-600 to-orange-600 dark:from-rose-400 dark:to-orange-400">
-            {menuT('Hymn.name')}
-          </h1>
-          <p className="max-w-2xl text-base md:text-lg text-muted-foreground mb-8">
-            {menuT('Hymn.content')}
-          </p>
-        </div>
-
-        {/* 하단 장식 */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-      </section>
-
-      {/* 탭 섹션 */}
-      <section
-        className={cn(
-          'transition-[width] duration-200',
-          state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
-        )}
-      >
-        <div className="flex justify-center space-x-4 mb-8">
-          <button
-            onClick={() => handleTabChange(HYMN_TAB.HYMN.toString())}
-            className={cn(
-              'px-6 py-2 rounded-full transition-colors',
-              currentType === HYMN_TAB.HYMN
-                ? 'bg-rose-500 text-white'
-                : 'bg-muted hover:bg-muted/80'
-            )}
-          >
-            {menuT('Hymn.hymn')}
-          </button>
-          <button
-            onClick={() => handleTabChange(HYMN_TAB.SONG.toString())}
-            className={cn(
-              'px-6 py-2 rounded-full transition-colors',
-              currentType === HYMN_TAB.SONG
-                ? 'bg-rose-500 text-white'
-                : 'bg-muted hover:bg-muted/80'
-            )}
-          >
-            {menuT('Hymn.song')}
-          </button>
-        </div>
-      </section>
+      <TabSection
+        tabs={[
+          { id: HYMN_TAB.HYMN, label: menuT('Hymn.hymn') },
+          { id: HYMN_TAB.SONG, label: menuT('Hymn.song') }
+        ]}
+        activeTab={currentType}
+        onTabChange={(tabId) => handleTabChange(tabId.toString())}
+        accentColor="bg-rose-500"
+      />
 
       {/* 찬양 그리드 */}
       <section
@@ -155,8 +118,8 @@ export default function HymnsPage() {
                 <div key={hymn.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
                   <ContentCard
                     id={hymn.id}
-                    name={locale === 'en' ? (hymn.nameEn || hymn.name || '') : (hymn.name || '')}
-                    desc={locale === 'en' ? (hymn.descEn || hymn.desc || '') : (hymn.desc || '')}
+                    name={locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || ''}
+                    desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
                     url={hymn.url || ''}
                     createdAt={hymn.createdAt || ''}
                   />

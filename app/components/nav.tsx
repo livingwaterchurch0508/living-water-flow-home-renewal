@@ -79,7 +79,10 @@ export function Nav() {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
-  const [selectedContent, setSelectedContent] = useState<{ item: SearchResult; type: 'sermon' | 'hymn' | 'community' } | null>(null);
+  const [selectedContent, setSelectedContent] = useState<{
+    item: SearchResult;
+    type: 'sermon' | 'hymn' | 'community';
+  } | null>(null);
   const debouncedQuery = useDebounce(query, 300);
   const router = useRouter();
   const pathname = usePathname();
@@ -138,9 +141,8 @@ export function Nav() {
   }, [debouncedQuery]);
 
   const handleSelect = (item: SearchResult, type: 'sermon' | 'hymn' | 'community') => {
-  
-      setOpen(type === 'sermon' && !item.url);
-      setSelectedContent({ item, type });
+    setOpen(type === 'sermon' && !item.url);
+    setSelectedContent({ item, type });
   };
 
   return (
@@ -290,7 +292,9 @@ export function Nav() {
                         >
                           <div className="flex items-center w-full gap-3">
                             <div className="flex-1">
-                              <div className="font-medium">{locale === 'ko' ? sermon.name : sermon.nameEn}</div>
+                              <div className="font-medium">
+                                {locale === 'ko' ? sermon.name : sermon.nameEn}
+                              </div>
                               {sermon.createdAt && (
                                 <div className="text-xs text-muted-foreground">
                                   {getRelativeTime(sermon.createdAt)}
@@ -326,7 +330,9 @@ export function Nav() {
                         >
                           <div className="flex items-center w-full gap-3">
                             <div className="flex-1">
-                              <div className="font-medium">{locale === 'ko' ? hymn.name : hymn.nameEn}</div>
+                              <div className="font-medium">
+                                {locale === 'ko' ? hymn.name : hymn.nameEn}
+                              </div>
                               {hymn.createdAt && (
                                 <div className="text-xs text-muted-foreground">
                                   {getRelativeTime(hymn.createdAt)}
@@ -361,7 +367,9 @@ export function Nav() {
                       >
                         <div className="flex items-center w-full gap-3">
                           <div className="flex-1">
-                            <div className="font-medium">{locale === 'ko' ? community.name : community.nameEn}</div>
+                            <div className="font-medium">
+                              {locale === 'ko' ? community.name : community.nameEn}
+                            </div>
                             {community.createdAt && (
                               <div className="text-xs text-muted-foreground">
                                 {getRelativeTime(community.createdAt)}
@@ -417,7 +425,11 @@ export function Nav() {
             <ContentCard
               id={parseInt(selectedContent.item.id)}
               name={locale === 'ko' ? selectedContent.item.name : selectedContent.item.nameEn || ''}
-              desc={locale === 'ko' ? selectedContent.item.desc || '' : selectedContent.item.descEn || ''}
+              desc={
+                locale === 'ko'
+                  ? selectedContent.item.desc || ''
+                  : selectedContent.item.descEn || ''
+              }
               url={selectedContent.item.url || ''}
               createdAt={selectedContent.item.createdAt || ''}
               variant="page"

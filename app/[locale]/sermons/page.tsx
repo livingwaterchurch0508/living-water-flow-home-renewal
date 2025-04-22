@@ -2,16 +2,20 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useInfiniteSermons } from '@/app/hooks/use-sermons';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { BookOpenIcon } from 'lucide-react';
+
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { SermonCard } from '@/app/components/cards/SermonCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
-import { cn } from '@/app/lib/utils';
 import { useSidebar } from '@/app/components/ui/sidebar';
-import { SERMON_TAB } from '@/app/variables/enums';
-import { BookOpenIcon } from 'lucide-react';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { MasonryGrid, MasonryItem } from '@/app/components/masonry/masonry-grid';
+import { HeroSection } from '@/app/components/hero-section';
+import { TabSection } from '@/app/components/ui/tab-section';
+
+import { useInfiniteSermons } from '@/app/hooks/use-sermons';
+import { cn } from '@/app/lib/utils';
+import { SERMON_TAB } from '@/app/variables/enums';
 
 export default function SermonsPage() {
   const t = useTranslations('Main');
@@ -129,21 +133,23 @@ export default function SermonsPage() {
               ];
               const gradientClass = gradients[index % gradients.length];
 
-              const name = locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '');
-              const desc = locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '');
+              const name = locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || '';
+              const desc = locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || '';
 
               return (
                 <MasonryItem key={sermon.id} span={span}>
                   <button
                     onClick={() => setSelectedSermon({ name, desc })}
                     className={cn(
-                      "group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300",
+                      'group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300',
                       gradientClass,
-                      "hover:shadow-md hover:-translate-y-0.5"
+                      'hover:shadow-md hover:-translate-y-0.5'
                     )}
                   >
                     <div className="space-y-1 sm:space-y-2 text-left">
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">{name}</h3>
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">
+                        {name}
+                      </h3>
                       <p className="text-base sm:text-base text-muted-foreground">{desc}</p>
                     </div>
                   </button>
@@ -189,8 +195,8 @@ export default function SermonsPage() {
             <div key={sermon.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
               <ContentCard
                 id={sermon.id}
-                name={locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '')}
-                desc={locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '')}
+                name={locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''}
+                desc={locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''}
                 url={sermon.url || ''}
                 createdAt={sermon.createdAt || ''}
               />
@@ -220,70 +226,29 @@ export default function SermonsPage() {
 
   return (
     <div className="min-h-screen py-10 px-2 space-y-16">
-      {/* 히어로 섹션 */}
-      <section
-        className={cn(
-          'relative h-[600px] transition-[width] duration-200 rounded-3xl overflow-hidden',
-          state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
-        )}
-      >
-        {/* 배경 그라데이션 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-violet-500/20 dark:from-blue-500/10 dark:to-violet-500/10" />
+      <HeroSection
+        title={menuT('Sermon.name')}
+        content={menuT('Sermon.content')}
+        bg1="from-blue-500/20"
+        bg2="to-violet-500/20"
+        bgDark1="dark:from-blue-500/10" 
+        bgDark2="dark:to-violet-500/10"
+        color1="from-blue-600"
+        color2="to-violet-600"
+        colorDark1="dark:from-blue-400"
+        colorDark2="dark:to-violet-400"
+        icon={<BookOpenIcon className="w-16 h-16 mb-6 text-blue-500/80" />}
+      />
 
-        {/* 배경 패턴 */}
-        <div className="absolute inset-0 bg-grid-white/10 dark:bg-grid-white/5" />
-
-        {/* 콘텐츠 */}
-        <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-          <BookOpenIcon className="w-16 h-16 mb-6 text-blue-500/80" />
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600 dark:from-blue-400 dark:to-violet-400">
-            {menuT('Sermon.name')}
-          </h1>
-          <p className="max-w-2xl text-base md:text-lg text-muted-foreground mb-8">
-            {menuT('Sermon.content')}
-          </p>
-        </div>
-
-        {/* 하단 장식 */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-      </section>
-
-      {/* 필터 및 검색 섹션 */}
-      <section
-        className={cn(
-          'space-y-6 transition-[width] duration-200',
-          state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
-        )}
-      >
-        <div className="flex justify-center space-x-4 mb-8">
-          <button
-            onClick={() => router.push(`/sermons?type=${SERMON_TAB.RHEMA.toString()}`)}
-            className={cn(
-              'px-6 py-2 rounded-full transition-colors',
-              currentType === SERMON_TAB.RHEMA
-                ? 'bg-blue-500 text-white'
-                : 'bg-muted hover:bg-muted/80'
-            )}
-          >
-            {menuT('Sermon.sermon')}
-          </button>
-          <button
-            onClick={() => router.push(`/sermons?type=${SERMON_TAB.SOUL.toString()}`)}
-            className={cn(
-              'px-6 py-2 rounded-full transition-colors',
-              currentType === SERMON_TAB.SOUL
-                ? 'bg-blue-500 text-white'
-                : 'bg-muted hover:bg-muted/80'
-            )}
-          >
-            {menuT('Sermon.soul')}
-          </button>
-        </div>
-      </section>
+      <TabSection
+        tabs={[
+          { id: SERMON_TAB.RHEMA, label: menuT('Sermon.sermon') },
+          { id: SERMON_TAB.SOUL, label: menuT('Sermon.soul') }
+        ]}
+        activeTab={currentType}
+        onTabChange={(tabId) => router.push(`/sermons?type=${tabId.toString()}`)}
+        accentColor="bg-blue-500"
+      />
 
       {/* 설교 콘텐츠 */}
       <section

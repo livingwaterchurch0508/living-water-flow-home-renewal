@@ -3,11 +3,14 @@
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import { MapIcon } from 'lucide-react';
-import { cn } from '@/app/lib/utils';
+
 import { useSidebar } from '@/app/components/ui/sidebar';
 import { TextReveal } from '@/app/components/magicui/text-reveal';
 import { BorderBeam } from '@/app/components/magicui/border-beam';
 import Location from '@/app/components/cards/Location';
+import { HeroSection } from '@/app/components/hero-section';
+
+import { cn } from '@/app/lib/utils';
 
 export default function InfosPage() {
   const t = useTranslations('Main');
@@ -16,37 +19,19 @@ export default function InfosPage() {
 
   return (
     <div className="min-h-screen py-10 px-2 space-y-16">
-      {/* 히어로 섹션 */}
-      <section
-        className={cn(
-          'relative h-[600px] transition-[width] duration-200 rounded-3xl overflow-hidden',
-          state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
-        )}
-      >
-        {/* 배경 그라데이션 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 dark:from-cyan-500/10 dark:to-blue-500/10" />
-
-        {/* 배경 패턴 */}
-        <div className="absolute inset-0 bg-grid-white/10 dark:bg-grid-white/5" />
-
-        {/* 콘텐츠 */}
-        <div className="relative h-full flex flex-col items-center justify-center text-center px-4">
-          <MapIcon className="w-16 h-16 mb-6 text-cyan-500/80" />
-          <TextReveal
-            text={t('Info.title')}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400"
-          />
-          <TextReveal
-            text={t('Info.description')}
-            className="max-w-2xl text-base md:text-lg text-muted-foreground mb-8 whitespace-pre-line"
-          />
-        </div>
-
-        {/* 하단 장식 */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-      </section>
+      <HeroSection
+        title={t('Info.title')}
+        content={t('Info.description')}
+        bg1="from-cyan-500/20"
+        bg2="to-blue-500/20"
+        bgDark1="dark:from-cyan-500/10"
+        bgDark2="dark:to-blue-500/10"
+        color1="from-cyan-600"
+        color2="to-blue-600"
+        colorDark1="dark:from-cyan-400"
+        colorDark2="dark:to-blue-400"
+        icon={<MapIcon className="w-16 h-16 mb-6 text-cyan-500/80" />}
+      />
 
       {/* 지도 및 오시는 길 섹션 */}
       <section
@@ -70,4 +55,4 @@ export default function InfosPage() {
       </section>
     </div>
   );
-} 
+}
