@@ -6,6 +6,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import { DateTime } from 'luxon';
+import { motion, useScroll } from 'motion/react';
+import { Languages } from 'lucide-react';
+
 import { buttonVariants } from '@/app/components/ui/button';
 import { Button } from '@/app/components/ui/button';
 import {
@@ -28,15 +31,14 @@ import { SidebarTrigger } from '@/app/components/ui/sidebar';
 import { ModeToggle } from '@/app/components/icon/mode-toggle';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/app/components/ui/tooltip';
 import Youtube from '@/app/components/icon/Youtube';
-import { cn } from '@/app/lib/utils';
-import { YOUTUBE_URL } from '@/app/variables/constants';
-import { useDebounce } from '@/app/hooks/use-debounce';
-import { motion, useScroll } from 'motion/react';
-import { LOCALE_TYPE } from '@/app/variables/enums';
-import { Languages } from 'lucide-react';
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
 import { SermonCard } from '@/app/components/cards/SermonCard';
+
+import { cn } from '@/app/lib/utils';
+import { YOUTUBE_URL } from '@/app/variables/constants';
+import { useDebounce } from '@/app/hooks/use-debounce';
+import { LOCALE_TYPE } from '@/app/variables/enums';
 
 interface SearchResult {
   id: string;

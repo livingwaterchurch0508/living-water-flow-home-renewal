@@ -30,7 +30,7 @@ export async function getSermons({
 
     let whereClause: SQL = eq(sermons.type, type);
     if (search) {
-      whereClause = sql`${whereClause} AND (${ilike(sermons.name, `%${search}%`)} OR ${ilike(sermons.desc, `%${search}%`)})`;
+      whereClause = sql`${whereClause} AND (${ilike(sermons.name, `%${search}%`)} OR ${ilike(sermons.desc, `%${search}%`)} OR ${ilike(sermons.nameEn, `%${search}%`)} OR ${ilike(sermons.descEn, `%${search}%`)})`;
     }
 
     const items = await db

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Church, HomeIcon, Music, Newspaper, MapPin, BookOpen } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 import { Dock, DockIcon } from '@/app/components/magicui/dock';
 import { Separator } from '@/app/components/ui/separator';
@@ -16,6 +17,37 @@ import { MENU_TAB } from '@/app/variables/enums';
 
 export default function BottomDock() {
   const t = useTranslations('Menu');
+
+  const pathname = usePathname();
+
+  const isActive = (path: string) => {
+    const currentPath = pathname.split('/').slice(2).join('/');
+    const comparePath = path.startsWith('/') ? path.slice(1) : path;
+    
+    return currentPath === comparePath;
+  }
+
+   const getIconColor = (path: string) => {
+     if (!isActive(path)) return 'text-muted-foreground';
+
+     switch (path) {
+       case '/':
+         return 'text-blue-500';
+       case `/${ROUTER_PATHS[MENU_TAB.INTRODUCE]}`:
+         return 'text-indigo-500';
+       case `/${ROUTER_PATHS[MENU_TAB.SERMON]}`:
+         return 'text-blue-500';
+       case `/${ROUTER_PATHS[MENU_TAB.HYMN]}`:
+         return 'text-rose-500';
+       case `/${ROUTER_PATHS[MENU_TAB.NEWS]}`:
+         return 'text-emerald-500';
+       case `/${ROUTER_PATHS[MENU_TAB.INFO]}`:
+         return 'text-violet-500';
+       default:
+         return 'text-muted-foreground';
+     }
+   };
+
   return (
     <div className="fixed bottom-5 left-0 right-0 z-50 flex justify-center">
       <Dock className="bg-background/80 shadow-lg backdrop-blur-md">
@@ -32,7 +64,7 @@ export default function BottomDock() {
                   'size-12'
                 )}
               >
-                <HomeIcon className="size-4" />
+                <HomeIcon className={cn(getIconColor('/'), 'size-4')} />
               </Link>
             </TooltipTrigger>
             <TooltipContent>
@@ -54,7 +86,7 @@ export default function BottomDock() {
                   'size-12'
                 )}
               >
-                <Church className="size-4" />
+                <Church className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.INTRODUCE]}`), 'size-4')} />
               </Link>
             </TooltipTrigger>
             <TooltipContent>
@@ -75,7 +107,7 @@ export default function BottomDock() {
                   'size-12'
                 )}
               >
-                <BookOpen className="size-4" />
+                <BookOpen className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.SERMON]}`), 'size-4')} />
               </Link>
             </TooltipTrigger>
             <TooltipContent>
@@ -96,7 +128,7 @@ export default function BottomDock() {
                   'size-12'
                 )}
               >
-                <Music className="size-4" />
+                <Music className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.HYMN]}`), 'size-4')} />
               </Link>
             </TooltipTrigger>
             <TooltipContent>
@@ -117,7 +149,7 @@ export default function BottomDock() {
                   'size-12'
                 )}
               >
-                <Newspaper className="size-4" />
+                <Newspaper className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.NEWS]}`), 'size-4')} />
               </Link>
             </TooltipTrigger>
             <TooltipContent>
@@ -138,7 +170,7 @@ export default function BottomDock() {
                   'size-12'
                 )}
               >
-                <MapPin className="size-4" />
+                <MapPin className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.INFO]}`), 'size-4')} />
               </Link>
             </TooltipTrigger>
             <TooltipContent>

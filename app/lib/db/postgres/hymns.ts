@@ -1,5 +1,5 @@
 import { NeonHttpDatabase } from 'drizzle-orm/neon-http';
-import { desc, eq, ilike, or, sql } from 'drizzle-orm';
+import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 
 import { getDb } from './dbConnection';
@@ -18,46 +18,47 @@ interface GetHymnsParams extends Required<Pick<IPage, 'limit' | 'offset'>> {
   search?: string;
 }
 
+export type GetHymnsResult = IHymns | IError;
+
 export async function getHymns({
   limit,
   offset,
   type,
   search,
-}: GetHymnsParams): Promise<IHymns | IError> {
+}: GetHymnsParams): Promise<GetHymnsResult> {
   try {
     const db = (await getDb()) as NeonHttpDatabase;
     if (!db) throw new Error('Database connection failed');
 
-    const baseQuery = db
-      .select({
-        id: hymns.id,
-        name: hymns.name,
-        nameEn: hymns.nameEn,
-        desc: hymns.desc,
-        descEn: hymns.descEn,
-        url: hymns.url,
-        type: hymns.type,
-        viewCount: hymns.viewCount,
-        createdAt: hymns.createdAt,
-      })
-      .from(hymns)
-      .where(eq(hymns.type, type));
-
-    const query = search
-      ? baseQuery.where(
-          or(
-            ilike(hymns.name, `%${search}%`),
-            ilike(hymns.desc, `%${search}%`)
-          )
+    const whereCondition = search
+      ? and(
+          eq(hymns.type, type),
+          or(ilike(hymns.name, `%${search}%`), ilike(hymns.desc, `%${search}%`), ilike(hymns.nameEn, `%${search}%`), ilike(hymns.descEn, `%${search}%`))
         )
-      : baseQuery;
+      : eq(hymns.type, type);
 
     const [items, totalResult] = await Promise.all([
-      query.orderBy(desc(hymns.createdAt)).limit(limit).offset(offset),
+      db
+        .select({
+          id: hymns.id,
+          name: hymns.name,
+          nameEn: hymns.nameEn,
+          desc: hymns.desc,
+          descEn: hymns.descEn,
+          url: hymns.url,
+          type: hymns.type,
+          viewCount: hymns.viewCount,
+          createdAt: hymns.createdAt,
+        })
+        .from(hymns)
+        .where(whereCondition)
+        .orderBy(desc(hymns.createdAt))
+        .limit(limit)
+        .offset(offset),
       db
         .select({ count: sql<number>`count(*)` })
         .from(hymns)
-        .where(eq(hymns.type, type)),
+        .where(whereCondition),
     ]);
 
     const total = Number(totalResult[0].count);
@@ -84,9 +85,9 @@ export interface IHymnsById {
   hymns: IHymn[];
 }
 
-export type IHymnType = Awaited<IError> | Awaited<IHymnsById> | null;
+export type GetHymnsByIdResult = IHymnsById | IError;
 
-export async function getHymnsById(id: number, type: HYMN_TAB) {
+export async function getHymnsById(id: number, type: HYMN_TAB): Promise<GetHymnsByIdResult> {
   try {
     const db = (await getDb()) as NeonHttpDatabase;
     if (!db) throw new Error('Database connection failed');
@@ -114,9 +115,7 @@ export async function getHymnsById(id: number, type: HYMN_TAB) {
 
     const transformedHymns = hymnsData.map((hymn) => ({
       ...hymn,
-      createdAt: hymn.createdAt
-        ? DateTime.fromJSDate(new Date(hymn.createdAt)).setZone('Asia/Seoul').toISO()
-        : null,
+      createdAt: hymn.createdAt ? DateTime.fromJSDate(hymn.createdAt).toISO() : null,
     }));
 
     return {
@@ -124,7 +123,13 @@ export async function getHymnsById(id: number, type: HYMN_TAB) {
       hymns: transformedHymns,
     };
   } catch (error) {
-    console.error('[GET_HYMN_BY_ID_ERROR]', error);
-    return error as { message: string };
+    if (error instanceof Error) {
+      return {
+        message: error.message,
+      };
+    }
+    return {
+      message: 'An unknown error occurred',
+    };
   }
 }
