@@ -54,7 +54,7 @@ export const Menus = () => [
       {
         name: 'Introduce.introduce',
         menuTab: MENU_TAB.INTRODUCE,
-        detailTab: INTRODUCE_TAB.INTRODUCE,
+        detailTab: INTRODUCE_TAB.CHURCH,
       },
       {
         name: 'Introduce.worship',

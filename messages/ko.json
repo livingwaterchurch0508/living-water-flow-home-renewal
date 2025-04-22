@@ -32,7 +32,8 @@
       "name": "소개",
       "pastor": "담임 목사",
       "introduce": "교회 소개",
-      "worship" : "예배 안내"
+      "worship" : "예배 안내",
+      "content":"실제를 가르치며 실천적인 삶으로 인도하는 영적전쟁의 실천에서 지혜와 능력으로 승리하도록 인도합니다."
     },
     "Sermon": {
       "name": "설교",
@@ -64,14 +65,19 @@
   "Footer": {
     "sect": "대한예수장로회",
     "church": "생수가 흐르는 교회",
-    "address": "16006 경기 의왕시 성고개로 53, 에이스청계타워 218호",
+    "addressDesc": "16006 경기 의왕시 성고개로 53, 에이스청계타워 218호",
+    "address": "주소",
     "contact": "TEL. 0507-1355-5043\u00A0\u00A0\u00A0E-MAIL. hyeri25@kakao.com",
     "public": "대중교통 안내",
     "location": "4호선 인덕원역 하차 - 2번 출구에서 80번, 33번, 83번, 마을 12번, 마을 13번 승차 - [숲속마을 1단지] 정류장 하차- 목적지까지 도보 2분",
     "youtube": "Youtube",
     "detail": "자세히보기",
     "car": "자차 안내",
-    "carDesc": "자차 사용 시, 교회 건물 내 지하 주차장 이용가능"
+    "carDesc": "자차 사용 시, 교회 건물 내 지하 주차장 이용가능",
+    "phone":"전화번호",
+    "email":"이메일",
+    "phoneDesc":"TEL. 0507-1355-5043",
+    "emailDesc":"E-MAIL. hyeri25@kakao.com"
 
   },
   "Common": {

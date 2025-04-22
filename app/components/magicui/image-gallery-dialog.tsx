@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from 'framer-motion';
-import { ChevronLeft, ChevronRight, XIcon, ImageIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, XIcon, ImageIcon, Maximize2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { PhotoProvider, PhotoView } from 'react-photo-view';
+import 'react-photo-view/dist/react-photo-view.css';
 
 import { cn } from '@/app/lib/utils';
 import { createPortal } from 'react-dom';
@@ -76,6 +78,10 @@ export default function ImageGalleryDialog({
       setIsOpen(true);
     }
   }, [autoOpen]);
+
+  useEffect(() => {
+    setIsImageLoaded(false);
+  }, [currentIndex]);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -162,12 +168,31 @@ export default function ImageGalleryDialog({
                 transition={{ type: 'spring', damping: 30, stiffness: 300 }}
                 className="relative mx-4 w-full max-w-3xl md:mx-0"
               >
-                <motion.button
-                  onClick={handleClose}
-                  className="absolute -top-12 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
-                >
-                  <XIcon className="size-5" />
-                </motion.button>
+                <div className="absolute -top-12 right-0 flex items-center gap-2">
+                  <PhotoProvider
+                    loop
+                    speed={() => 300}
+                    easing={(type) => (type === 2 ? 'cubic-bezier(0.36, 0, 0.66, -0.56)' : 'cubic-bezier(0.34, 1.56, 0.64, 1)')}
+                  >
+                    {images.map((img, idx) => (
+                      <PhotoView key={idx} src={img.src}>
+                        <div style={{ display: idx === currentIndex ? 'block' : 'none' }}>
+                          <motion.button
+                            className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
+                          >
+                            <Maximize2 className="size-5" />
+                          </motion.button>
+                        </div>
+                      </PhotoView>
+                    ))}
+                  </PhotoProvider>
+                  <motion.button
+                    onClick={handleClose}
+                    className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
+                  >
+                    <XIcon className="size-5" />
+                  </motion.button>
+                </div>
 
                 <div className="relative isolate z-[1] overflow-hidden rounded-2xl border-2 border-white bg-black">
                   {title && (

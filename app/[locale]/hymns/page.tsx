@@ -55,7 +55,7 @@ export default function HymnsPage() {
       {/* 히어로 섹션 */}
       <section
         className={cn(
-          'relative h-[400px] transition-[width] duration-200 rounded-3xl overflow-hidden',
+          'relative h-[600px] transition-[width] duration-200 rounded-3xl overflow-hidden',
           state === 'expanded'
             ? 'w-full md:w-[calc(100vw-270px)]'
             : 'w-full md:w-[calc(100vw-62px)]'

@@ -32,7 +32,8 @@
       "name": "About",
       "pastor": "Lead Pastor",
       "introduce": "Church",
-      "worship" : "Service Times"
+      "worship" : "Service Times",
+      "content": "Teach reality and lead you to a practical life, leading you to victory with wisdom and ability in the practice of spiritual war."
     },
     "Sermon": {
       "name": "Sermons",
@@ -64,14 +65,19 @@
   "Footer": {
     "sect": "Korean Presbyterian Church",
     "church": "Living Flow Water Church",
-    "address": "16006 53, Seonggogae-ro, Uiwang-si, Gyeonggi-do, Republic of Korea",
+    "addressDesc": "16006 53, Seonggogae-ro, Uiwang-si, Gyeonggi-do, Republic of Korea",
+    "address": "Address",
     "contact": "TEL. 0507-1355-5043\u00A0\u00A0\u00A0E-MAIL. hyeri25@kakao.com",
     "public": "Transportation Guidance",
     "location": "Get off at Indeokwon Station on Line 4 - Exit 2 80, 33, 83, village 12, village 13 - Get off the bus stop [Forest Village Complex 1] - 2 minutes on foot to the destination",
     "youtube": "Youtube",
     "detail": "in detail",
     "car": "Guide",
-    "carDesc": "Underground parking lot available in church building when using one's own car"
+    "carDesc": "Underground parking lot available in church building when using one's own car",
+    "phone":"Phone",
+    "email":"E-MAIL",
+    "phoneDesc":"TEL. 0507-1355-5043",
+    "emailDesc":"E-MAIL. hyeri25@kakao.com"
   },
   "Common": {
     "list": "List",

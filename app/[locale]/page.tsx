@@ -15,7 +15,7 @@ import { useSidebar } from '@/app/components/ui/sidebar';
 import { cn } from '@/app/lib/utils';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import { YOUTUBE_URL, ROUTER_PATHS } from '@/app/variables/constants';
-import { MENU_TAB, SERMON_TAB, HYMN_TAB } from '@/app/variables/enums';
+import { MENU_TAB, SERMON_TAB, HYMN_TAB, INTRODUCE_TAB } from '@/app/variables/enums';
 import Youtube from '@/app/components/icon/Youtube';
 import { buttonVariants } from '@/app/components/ui/button';
 import { MasonryGrid, MasonryItem } from '@/app/components/masonry/masonry-grid';
@@ -124,7 +124,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/introduce/worship"
+              href={`/introduces?type=${INTRODUCE_TAB.WORSHIP}`}
               className={cn(
                 buttonVariants({ size: 'lg' }),
                 'min-w-[200px] bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white border-0'
