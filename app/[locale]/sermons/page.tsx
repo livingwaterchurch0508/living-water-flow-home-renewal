@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useInfiniteSermons } from '@/app/hooks/use-sermons';
 import { ContentCard } from '@/app/components/cards/ContentCard';
+import { SermonCard } from '@/app/components/cards/SermonCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import { cn } from '@/app/lib/utils';
 import { useSidebar } from '@/app/components/ui/sidebar';
@@ -11,7 +12,6 @@ import { SERMON_TAB } from '@/app/variables/enums';
 import { BookOpenIcon } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { MasonryGrid, MasonryItem } from '@/app/components/masonry/masonry-grid';
-import Link from 'next/link';
 
 export default function SermonsPage() {
   const t = useTranslations('Main');
@@ -23,6 +23,7 @@ export default function SermonsPage() {
   const searchParams = useSearchParams();
   const currentType = Number(searchParams.get('type')) || SERMON_TAB.RHEMA;
   const observerTarget = useRef<HTMLDivElement>(null);
+  const [selectedSermon, setSelectedSermon] = useState<{ name: string; desc: string } | null>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
     useInfiniteSermons({
@@ -110,9 +111,8 @@ export default function SermonsPage() {
           <MasonryGrid className="gap-2 sm:gap-3 md:gap-4">
             {sermons.map((sermon, index) => {
               const contentLength = (sermon.name?.length || 0) + (sermon.desc?.length || 0);
-              let span = 6; // 기본 크기
+              let span = 6;
 
-              // 화면 크기와 내용 길이에 따라 span 조정
               if (contentLength > 200) {
                 span = 12;
               } else if (contentLength > 100) {
@@ -129,29 +129,37 @@ export default function SermonsPage() {
               ];
               const gradientClass = gradients[index % gradients.length];
 
+              const name = locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '');
+              const desc = locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '');
+
               return (
                 <MasonryItem key={sermon.id} span={span}>
-                  <Link
-                    href={`/sermons/${sermon.id}?type=${SERMON_TAB.SOUL}`}
+                  <button
+                    onClick={() => setSelectedSermon({ name, desc })}
                     className={cn(
                       "group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300",
                       gradientClass,
                       "hover:shadow-md hover:-translate-y-0.5"
                     )}
                   >
-                    <div className="space-y-1 sm:space-y-2">
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">
-                        {locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '')}
-                      </h3>
-                      <p className="text-base sm:text-base text-muted-foreground">
-                        {locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '')}
-                      </p>
+                    <div className="space-y-1 sm:space-y-2 text-left">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">{name}</h3>
+                      <p className="text-base sm:text-base text-muted-foreground">{desc}</p>
                     </div>
-                  </Link>
+                  </button>
                 </MasonryItem>
               );
             })}
           </MasonryGrid>
+
+          {selectedSermon && (
+            <SermonCard
+              name={selectedSermon.name}
+              desc={selectedSermon.desc}
+              autoOpen={true}
+              onDialogClose={() => setSelectedSermon(null)}
+            />
+          )}
 
           {/* 무한 스크롤 로딩 인디케이터 */}
           <div ref={observerTarget} className="mt-8">

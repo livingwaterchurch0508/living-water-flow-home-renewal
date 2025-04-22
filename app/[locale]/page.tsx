@@ -1,11 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ArrowRightIcon } from '@radix-ui/react-icons';
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
+import { SermonCard } from '@/app/components/cards/SermonCard';
 import { useHymns } from '@/app/hooks/use-hymns';
 import { useSermons } from '@/app/hooks/use-sermons';
 import { useCommunities } from '@/app/hooks/use-communities';
@@ -27,6 +28,7 @@ export default function Home() {
   const { state } = useSidebar();
    const locale = useLocale();
 
+  const [selectedSermon, setSelectedSermon] = useState<{ name: string; desc: string } | null>(null);
 
   const {
     data: hymnsData,
@@ -355,26 +357,38 @@ export default function Home() {
                   'bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 dark:from-violet-500/20 dark:to-fuchsia-500/20',
                 ];
                 const gradientClass = gradients[index % gradients.length];
+
+                const name = locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '');
+                const desc = locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '');
                 
                 return (
                   <MasonryItem key={sermon.id} span={span}>
-                    <Link
-                      href={`/sermons/${sermon.id}?type=${SERMON_TAB.SOUL}`}
+                    <button
+                      onClick={() => setSelectedSermon({ name, desc })}
                       className={cn(
                         "group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300",
                         gradientClass,
                         "hover:shadow-md hover:-translate-y-0.5"
                       )}
                     >
-                      <div className="space-y-1 sm:space-y-2">
-                        <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">{locale === 'en' ? (sermon.nameEn || sermon.name || '') : (sermon.name || '')}</h3>
-                        <p className="text-base sm:text-base text-muted-foreground">{locale === 'en' ? (sermon.descEn || sermon.desc || '') : (sermon.desc || '')}</p>
+                      <div className="space-y-1 sm:space-y-2 text-left">
+                        <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">{name}</h3>
+                        <p className="text-base sm:text-base text-muted-foreground">{desc}</p>
                       </div>
-                    </Link>
+                    </button>
                   </MasonryItem>
                 );
               })}
             </MasonryGrid>
+
+            {selectedSermon && (
+              <SermonCard
+                name={selectedSermon.name}
+                desc={selectedSermon.desc}
+                autoOpen={true}
+                onDialogClose={() => setSelectedSermon(null)}
+              />
+            )}
           </div>
         )}
       </section>

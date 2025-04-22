@@ -7,7 +7,11 @@ import { communities, files } from './schema';
 import { NEWS_TAB, NEWS_TYPES } from '@/app/variables/enums';
 import { IError, IPage } from '@/app/variables/interfaces';
 
-type Community = typeof communities.$inferSelect;
+type Community = typeof communities.$inferSelect & {
+  nameEn: string | null;
+  descEn: string | null;
+  viewCount: number;
+};
 type File = typeof files.$inferSelect;
 
 export interface ICommunities {
@@ -18,7 +22,7 @@ export interface ICommunities {
 
 export type ICommunitiesType = Awaited<IError> | Awaited<ICommunities> | null;
 
-interface IGetCommunities extends IPage {
+interface IGetCommunities extends Required<Pick<IPage, 'limit' | 'offset'>> {
   type?: NEWS_TYPES;
 }
 
@@ -40,11 +44,10 @@ export async function getCommunities({
   offset = 0,
   limit = 10,
 }: IGetCommunities) {
-  const db: NeonHttpDatabase<Record<string, never>> | null = await getDb();
-
-  if (!db) return null;
-
   try {
+    const db = (await getDb()) as NeonHttpDatabase;
+    if (!db) throw new Error('Database connection failed');
+
     const totalQuery = db.select({ total: sql<number>`count(*) as total` }).from(communities);
 
     if (type !== NEWS_TYPES.ALL) {
@@ -55,8 +58,17 @@ export async function getCommunities({
     const total = Number(results.total) || 0;
 
     const query = db
-      .select()
+      .select({
+        community: {
+          ...communities,
+          nameEn: communities.nameEn,
+          descEn: communities.descEn,
+          viewCount: communities.viewCount,
+        },
+        file: files,
+      })
       .from(communities)
+      .leftJoin(files, eq(communities.id, files.communityId))
       .orderBy(desc(communities.createdAt))
       .limit(limit)
       .offset(offset);
@@ -65,25 +77,7 @@ export async function getCommunities({
       query.where(eq(communities.type, type));
     }
 
-    const communitiesRows = await query;
-    const communityIds = communitiesRows.map((community) => community.id);
-
-    let rows;
-    if (type === NEWS_TYPES.ALL) {
-      rows = await db
-        .select({ community: communities, file: files })
-        .from(communities)
-        .leftJoin(files, eq(communities.id, files.communityId))
-        .where(inArray(communities.id, communityIds))
-        .orderBy(desc(communities.createdAt));
-    } else {
-      rows = await db
-        .select({ community: communities, file: files })
-        .from(communities)
-        .leftJoin(files, eq(communities.id, files.communityId))
-        .where(and(inArray(communities.id, communityIds), eq(communities.type, type)))
-        .orderBy(desc(communities.createdAt));
-    }
+    const rows = await query;
 
     const result = rows.reduce<
       Record<
@@ -143,11 +137,10 @@ export interface ICommunitiesById {
 export type ICommunityType = Awaited<IError> | Awaited<ICommunitiesById> | null;
 
 export async function getCommunitiesById(id: number, type: NEWS_TAB) {
-  const db: NeonHttpDatabase<Record<string, never>> | null = await getDb();
-
-  if (!db) return null;
-
   try {
+    const db = (await getDb()) as NeonHttpDatabase;
+    if (!db) throw new Error('Database connection failed');
+
     const ids = await db
       .select({ id: communities.id })
       .from(communities)
@@ -155,7 +148,15 @@ export async function getCommunitiesById(id: number, type: NEWS_TAB) {
       .where(eq(communities.type, type));
 
     const rows = await db
-      .select({ community: communities, file: files })
+      .select({
+        community: {
+          ...communities,
+          nameEn: communities.nameEn,
+          descEn: communities.descEn,
+          viewCount: communities.viewCount,
+        },
+        file: files,
+      })
       .from(communities)
       .leftJoin(files, eq(communities.id, files.communityId))
       .where(and(inArray(communities.id, [id]), eq(communities.type, type)))

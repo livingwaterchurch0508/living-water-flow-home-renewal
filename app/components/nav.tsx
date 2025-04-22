@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
@@ -44,6 +44,8 @@ interface SearchResult {
   url?: string;
   type?: string;
   desc?: string;
+  nameEn?: string;
+  descEn?: string;
   createdAt?: string;
   thumbnailUrl?: string;
   files?: { url: string; caption: string }[];
@@ -85,6 +87,7 @@ export function Nav() {
   const tSearch = useTranslations('Search');
   const { scrollY, scrollYProgress } = useScroll();
   const [scrolled, setScrolled] = useState(false);
+  const locale = useLocale();
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -150,7 +153,9 @@ export function Nav() {
         initial={{ backdropFilter: 'blur(6px)' }}
         animate={{
           backdropFilter: scrolled ? 'blur(8px)' : 'blur(6px)',
-          backgroundColor: scrolled ? 'rgba(var(--background), 0.9)' : 'rgba(var(--background), 0.8)',
+          backgroundColor: scrolled
+            ? 'rgba(var(--background), 0.9)'
+            : 'rgba(var(--background), 0.8)',
         }}
         transition={{ duration: 0.2 }}
       >
@@ -285,7 +290,7 @@ export function Nav() {
                         >
                           <div className="flex items-center w-full gap-3">
                             <div className="flex-1">
-                              <div className="font-medium">{sermon.name}</div>
+                              <div className="font-medium">{locale === 'ko' ? sermon.name : sermon.nameEn}</div>
                               {sermon.createdAt && (
                                 <div className="text-xs text-muted-foreground">
                                   {getRelativeTime(sermon.createdAt)}
@@ -321,7 +326,7 @@ export function Nav() {
                         >
                           <div className="flex items-center w-full gap-3">
                             <div className="flex-1">
-                              <div className="font-medium">{hymn.name}</div>
+                              <div className="font-medium">{locale === 'ko' ? hymn.name : hymn.nameEn}</div>
                               {hymn.createdAt && (
                                 <div className="text-xs text-muted-foreground">
                                   {getRelativeTime(hymn.createdAt)}
@@ -356,7 +361,7 @@ export function Nav() {
                       >
                         <div className="flex items-center w-full gap-3">
                           <div className="flex-1">
-                            <div className="font-medium">{community.name}</div>
+                            <div className="font-medium">{locale === 'ko' ? community.name : community.nameEn}</div>
                             {community.createdAt && (
                               <div className="text-xs text-muted-foreground">
                                 {getRelativeTime(community.createdAt)}
@@ -384,11 +389,11 @@ export function Nav() {
         </Command>
       </CommandDialog>
 
-      {selectedContent && (
-        selectedContent.type === 'community' ? (
+      {selectedContent &&
+        (selectedContent.type === 'community' ? (
           <div className="hidden">
             <CommunityCard
-              name={selectedContent.item.name}
+              name={locale === 'ko' ? selectedContent.item.name : selectedContent.item.nameEn || ''}
               desc={selectedContent.item.fileCaption || ''}
               url={selectedContent.item.fileUrl || ''}
               createdAt={selectedContent.item.createdAt || ''}
@@ -401,8 +406,8 @@ export function Nav() {
         ) : selectedContent.type === 'sermon' && !selectedContent.item.url ? (
           <div className="hidden">
             <SermonCard
-              name={selectedContent.item.name}
-              desc={selectedContent.item.desc}
+              name={locale === 'ko' ? selectedContent.item.name : selectedContent.item.nameEn || ''}
+              desc={locale === 'ko' ? selectedContent.item.desc : selectedContent.item.descEn || ''}
               autoOpen
               onDialogClose={() => setSelectedContent(null)}
             />
@@ -411,8 +416,8 @@ export function Nav() {
           <div className="hidden">
             <ContentCard
               id={parseInt(selectedContent.item.id)}
-              name={selectedContent.item.name}
-              desc=""
+              name={locale === 'ko' ? selectedContent.item.name : selectedContent.item.nameEn || ''}
+              desc={locale === 'ko' ? selectedContent.item.desc || '' : selectedContent.item.descEn || ''}
               url={selectedContent.item.url || ''}
               createdAt={selectedContent.item.createdAt || ''}
               variant="page"
@@ -420,8 +425,7 @@ export function Nav() {
               onDialogClose={() => setSelectedContent(null)}
             />
           </div>
-        )
-      )}
+        ))}
     </>
   );
 }

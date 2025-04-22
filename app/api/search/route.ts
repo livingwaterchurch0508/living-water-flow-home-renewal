@@ -24,13 +24,15 @@ export async function GET(request: Request) {
         .select({
           id: sermons.id,
           name: sermons.name,
+          nameEn: sermons.nameEn,
           desc: sermons.desc,
+          descEn: sermons.descEn,
           type: sermons.type,
           url: sermons.url,
           createdAt: sermons.createdAt,
         })
         .from(sermons)
-        .where(or(ilike(sermons.name, `%${query}%`), ilike(sermons.desc, `%${query}%`)))
+        .where(or(ilike(sermons.name, `%${query}%`), ilike(sermons.desc, `%${query}%`), ilike(sermons.nameEn, `%${query}%`), ilike(sermons.descEn, `%${query}%`)))
         .orderBy(desc(sermons.createdAt))
         .limit(5),
 
@@ -39,11 +41,15 @@ export async function GET(request: Request) {
         .select({
           id: hymns.id,
           name: hymns.name,
+          nameEn: hymns.nameEn,
+          desc: hymns.desc,
+          descEn: hymns.descEn,
           url: hymns.url,
+          type: hymns.type,
           createdAt: hymns.createdAt,
         })
         .from(hymns)
-        .where(or(ilike(hymns.name, `%${query}%`), ilike(hymns.desc, `%${query}%`)))
+        .where(or(ilike(hymns.name, `%${query}%`), ilike(hymns.desc, `%${query}%`), ilike(hymns.nameEn, `%${query}%`), ilike(hymns.descEn, `%${query}%`)))
         .orderBy(desc(hymns.createdAt))
         .limit(5),
 
@@ -52,13 +58,17 @@ export async function GET(request: Request) {
         .select({
           id: communities.id,
           name: communities.name,
+          nameEn: communities.nameEn,
+          desc: communities.desc,
+          descEn: communities.descEn,
           createdAt: communities.createdAt,
           fileUrl: files.url,
           fileCaption: files.caption,
         })
         .from(communities)
         .leftJoin(files, eq(communities.id, files.communityId))
-        .where(or(ilike(communities.name, `%${query}%`), ilike(communities.desc, `%${query}%`)))
+        .where(or(ilike(communities.name, `%${query}%`), ilike(communities.desc, `%${query}%`)
+      , ilike(communities.nameEn, `%${query}%`), ilike(communities.descEn, `%${query}%`)))
         .orderBy(desc(communities.createdAt))
         .limit(5),
     ]);
