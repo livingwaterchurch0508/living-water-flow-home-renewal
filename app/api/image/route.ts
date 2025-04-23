@@ -4,6 +4,10 @@ import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs';
 import { bucket } from '@/app/lib/fetch/storage';
+import { Bucket } from '@google-cloud/storage';
+
+// Bucket이 null이 아님을 보장 (storage.ts에서 null일 경우 에러를 던지므로)
+const storageBucket = bucket as Bucket;
 
 // Create a new cache instance (TTL: 3600 seconds, 1 hour)
 const cache = new NodeCache({ stdTTL: 3600 });
@@ -65,7 +69,7 @@ export async function GET(req: NextRequest) {
 
     // Get the file from Google Cloud Storage
     console.log('[GET_IMAGE] Fetching from storage:', imageName);
-    const file = bucket.file(imageName);
+    const file = storageBucket.file(imageName);
 
     const [exists] = await file.exists();
     if (!exists) {
