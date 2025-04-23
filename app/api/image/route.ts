@@ -1,21 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import NodeCache from 'node-cache';
+// import NodeCache from 'node-cache';
 import sharp from 'sharp';
 import { storageClient } from '@/app/lib/fetch/storage';
-import path from 'path';
-import fs from 'fs';
+// import path from 'path';
+// import fs from 'fs';
 
 // Edge Cache 비활성화
 export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 
 // 캐시 설정 수정
-const cache = new NodeCache({ 
-  stdTTL: 3600,
-  checkperiod: 120,
-  useClones: false,
-  maxKeys: 100
-});
+// const cache = new NodeCache({
+//   stdTTL: 3600,
+//   checkperiod: 120,
+//   useClones: false,
+//   maxKeys: 100
+// });
 
 async function compressImage(buffer: Buffer): Promise<Buffer> {
   try {
@@ -40,15 +40,15 @@ async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
 }
 
 // Helper function to get local fallback image
-async function getLocalFallbackImage(): Promise<Buffer> {
-  try {
-    const fallbackPath = path.join(process.cwd(), 'public', 'images', 'fallback.jpg');
-    return await fs.promises.readFile(fallbackPath);
-  } catch (error) {
-    console.error('[FALLBACK_IMAGE_ERROR]', error);
-    throw new Error('Fallback image not found');
-  }
-}
+// async function getLocalFallbackImage(): Promise<Buffer> {
+//   try {
+//     const fallbackPath = path.join(process.cwd(), 'public', 'images', 'fallback.jpg');
+//     return await fs.promises.readFile(fallbackPath);
+//   } catch (error) {
+//     console.error('[FALLBACK_IMAGE_ERROR]', error);
+//     throw new Error('Fallback image not found');
+//   }
+// }
 
 export async function GET(req: NextRequest) {
   try {
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     console.log('[ENV_CHECK]', {
       hasProject: !!process.env.GOOGLE_CLOUD_PROJECT,
       hasCredentials: !!process.env.GOOGLE_CLOUD_CREDENTIALS,
-      hasBucket: !!process.env.STORAGE_BUCKET_NAME
+      hasBucket: !!process.env.STORAGE_BUCKET_NAME,
     });
 
     if (!imageName) {
@@ -84,12 +84,9 @@ export async function GET(req: NextRequest) {
       console.error('[STORAGE_ERROR] Storage client not initialized:', {
         hasProject: !!process.env.GOOGLE_CLOUD_PROJECT,
         hasBucket: !!process.env.STORAGE_BUCKET_NAME,
-        hasCredentials: !!process.env.GOOGLE_CLOUD_CREDENTIALS
+        hasCredentials: !!process.env.GOOGLE_CLOUD_CREDENTIALS,
       });
-      return NextResponse.json(
-        { error: 'Storage client not initialized' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Storage client not initialized' }, { status: 500 });
     }
 
     console.log('[GET_IMAGE] Fetching from storage:', imageName);
@@ -98,13 +95,10 @@ export async function GET(req: NextRequest) {
 
     const [exists] = await file.exists();
     console.log('[GET_IMAGE] File exists:', exists);
-    
+
     if (!exists) {
       console.warn('[GET_IMAGE] Image not found:', imageName);
-      return NextResponse.json(
-        { error: 'Image not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Image not found' }, { status: 404 });
     }
 
     console.log('[GET_IMAGE] Processing image:', imageName);
@@ -129,22 +123,22 @@ export async function GET(req: NextRequest) {
       headers: {
         'Content-Type': contentType.startsWith('image/') ? 'image/webp' : contentType,
         'Cache-Control': 'no-cache',
-        'ETag': `"${imageName}"`,
+        ETag: `"${imageName}"`,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('[GET_IMAGE_ERROR] Full error:', {
-      message: error?.message || 'Unknown error',
-      stack: error?.stack,
-      name: error?.name,
-      code: error?.code,
-      storageInitialized: storageClient.isInitialized()
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : 'UnknownError',
+      code: error instanceof Error ? error.cause : undefined,
+      storageInitialized: storageClient.isInitialized(),
     });
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to process image',
-        details: error?.message || 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
