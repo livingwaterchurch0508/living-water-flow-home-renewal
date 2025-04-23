@@ -18,12 +18,28 @@ async function generateCredentials() {
 
   try {
     const jsonString = Buffer.from(base64, "base64").toString("utf-8");
-    const filePath = join(__dirname, "livingwater.json");
+    
+    // Determine the correct file path based on the environment
+    const filePath = process.env.VERCEL
+      ? '/var/task/livingwater.json'  // Vercel runtime path
+      : join(__dirname, "livingwater.json"); // Local development path
     
     await writeFile(filePath, jsonString);
     console.log(`Google credentials written to ${filePath}`);
+    
+    // If in Vercel environment, also write to /vercel/path0/
+    if (process.env.VERCEL) {
+      const vercelPath = '/vercel/path0/livingwater.json';
+      await writeFile(vercelPath, jsonString);
+      console.log(`Google credentials also written to ${vercelPath}`);
+    }
   } catch (error) {
     console.error("Failed to write credentials:", error);
+    console.error("Current environment:", {
+      isVercel: !!process.env.VERCEL,
+      cwd: process.cwd(),
+      dirname: __dirname
+    });
     process.exit(1);
   }
 }
