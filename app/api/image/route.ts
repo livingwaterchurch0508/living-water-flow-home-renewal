@@ -52,18 +52,23 @@ async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
 
 export async function GET(req: NextRequest) {
   try {
-    const imageName = req.nextUrl.searchParams.get('imageName');
+    // Log full URL and all parameters
+    console.log('[GET_IMAGE] Full URL:', req.nextUrl.toString());
+    console.log('[GET_IMAGE] Search params:', Object.fromEntries(req.nextUrl.searchParams));
     console.log('[GET_IMAGE] Request headers:', Object.fromEntries(req.headers));
-    console.log('[GET_IMAGE] Requested image:', imageName);
-    console.log('[ENV_CHECK]', {
-      hasProject: !!process.env.GOOGLE_CLOUD_PROJECT,
-      hasCredentials: !!process.env.GOOGLE_CLOUD_CREDENTIALS,
-      hasBucket: !!process.env.STORAGE_BUCKET_NAME,
-    });
 
+    const imageName = req.nextUrl.searchParams.get('imageName');
+    
     if (!imageName) {
-      console.warn('[GET_IMAGE] No image name provided');
-      return NextResponse.json({ error: 'Image name not provided' }, { status: 400 });
+      console.warn('[GET_IMAGE] Missing image name in URL:', req.nextUrl.toString());
+      return NextResponse.json(
+        { 
+          error: 'Image name not provided',
+          url: req.nextUrl.toString(),
+          params: Object.fromEntries(req.nextUrl.searchParams)
+        }, 
+        { status: 400 }
+      );
     }
 
     // 캐시 체크 비활성화 (테스트용)
@@ -81,12 +86,19 @@ export async function GET(req: NextRequest) {
     */
 
     if (!storageClient.isInitialized()) {
-      console.error('[STORAGE_ERROR] Storage client not initialized:', {
+      const envStatus = {
         hasProject: !!process.env.GOOGLE_CLOUD_PROJECT,
         hasBucket: !!process.env.STORAGE_BUCKET_NAME,
         hasCredentials: !!process.env.GOOGLE_CLOUD_CREDENTIALS,
-      });
-      return NextResponse.json({ error: 'Storage client not initialized' }, { status: 500 });
+        projectId: process.env.GOOGLE_CLOUD_PROJECT || 'not-set',
+        bucketName: process.env.STORAGE_BUCKET_NAME || 'not-set'
+      };
+      
+      console.error('[STORAGE_ERROR] Storage client not initialized:', envStatus);
+      return NextResponse.json({ 
+        error: 'Storage client not initialized',
+        envStatus
+      }, { status: 500 });
     }
 
     console.log('[GET_IMAGE] Fetching from storage:', imageName);
