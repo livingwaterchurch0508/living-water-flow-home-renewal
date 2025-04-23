@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     TZ: "Asia/Seoul",
   },
   images: {
+    unoptimized: true, 
     domains: ['storage.googleapis.com'],
     remotePatterns: [
       {
