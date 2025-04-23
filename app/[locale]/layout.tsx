@@ -1,21 +1,23 @@
 import './globals.css';
 import { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
+import { Analytics } from '@vercel/analytics/react';
+import { Geist, Geist_Mono } from 'next/font/google';
 
 import { AppSidebar } from '@/app/components/app-sidebar';
 import { Nav } from '@/app/components/nav';
 import BottomDock from '@/app/components/bottom-dock';
 import { ClientProviders } from '@/app/components/providers/client-providers';
 
-import { cn } from '@/app/lib/utils';
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
 
-// S-CoreDream 폰트 스타일 정의
-const sCoreDreamFont = {
-  variable: '--font-score',
-  style: {
-    fontFamily: 'S-CoreDream-4Regular',
-  },
-};
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
 
 export const metadata: Metadata = {
   title: '생수가 흐르는 교회',
@@ -35,28 +37,8 @@ export default async function RootLayout({
     <html
       lang={locale}
       suppressHydrationWarning
-      className={cn(
-        'light',
-        sCoreDreamFont.variable
-      )}
     >
-      <head>
-        <style>
-          {`
-            @font-face {
-              font-family: 'S-CoreDream-4Regular';
-              src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-4Regular.woff') format('woff');
-              font-weight: normal;
-              font-style: normal;
-            }
-
-            body {
-              font-family: 'S-CoreDream-4Regular', sans-serif;
-            }
-          `}
-        </style>
-      </head>
-      <body>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextIntlClientProvider locale={locale}>
           <ClientProviders>
             <div className="relative flex min-h-screen w-full">
@@ -67,6 +49,7 @@ export default async function RootLayout({
                 <BottomDock />
               </div>
             </div>
+            <Analytics />
           </ClientProviders>
         </NextIntlClientProvider>
       </body>

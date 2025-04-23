@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     TZ: "Asia/Seoul",
   },
   images: {
+    domains: ['storage.googleapis.com'],
     remotePatterns: [
       {
         protocol: "https",
@@ -13,6 +14,11 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "/vi/**",
         search: "",
+      },
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        pathname: '/livingwater-424005.appspot.com/**',
       },
     ],
   },
