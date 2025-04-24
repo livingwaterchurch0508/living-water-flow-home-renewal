@@ -21,7 +21,7 @@ import { useSermons } from '@/app/hooks/use-sermons';
 import { useCommunities } from '@/app/hooks/use-communities';
 import { cn } from '@/app/lib/utils';
 
-import { YOUTUBE_URL, ROUTER_PATHS } from '@/app/variables/constants';
+import { YOUTUBE_URL, ROUTER_PATHS, SECTION_WIDTH  } from '@/app/variables/constants';
 import { MENU_TAB, SERMON_TAB, HYMN_TAB, INTRODUCE_TAB } from '@/app/variables/enums';
 import type { IHymn, ISermon, ICommunity } from '@/app/variables/interfaces';
 
@@ -149,8 +149,8 @@ export default function Home() {
         className={cn(
           'space-y-8 transition-[width] duration-200',
           state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
+            ? SECTION_WIDTH.EXPANDED
+            : SECTION_WIDTH.COLLAPSED
         )}
       >
         <div className="flex items-center justify-between">
@@ -201,8 +201,8 @@ export default function Home() {
         className={cn(
           'space-y-8 transition-[width] duration-200',
           state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
+            ? SECTION_WIDTH.EXPANDED
+            : SECTION_WIDTH.COLLAPSED
         )}
       >
         <div className="flex items-center justify-between">
@@ -257,8 +257,8 @@ export default function Home() {
         className={cn(
           'space-y-8 transition-[width] duration-200',
           state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
+            ? SECTION_WIDTH.EXPANDED
+            : SECTION_WIDTH.COLLAPSED
         )}
       >
         <div className="flex items-center justify-between">
@@ -317,8 +317,8 @@ export default function Home() {
         className={cn(
           'space-y-8 transition-[width] duration-200',
           state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
+            ? SECTION_WIDTH.EXPANDED
+            : SECTION_WIDTH.COLLAPSED
         )}
       >
         <div className="flex items-center justify-between">

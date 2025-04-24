@@ -4,6 +4,7 @@ import { TextReveal } from '@/app/components/magicui/text-reveal';
 import { useSidebar } from '@/app/components/ui/sidebar';
 
 import { cn } from '@/app/lib/utils';
+import { SECTION_WIDTH } from '@/app/variables/constants';
 
 interface IHeroSection {
   title: string;
@@ -40,7 +41,7 @@ export function HeroSection({
     <section
       className={cn(
         'relative h-[600px] transition-[width] duration-200 rounded-3xl overflow-hidden',
-        state === 'expanded' ? 'w-full md:w-[calc(100vw-270px)]' : 'w-full md:w-[calc(100vw-62px)]'
+        state === 'expanded' ? SECTION_WIDTH.EXPANDED : SECTION_WIDTH.COLLAPSED
       )}
     >
       {/* 배경 그라데이션 */}

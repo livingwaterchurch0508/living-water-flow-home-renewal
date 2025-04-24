@@ -33,7 +33,12 @@ export async function getHymns({
     const whereCondition = search
       ? and(
           eq(hymns.type, type),
-          or(ilike(hymns.name, `%${search}%`), ilike(hymns.desc, `%${search}%`), ilike(hymns.nameEn, `%${search}%`), ilike(hymns.descEn, `%${search}%`))
+          or(
+            ilike(hymns.name, `%${search}%`),
+            ilike(hymns.desc, `%${search}%`),
+            ilike(hymns.nameEn, `%${search}%`),
+            ilike(hymns.descEn, `%${search}%`)
+          )
         )
       : eq(hymns.type, type);
 
@@ -131,5 +136,41 @@ export async function getHymnsById(id: number, type: HYMN_TAB): Promise<GetHymns
     return {
       message: 'An unknown error occurred',
     };
+  }
+}
+
+export async function getHymnById(id: string): Promise<IHymn | null> {
+  try {
+    const db = (await getDb()) as NeonHttpDatabase;
+    if (!db) throw new Error('Database connection failed');
+
+    const result = await db
+      .select({
+        id: hymns.id,
+        name: hymns.name,
+        nameEn: hymns.nameEn,
+        desc: hymns.desc,
+        descEn: hymns.descEn,
+        url: hymns.url,
+        type: hymns.type,
+        viewCount: hymns.viewCount,
+        createdAt: hymns.createdAt,
+      })
+      .from(hymns)
+      .where(eq(hymns.id, parseInt(id)))
+      .limit(1);
+
+    if (!result.length) {
+      return null;
+    }
+
+    const hymn = result[0];
+    return {
+      ...hymn,
+      createdAt: hymn.createdAt ? DateTime.fromJSDate(hymn.createdAt).toISO() : null,
+    };
+  } catch (error) {
+    console.error('Error in getHymnById:', error);
+    return null;
   }
 }

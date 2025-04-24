@@ -146,7 +146,6 @@ export function AppSidebar() {
                                 <SidebarMenuSubButton asChild>
                                   <Link
                                     href={`/${ROUTER_PATHS[item.menuTab]}?type=${item.detailTab}`}
-                                    prefetch={false}
                                   >
                                     {t(item.name)}
                                   </Link>

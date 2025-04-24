@@ -15,6 +15,7 @@ import { TabSection } from '@/app/components/ui/tab-section';
 
 import { cn } from '@/app/lib/utils';
 import { INTRODUCE_TAB } from '@/app/variables/enums';
+import { SECTION_WIDTH } from '@/app/variables/constants';
 
 const CONTENT_ANIMATION = {
   initial: { opacity: 0, y: 20 },
@@ -54,7 +55,7 @@ export default function IntroducesPage() {
 
   const sectionClassName = cn(
     'transition-[width] duration-200',
-    state === 'expanded' ? 'w-full md:w-[calc(100vw-270px)]' : 'w-full md:w-[calc(100vw-62px)]'
+    state === 'expanded' ? SECTION_WIDTH.EXPANDED : SECTION_WIDTH.COLLAPSED
   );
 
   const renderContent = () => {
@@ -71,7 +72,7 @@ export default function IntroducesPage() {
   };
 
   return (
-    <div className="min-h-screen py-10 px-2 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-2  space-y-16">
       <HeroSection
         title={menuT('Introduce.name')}
         content={menuT('Introduce.content')}

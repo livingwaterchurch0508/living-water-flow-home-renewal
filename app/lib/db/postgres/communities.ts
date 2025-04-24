@@ -203,3 +203,56 @@ export async function getCommunitiesById(id: number, type: NEWS_TAB) {
     return error as { message: string };
   }
 }
+
+export async function getCommunityById(id: number) {
+  try {
+    const db = (await getDb()) as NeonHttpDatabase;
+    if (!db) throw new Error('Database connection failed');
+
+    const rows = await db
+      .select({
+        community: {
+          ...communities,
+          nameEn: communities.nameEn,
+          descEn: communities.descEn,
+          viewCount: communities.viewCount,
+        },
+        file: files,
+      })
+      .from(communities)
+      .leftJoin(files, eq(communities.id, files.communityId))
+      .where(eq(communities.id, id));
+
+    if (rows.length === 0) return null;
+
+    // 결과를 커뮤니티와 파일 목록으로 구조화
+    const result = rows.reduce<{
+      community: typeof rows[0]['community'];
+      files: (Omit<typeof files.$inferSelect, 'createdAt'> & { createdAt: string | null })[];
+    }>(
+      (acc, row) => {
+        if (!acc.community) {
+          acc.community = row.community;
+        }
+        if (row.file) {
+          const { createdAt, ...fileWithoutCreatedAt } = row.file;
+          acc.files.push({
+            ...fileWithoutCreatedAt,
+            createdAt: formatDate(createdAt),
+          });
+        }
+        return acc;
+      },
+      { community: rows[0].community, files: [] }
+    );
+
+    return {
+      ...result.community,
+      createdAt: formatDate(result.community.createdAt),
+      files: result.files,
+    };
+  } catch (error) {
+    console.error('Error fetching community by ID:', error);
+    throw error;
+  }
+}

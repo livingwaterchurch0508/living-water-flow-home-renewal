@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { MusicIcon } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
@@ -14,6 +15,7 @@ import { TabSection } from '@/app/components/ui/tab-section';
 import { useInfiniteHymns } from '@/app/hooks/use-hymns';
 import { cn } from '@/app/lib/utils';
 import { HYMN_TAB } from '@/app/variables/enums';
+import { SECTION_WIDTH } from '@/app/variables/constants';
 
 export default function HymnsPage() {
   const menuT = useTranslations('Menu');
@@ -24,7 +26,41 @@ export default function HymnsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentType = Number(searchParams.get('type')) || HYMN_TAB.HYMN;
+  const selectedId = searchParams.get('id');
   const observerTarget = useRef<HTMLDivElement>(null);
+
+  // 선택된 찬양 데이터를 가져오는 쿼리
+  const { data: selectedHymnData, isLoading: isLoadingHymn } = useQuery({
+    queryKey: ['hymn', selectedId],
+    queryFn: async () => {
+      if (!selectedId) return null;
+      const response = await fetch(`/api/hymns/${selectedId}`);
+      if (!response.ok) {
+        // 에러 발생 시 URL 파라미터에서 id 제거
+        const params = new URLSearchParams(searchParams);
+        params.delete('id');
+        router.push(`/hymns?${params.toString()}`);
+        return null;
+      }
+      const data = await response.json();
+      if (data.status === 'error' || !data.payload) {
+        // 데이터가 없을 때도 URL 파라미터에서 id 제거
+        const params = new URLSearchParams(searchParams);
+        params.delete('id');
+        router.push(`/hymns?${params.toString()}`);
+        return null;
+      }
+      return data.payload;
+    },
+    enabled: !!selectedId,
+  });
+
+  // Dialog 닫을 때 id 파라미터 제거
+  const handleCloseDialog = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('id');
+    router.push(`/hymns?${params.toString()}`);
+  };
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
     useInfiniteHymns({
@@ -52,11 +88,13 @@ export default function HymnsPage() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const handleTabChange = (value: string) => {
-    router.push(`/hymns?type=${value}`);
+    const params = new URLSearchParams(searchParams);
+    params.set('type', value);
+    router.push(`/hymns?${params.toString()}`);
   };
 
   return (
-    <div className="min-h-screen py-10 px-2 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-2 space-y-16">
       <HeroSection
         title={menuT('Hymn.name')}
         content={menuT('Hymn.content')}
@@ -74,7 +112,7 @@ export default function HymnsPage() {
       <TabSection
         tabs={[
           { id: HYMN_TAB.HYMN, label: menuT('Hymn.hymn') },
-          { id: HYMN_TAB.SONG, label: menuT('Hymn.song') }
+          { id: HYMN_TAB.SONG, label: menuT('Hymn.song') },
         ]}
         activeTab={currentType}
         onTabChange={(tabId) => handleTabChange(tabId.toString())}
@@ -85,9 +123,7 @@ export default function HymnsPage() {
       <section
         className={cn(
           'transition-[width] duration-200 px-4 sm:px-6',
-          state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
+          state === 'expanded' ? SECTION_WIDTH.EXPANDED : SECTION_WIDTH.COLLAPSED
         )}
       >
         {isError ? (
@@ -146,6 +182,39 @@ export default function HymnsPage() {
           </>
         )}
       </section>
+
+      {/* 선택된 찬양 Dialog */}
+      {selectedId && selectedHymnData && (
+        <>
+          {isLoadingHymn ? (
+            <div className="w-full aspect-video bg-card rounded-xl p-8">
+              <div className="h-full flex flex-col gap-4">
+                <Skeleton className="h-8 w-3/4" />
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="flex-1 w-full" />
+              </div>
+            </div>
+          ) : (
+            <ContentCard
+              id={selectedHymnData.id}
+              name={
+                locale === 'en'
+                  ? selectedHymnData.nameEn || selectedHymnData.name
+                  : selectedHymnData.name
+              }
+              desc={
+                locale === 'en'
+                  ? selectedHymnData.descEn || selectedHymnData.desc
+                  : selectedHymnData.desc
+              }
+              url={selectedHymnData.url}
+              createdAt={selectedHymnData.createdAt}
+              autoOpen={true}
+              onDialogClose={handleCloseDialog}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

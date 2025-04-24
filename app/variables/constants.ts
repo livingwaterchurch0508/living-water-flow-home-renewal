@@ -136,3 +136,8 @@ export const Menus = () => [
     ],
   },
 ];
+
+export const SECTION_WIDTH = {
+  EXPANDED: 'w-full md:w-[calc(100vw-291px)]',
+  COLLAPSED: 'w-full md:w-[calc(100vw-83px)]',
+} as const;

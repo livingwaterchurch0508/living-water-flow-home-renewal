@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BookOpenIcon } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { SermonCard } from '@/app/components/cards/SermonCard';
@@ -16,6 +17,7 @@ import { TabSection } from '@/app/components/ui/tab-section';
 import { useInfiniteSermons } from '@/app/hooks/use-sermons';
 import { cn } from '@/app/lib/utils';
 import { SERMON_TAB } from '@/app/variables/enums';
+import { SECTION_WIDTH } from '@/app/variables/constants';
 
 export default function SermonsPage() {
   const t = useTranslations('Main');
@@ -26,8 +28,42 @@ export default function SermonsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentType = Number(searchParams.get('type')) || SERMON_TAB.RHEMA;
+  const selectedId = searchParams.get('id');
   const observerTarget = useRef<HTMLDivElement>(null);
   const [selectedSermon, setSelectedSermon] = useState<{ name: string; desc: string } | null>(null);
+
+  // 선택된 설교 데이터를 가져오는 쿼리
+  const { data: selectedSermonData, isLoading: isLoadingSermon } = useQuery({
+    queryKey: ['sermon', selectedId],
+    queryFn: async () => {
+      if (!selectedId) return null;
+      const response = await fetch(`/api/sermons/${selectedId}`);
+      if (!response.ok) {
+        // 에러 발생 시 URL 파라미터에서 id 제거
+        const params = new URLSearchParams(searchParams);
+        params.delete('id');
+        router.push(`/sermons?${params.toString()}`);
+        return null;
+      }
+      const data = await response.json();
+      if (data.status === 'error' || !data.payload) {
+        // 데이터가 없을 때도 URL 파라미터에서 id 제거
+        const params = new URLSearchParams(searchParams);
+        params.delete('id');
+        router.push(`/sermons?${params.toString()}`);
+        return null;
+      }
+      return data.payload;
+    },
+    enabled: !!selectedId,
+  });
+
+  // Dialog 닫을 때 id 파라미터 제거
+  const handleCloseDialog = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete('id');
+    router.push(`/sermons?${params.toString()}`);
+  };
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
     useInfiniteSermons({
@@ -225,13 +261,13 @@ export default function SermonsPage() {
   };
 
   return (
-    <div className="min-h-screen py-10 px-2 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-2 space-y-16">
       <HeroSection
         title={menuT('Sermon.name')}
         content={menuT('Sermon.content')}
         bg1="from-blue-500/20"
         bg2="to-violet-500/20"
-        bgDark1="dark:from-blue-500/10" 
+        bgDark1="dark:from-blue-500/10"
         bgDark2="dark:to-violet-500/10"
         color1="from-blue-600"
         color2="to-violet-600"
@@ -243,10 +279,14 @@ export default function SermonsPage() {
       <TabSection
         tabs={[
           { id: SERMON_TAB.RHEMA, label: menuT('Sermon.sermon') },
-          { id: SERMON_TAB.SOUL, label: menuT('Sermon.soul') }
+          { id: SERMON_TAB.SOUL, label: menuT('Sermon.soul') },
         ]}
         activeTab={currentType}
-        onTabChange={(tabId) => router.push(`/sermons?type=${tabId.toString()}`)}
+        onTabChange={(tabId) => {
+          const params = new URLSearchParams(searchParams);
+          params.set('type', tabId.toString());
+          router.push(`/sermons?${params.toString()}`);
+        }}
         accentColor="bg-blue-500"
       />
 
@@ -254,13 +294,59 @@ export default function SermonsPage() {
       <section
         className={cn(
           'transition-[width] duration-200 px-4 sm:px-6',
-          state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
+          state === 'expanded' ? SECTION_WIDTH.EXPANDED : SECTION_WIDTH.COLLAPSED
         )}
       >
         {renderContent()}
       </section>
+
+      {/* 선택된 설교 Dialog */}
+      {selectedId && selectedSermonData && (
+        <>
+          {isLoadingSermon ? (
+            <div className="w-full aspect-video bg-card rounded-xl p-8">
+              <div className="h-full flex flex-col gap-4">
+                <Skeleton className="h-8 w-3/4" />
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="flex-1 w-full" />
+              </div>
+            </div>
+          ) : currentType === SERMON_TAB.SOUL ? (
+            <SermonCard
+              name={
+                locale === 'en'
+                  ? selectedSermonData.nameEn || selectedSermonData.name
+                  : selectedSermonData.name
+              }
+              desc={
+                locale === 'en'
+                  ? selectedSermonData.descEn || selectedSermonData.desc
+                  : selectedSermonData.desc
+              }
+              autoOpen={true}
+              onDialogClose={handleCloseDialog}
+            />
+          ) : (
+            <ContentCard
+              id={selectedSermonData.id}
+              name={
+                locale === 'en'
+                  ? selectedSermonData.nameEn || selectedSermonData.name
+                  : selectedSermonData.name
+              }
+              desc={
+                locale === 'en'
+                  ? selectedSermonData.descEn || selectedSermonData.desc
+                  : selectedSermonData.desc
+              }
+              url={selectedSermonData.url}
+              createdAt={selectedSermonData.createdAt}
+              autoOpen={true}
+              onDialogClose={handleCloseDialog}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

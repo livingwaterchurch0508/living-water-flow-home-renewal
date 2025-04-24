@@ -11,6 +11,7 @@ import Location from '@/app/components/cards/Location';
 import { HeroSection } from '@/app/components/hero-section';
 
 import { cn } from '@/app/lib/utils';
+import { SECTION_WIDTH } from '@/app/variables/constants';
 
 export default function InfosPage() {
   const t = useTranslations('Main');
@@ -18,7 +19,7 @@ export default function InfosPage() {
   const { state } = useSidebar();
 
   return (
-    <div className="min-h-screen py-10 px-2 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-2 space-y-16">
       <HeroSection
         title={t('Info.title')}
         content={t('Info.description')}
@@ -37,9 +38,7 @@ export default function InfosPage() {
       <section
         className={cn(
           'transition-[width] duration-200',
-          state === 'expanded'
-            ? 'w-full md:w-[calc(100vw-270px)]'
-            : 'w-full md:w-[calc(100vw-62px)]'
+          state === 'expanded' ? SECTION_WIDTH.EXPANDED : SECTION_WIDTH.COLLAPSED
         )}
       >
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-neutral-50 to-neutral-100">

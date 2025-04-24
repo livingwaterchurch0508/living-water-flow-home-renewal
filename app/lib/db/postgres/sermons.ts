@@ -124,3 +124,41 @@ export async function getSermonsById(id: number, type: number) {
     return error as { message: string };
   }
 }
+
+export async function getSermonById(id: string): Promise<ISermon | null> {
+  try {
+    const db = (await getDb()) as NeonHttpDatabase;
+    if (!db) throw new Error('Database connection failed');
+
+    const result = await db
+      .select({
+        id: sermons.id,
+        name: sermons.name,
+        nameEn: sermons.nameEn,
+        desc: sermons.desc,
+        descEn: sermons.descEn,
+        url: sermons.url,
+        type: sermons.type,
+        viewCount: sermons.viewCount,
+        createdAt: sermons.createdAt,
+      })
+      .from(sermons)
+      .where(eq(sermons.id, parseInt(id)))
+      .limit(1);
+
+    if (!result || result.length === 0) {
+      return null;
+    }
+
+    return {
+      ...result[0],
+      createdAt: result[0].createdAt 
+        ? DateTime.fromJSDate(new Date(result[0].createdAt)).setZone('Asia/Seoul').toISO()
+        : null,
+    } as ISermon;
+
+  } catch (error) {
+    console.error('Error fetching sermon by ID:', error);
+    throw error;
+  }
+}
