@@ -164,8 +164,20 @@ export function Nav() {
         transition={{ duration: 0.2 }}
       >
         <div className="flex h-14 w-full items-center px-4">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <SidebarTrigger />
+            <Link href={`/${locale}`} className="flex items-center gap-2">
+              <Image 
+                src="/images/logo.png" 
+                alt="Living Water Church Logo" 
+                width={32} 
+                height={32}
+                className="w-8 h-8"
+              />
+              <span className="hidden lg:block text-lg font-semibold">
+                {t('name')}
+              </span>
+            </Link>
           </div>
 
           <div className="flex-1 flex items-center justify-center px-4">
