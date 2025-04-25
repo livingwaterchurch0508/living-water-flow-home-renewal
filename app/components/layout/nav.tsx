@@ -35,9 +35,9 @@ import { ContentCard } from '@/app/components/cards/ContentCard';
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
 import { SermonCard } from '@/app/components/cards/SermonCard';
 
+import { useDebounce } from '@/app/hooks/use-debounce';
 import { cn } from '@/app/lib/utils';
 import { YOUTUBE_URL } from '@/app/variables/constants';
-import { useDebounce } from '@/app/hooks/use-debounce';
 import { LOCALE_TYPE } from '@/app/variables/enums';
 
 interface SearchResult {
@@ -167,16 +167,14 @@ export function Nav() {
           <div className="flex items-center gap-2">
             <SidebarTrigger />
             <Link href={`/${locale}`} className="flex items-center gap-2">
-              <Image 
-                src="/images/logo.png" 
-                alt="Living Water Church Logo" 
-                width={32} 
+              <Image
+                src="/images/logo.png"
+                alt="Living Water Church Logo"
+                width={32}
                 height={32}
                 className="w-8 h-8"
               />
-              <span className="hidden lg:block text-lg font-semibold">
-                {t('name')}
-              </span>
+              <span className="hidden lg:block text-lg font-semibold">{t('name')}</span>
             </Link>
           </div>
 
@@ -437,7 +435,6 @@ export function Nav() {
         ) : (
           <div className="hidden">
             <ContentCard
-              id={parseInt(selectedContent.item.id)}
               name={locale === 'ko' ? selectedContent.item.name : selectedContent.item.nameEn || ''}
               desc={
                 locale === 'ko'

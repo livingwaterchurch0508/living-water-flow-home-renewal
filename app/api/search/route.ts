@@ -32,7 +32,14 @@ export async function GET(request: Request) {
           createdAt: sermons.createdAt,
         })
         .from(sermons)
-        .where(or(ilike(sermons.name, `%${query}%`), ilike(sermons.desc, `%${query}%`), ilike(sermons.nameEn, `%${query}%`), ilike(sermons.descEn, `%${query}%`)))
+        .where(
+          or(
+            ilike(sermons.name, `%${query}%`),
+            ilike(sermons.desc, `%${query}%`),
+            ilike(sermons.nameEn, `%${query}%`),
+            ilike(sermons.descEn, `%${query}%`)
+          )
+        )
         .orderBy(desc(sermons.createdAt))
         .limit(5),
 
@@ -49,7 +56,14 @@ export async function GET(request: Request) {
           createdAt: hymns.createdAt,
         })
         .from(hymns)
-        .where(or(ilike(hymns.name, `%${query}%`), ilike(hymns.desc, `%${query}%`), ilike(hymns.nameEn, `%${query}%`), ilike(hymns.descEn, `%${query}%`)))
+        .where(
+          or(
+            ilike(hymns.name, `%${query}%`),
+            ilike(hymns.desc, `%${query}%`),
+            ilike(hymns.nameEn, `%${query}%`),
+            ilike(hymns.descEn, `%${query}%`)
+          )
+        )
         .orderBy(desc(hymns.createdAt))
         .limit(5),
 
@@ -67,8 +81,14 @@ export async function GET(request: Request) {
         })
         .from(communities)
         .leftJoin(files, eq(communities.id, files.communityId))
-        .where(or(ilike(communities.name, `%${query}%`), ilike(communities.desc, `%${query}%`)
-      , ilike(communities.nameEn, `%${query}%`), ilike(communities.descEn, `%${query}%`)))
+        .where(
+          or(
+            ilike(communities.name, `%${query}%`),
+            ilike(communities.desc, `%${query}%`),
+            ilike(communities.nameEn, `%${query}%`),
+            ilike(communities.descEn, `%${query}%`)
+          )
+        )
         .orderBy(desc(communities.createdAt))
         .limit(5),
     ]);

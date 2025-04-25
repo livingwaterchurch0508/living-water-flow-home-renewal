@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Play, XIcon } from 'lucide-react';
-import { cn } from '@/app/lib/utils';
-import { YOUTUBE_URL } from '@/app/variables/constants';
 import Image from 'next/image';
 import { createPortal } from 'react-dom';
-import { getRelativeTime } from '@/app/lib/date';
 import { useParams } from 'next/navigation';
+import { Play, XIcon } from 'lucide-react';
+
+import { cn } from '@/app/lib/utils';
+import { getRelativeTime } from '@/app/lib/date';
+import { YOUTUBE_URL } from '@/app/variables/constants';
 
 interface ContentCardProps {
-  id: number;
   name: string;
   desc: string;
   url: string;
@@ -77,10 +77,10 @@ export function ContentCard({
               <div className="absolute inset-0 p-4 sm:p-6">
                 <div className="relative z-10 h-full flex flex-col">
                   <div className="flex-1 space-y-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-white line-clamp-2 mb-2">
-                    {name}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-neutral-200 line-clamp-2">{desc}</p>
+                    <h3 className="text-base sm:text-lg font-semibold text-white line-clamp-2 mb-2">
+                      {name}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-neutral-200 line-clamp-2">{desc}</p>
                   </div>
                   <div className="flex items-center justify-end gap-2 text-xs text-neutral-300">
                     <span>{relativeTime}</span>

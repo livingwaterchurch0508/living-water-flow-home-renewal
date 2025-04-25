@@ -8,7 +8,7 @@ import { useSidebar } from '@/app/components/ui/sidebar';
 import { TextReveal } from '@/app/components/magicui/text-reveal';
 import { BorderBeam } from '@/app/components/magicui/border-beam';
 import Location from '@/app/components/cards/Location';
-import { HeroSection } from '@/app/components/hero-section';
+import { HeroSection } from '@/app/components/layout/hero-section';
 
 import { cn } from '@/app/lib/utils';
 import { SECTION_WIDTH } from '@/app/variables/constants';

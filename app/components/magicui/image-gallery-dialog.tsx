@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import Image from 'next/image';
 import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from 'framer-motion';
-import { ChevronLeft, ChevronRight, XIcon, ImageIcon, Maximize2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
+import { ChevronLeft, ChevronRight, XIcon, ImageIcon, Maximize2 } from 'lucide-react';
 
 import { cn } from '@/app/lib/utils';
-import { createPortal } from 'react-dom';
-import Image from 'next/image';
 
 interface ImageGalleryProps {
   images: Array<{
@@ -84,6 +84,7 @@ export default function ImageGalleryDialog({
   }, [currentIndex]);
 
   const handleClose = () => {
+    setIsImageLoaded(false);
     setIsOpen(false);
     onClose?.();
   };
@@ -172,14 +173,16 @@ export default function ImageGalleryDialog({
                   <PhotoProvider
                     loop
                     speed={() => 300}
-                    easing={(type) => (type === 2 ? 'cubic-bezier(0.36, 0, 0.66, -0.56)' : 'cubic-bezier(0.34, 1.56, 0.64, 1)')}
+                    easing={(type) =>
+                      type === 2
+                        ? 'cubic-bezier(0.36, 0, 0.66, -0.56)'
+                        : 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+                    }
                   >
                     {images.map((img, idx) => (
                       <PhotoView key={idx} src={img.src}>
                         <div style={{ display: idx === currentIndex ? 'block' : 'none' }}>
-                          <motion.button
-                            className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
-                          >
+                          <motion.button className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black">
                             <Maximize2 className="size-5" />
                           </motion.button>
                         </div>
@@ -207,21 +210,21 @@ export default function ImageGalleryDialog({
                       initial={{ opacity: 0, x: 0 }}
                       animate={controls}
                       style={{ x, opacity }}
-                      drag={images.length > 1 ? "x" : false}
+                      drag={images.length > 1 ? 'x' : false}
                       dragConstraints={{ left: 0, right: 0 }}
                       dragElastic={images.length > 1 ? 1 : 0}
                       onDragEnd={images.length > 1 ? handleDragEnd : undefined}
                       transition={{
-                        x: { type: "spring", stiffness: 300, damping: 30 },
-                        opacity: { duration: 0.2 }
+                        x: { type: 'spring', stiffness: 300, damping: 30 },
+                        opacity: { duration: 0.2 },
                       }}
                     >
                       <Image
                         src={images[currentIndex].src}
                         alt={images[currentIndex].alt || `Image ${currentIndex + 1}`}
                         className={cn(
-                          "object-contain transition-opacity duration-200",
-                          isImageLoaded ? "opacity-100" : "opacity-0"
+                          'object-contain transition-opacity duration-200',
+                          isImageLoaded ? 'opacity-100' : 'opacity-0'
                         )}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -259,7 +262,6 @@ export default function ImageGalleryDialog({
                       </div>
                     </>
                   )}
-
                 </div>
 
                 {/* Thumbnails */}

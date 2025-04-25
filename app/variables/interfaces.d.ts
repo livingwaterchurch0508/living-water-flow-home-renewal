@@ -61,3 +61,13 @@ export interface IMoveTab {
   menuTab: MENU_TAB;
   detailTab?: INTRODUCE_TAB | SERMON_TAB | HYMN_TAB | NEWS_TAB | INFO_TAB;
 }
+
+export interface IPaginatedResponse<T> {
+  total: number;
+  totalPages: number;
+  items: T[];
+}
+
+export type IHymnsResponse = IPaginatedResponse<IHymn>;
+export type ISermonsResponse = IPaginatedResponse<ISermon>;
+export type ICommunitiesResponse = IPaginatedResponse<ICommunity>;

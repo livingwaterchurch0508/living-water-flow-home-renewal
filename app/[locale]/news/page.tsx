@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { NewspaperIcon } from 'lucide-react';
@@ -9,8 +9,8 @@ import { useQuery } from '@tanstack/react-query';
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import { useSidebar } from '@/app/components/ui/sidebar';
-import { HeroSection } from '@/app/components/hero-section';
-import { TabSection } from '@/app/components/ui/tab-section';
+import { HeroSection } from '@/app/components/layout/hero-section';
+import { TabSection } from '@/app/components/layout/tab-section';
 
 import { useInfiniteCommunities } from '@/app/hooks/use-communities';
 import { cn } from '@/app/lib/utils';
@@ -28,6 +28,7 @@ export default function NewsPage() {
   const currentType = Number(searchParams.get('type')) || NEWS_TAB.NEWS;
   const selectedId = searchParams.get('id');
   const observerTarget = useRef<HTMLDivElement>(null);
+  const [selectedCommunity, setSelectedCommunity] = useState<number | null>(null);
 
   // 선택된 커뮤니티 데이터를 가져오는 쿼리
   const { data: selectedCommunityData, isLoading: isLoadingCommunity } = useQuery({
@@ -92,22 +93,22 @@ export default function NewsPage() {
       <HeroSection
         title={menuT('News.name')}
         content={menuT('News.content')}
-        bg1="from-rose-500/20"
-        bg2="to-orange-500/20"
-        bgDark1="dark:from-rose-500/10"
-        bgDark2="dark:to-orange-500/10"
-        color1="from-rose-600"
-        color2="to-orange-600"
-        colorDark1="dark:from-rose-400"
-        colorDark2="dark:to-orange-400"
-        icon={<NewspaperIcon className="w-16 h-16 mb-6 text-rose-500/80" />}
+        bg1="from-emerald-500/20"
+        bg2="to-teal-500/20"
+        bgDark1="dark:from-emerald-500/10"
+        bgDark2="dark:to-teal-500/10"
+        color1="from-emerald-600"
+        color2="to-teal-600"
+        colorDark1="dark:from-emerald-400"
+        colorDark2="dark:to-teal-400"
+        icon={<NewspaperIcon className="w-16 h-16 mb-6 text-emerald-500/80" />}
       />
 
       <TabSection
         tabs={[
           { id: NEWS_TAB.NEWS, label: menuT('News.service') },
           { id: NEWS_TAB.EVENT, label: menuT('News.event') },
-          { id: NEWS_TAB.STORY, label: menuT('News.story') }
+          { id: NEWS_TAB.STORY, label: menuT('News.story') },
         ]}
         activeTab={currentType}
         onTabChange={(tabId) => {
@@ -115,7 +116,7 @@ export default function NewsPage() {
           params.set('type', tabId.toString());
           router.push(`/news?${params.toString()}`);
         }}
-        accentColor="bg-rose-500"
+        accentColor="bg-emerald-500"
       />
 
       <section
@@ -152,22 +153,28 @@ export default function NewsPage() {
                 <div
                   key={community.id}
                   onClick={() => {
-                    const params = new URLSearchParams(searchParams);
-                    params.set('id', community.id.toString());
-                    router.push(`/news?${params.toString()}`);
+                    setSelectedCommunity(community.id);
                   }}
                   className="cursor-pointer"
                 >
                   <CommunityCard
                     name={
-                      locale === 'en' ? community.nameEn || community.name || '' : community.name || ''
+                      locale === 'en'
+                        ? community.nameEn || community.name || ''
+                        : community.name || ''
                     }
                     desc={
-                      locale === 'en' ? community.descEn || community.desc || '' : community.desc || ''
+                      locale === 'en'
+                        ? community.descEn || community.desc || ''
+                        : community.desc || ''
                     }
                     url={community.files[0]?.url || ''}
                     createdAt={community.createdAt || ''}
                     caption={Number(community.files[0]?.caption) || 1}
+                    autoOpen={selectedCommunity === community.id}
+                    onDialogClose={() => {
+                      setSelectedCommunity(null);
+                    }}
                   />
                 </div>
               ))}

@@ -23,30 +23,30 @@ export default function BottomDock() {
   const isActive = (path: string) => {
     const currentPath = pathname.split('/').slice(2).join('/');
     const comparePath = path.startsWith('/') ? path.slice(1) : path;
-    
+
     return currentPath === comparePath;
-  }
+  };
 
-   const getIconColor = (path: string) => {
-     if (!isActive(path)) return 'text-muted-foreground';
+  const getIconColor = (path: string) => {
+    if (!isActive(path)) return 'text-muted-foreground';
 
-     switch (path) {
-       case '/':
-         return 'text-blue-500';
-       case `/${ROUTER_PATHS[MENU_TAB.INTRODUCE]}`:
-         return 'text-indigo-500';
-       case `/${ROUTER_PATHS[MENU_TAB.SERMON]}`:
-         return 'text-blue-500';
-       case `/${ROUTER_PATHS[MENU_TAB.HYMN]}`:
-         return 'text-rose-500';
-       case `/${ROUTER_PATHS[MENU_TAB.NEWS]}`:
-         return 'text-emerald-500';
-       case `/${ROUTER_PATHS[MENU_TAB.INFO]}`:
-         return 'text-violet-500';
-       default:
-         return 'text-muted-foreground';
-     }
-   };
+    switch (path) {
+      case '/':
+        return 'text-blue-500';
+      case `/${ROUTER_PATHS[MENU_TAB.INTRODUCE]}`:
+        return 'text-indigo-500';
+      case `/${ROUTER_PATHS[MENU_TAB.SERMON]}`:
+        return 'text-blue-500';
+      case `/${ROUTER_PATHS[MENU_TAB.HYMN]}`:
+        return 'text-rose-500';
+      case `/${ROUTER_PATHS[MENU_TAB.NEWS]}`:
+        return 'text-emerald-500';
+      case `/${ROUTER_PATHS[MENU_TAB.INFO]}`:
+        return 'text-violet-500';
+      default:
+        return 'text-muted-foreground';
+    }
+  };
 
   return (
     <div className="fixed bottom-5 left-0 right-0 z-50 flex justify-center">
@@ -55,7 +55,7 @@ export default function BottomDock() {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href={'/'}
+                href={'/public'}
                 className={cn(
                   buttonVariants({
                     variant: 'ghost',
@@ -86,7 +86,9 @@ export default function BottomDock() {
                   'size-12'
                 )}
               >
-                <Church className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.INTRODUCE]}`), 'size-4')} />
+                <Church
+                  className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.INTRODUCE]}`), 'size-4')}
+                />
               </Link>
             </TooltipTrigger>
             <TooltipContent>
@@ -107,7 +109,9 @@ export default function BottomDock() {
                   'size-12'
                 )}
               >
-                <BookOpen className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.SERMON]}`), 'size-4')} />
+                <BookOpen
+                  className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.SERMON]}`), 'size-4')}
+                />
               </Link>
             </TooltipTrigger>
             <TooltipContent>
@@ -149,7 +153,9 @@ export default function BottomDock() {
                   'size-12'
                 )}
               >
-                <Newspaper className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.NEWS]}`), 'size-4')} />
+                <Newspaper
+                  className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.NEWS]}`), 'size-4')}
+                />
               </Link>
             </TooltipTrigger>
             <TooltipContent>

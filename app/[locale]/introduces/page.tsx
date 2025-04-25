@@ -10,8 +10,8 @@ import { useSidebar } from '@/app/components/ui/sidebar';
 import { PastorContent } from '@/app/components/introduces/PastorContent';
 import { ChurchContent } from '@/app/components/introduces/ChurchContent';
 import { WorshipContent } from '@/app/components/introduces/WorshipContent';
-import { HeroSection } from '@/app/components/hero-section';
-import { TabSection } from '@/app/components/ui/tab-section';
+import { HeroSection } from '@/app/components/layout/hero-section';
+import { TabSection } from '@/app/components/layout/tab-section';
 
 import { cn } from '@/app/lib/utils';
 import { INTRODUCE_TAB } from '@/app/variables/enums';

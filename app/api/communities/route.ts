@@ -55,10 +55,20 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Validate response data
+    if (!('communities' in result)) {
+      return NextResponse.json(
+        {
+          error: 'Invalid response format',
+          status: 'error',
+        },
+        { status: 500 }
+      );
+    }
+
     const validatedData = ResponseSchema.parse({
-      ...result,
       items: result.communities,
+      total: result.total,
+      totalPages: result.totalPages,
     });
 
     return NextResponse.json(
@@ -72,5 +82,4 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return handleApiError(error);
   }
 }
-
 export type CommunitiesGetResponse = ApiResponse<CommunitiesResponse>;

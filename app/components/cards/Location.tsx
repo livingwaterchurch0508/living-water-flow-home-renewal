@@ -3,9 +3,10 @@
 import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import Script from 'next/script';
-import { YOUTUBE_URL } from '@/app/variables/constants';
 import { motion } from 'framer-motion';
 import { BusIcon, CarIcon, MapPinIcon, PhoneIcon, MailIcon } from 'lucide-react';
+
+import { YOUTUBE_URL } from '@/app/variables/constants';
 
 interface LatLng {
   lat: number;
@@ -101,7 +102,7 @@ export default function Location() {
           content: contentString,
         });
 
-        window.naver.maps.Event.addListener(marker, "click", function () {
+        window.naver.maps.Event.addListener(marker, 'click', function () {
           if (infowindow.getMap()) {
             infowindow.close();
           } else {
@@ -131,7 +132,7 @@ export default function Location() {
           }
         }}
       />
-      
+
       <div className="grid md:grid-cols-3 gap-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -159,9 +160,7 @@ export default function Location() {
                 </div>
                 <h3 className="text-xl font-semibold">{t('address')}</h3>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('addressDesc')}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t('addressDesc')}</p>
             </div>
           </div>
 
@@ -173,9 +172,7 @@ export default function Location() {
                 </div>
                 <h3 className="text-xl font-semibold">{t('phone')}</h3>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('phoneDesc')}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t('phoneDesc')}</p>
             </div>
           </div>
 
@@ -187,9 +184,7 @@ export default function Location() {
                 </div>
                 <h3 className="text-xl font-semibold">{t('email')}</h3>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t('emailDesc')}
-              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t('emailDesc')}</p>
             </div>
           </div>
         </motion.div>
@@ -232,4 +227,4 @@ export default function Location() {
       </div>
     </div>
   );
-} 
+}

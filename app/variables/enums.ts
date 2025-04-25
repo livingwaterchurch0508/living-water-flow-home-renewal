@@ -46,8 +46,8 @@ export enum MENU_TAB {
  * 2: 주일 예배
  */
 export enum INTRODUCE_TAB {
-  PASTOR ,
-  CHURCH ,
+  PASTOR,
+  CHURCH,
   WORSHIP,
 }
 

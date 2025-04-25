@@ -23,4 +23,4 @@ export function WorshipContent() {
       </div>
     </ContentCard>
   );
-} 
+}

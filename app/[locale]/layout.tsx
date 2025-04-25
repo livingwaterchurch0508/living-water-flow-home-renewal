@@ -4,9 +4,9 @@ import { NextIntlClientProvider } from 'next-intl';
 import { Analytics } from '@vercel/analytics/react';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import { AppSidebar } from '@/app/components/app-sidebar';
-import { Nav } from '@/app/components/nav';
-import BottomDock from '@/app/components/bottom-dock';
+import { AppSidebar } from '@/app/components/layout/app-sidebar';
+import { Nav } from '@/app/components/layout/nav';
+import BottomDock from '@/app/components/layout/bottom-dock';
 import { ClientProviders } from '@/app/components/providers/client-providers';
 
 const geistSans = Geist({
@@ -34,10 +34,7 @@ export default async function RootLayout({
   const { locale } = await params;
 
   return (
-    <html
-      lang={locale}
-      suppressHydrationWarning
-    >
+    <html lang={locale} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextIntlClientProvider locale={locale}>
           <ClientProviders>

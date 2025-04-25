@@ -1,17 +1,18 @@
-import { NeonHttpDatabase } from 'drizzle-orm/neon-http';
-import { desc, eq, ilike, sql } from 'drizzle-orm';
-import { SQL } from 'drizzle-orm';
-import { DateTime } from 'luxon';
-
+import { desc, eq, ilike, or, and, sql } from 'drizzle-orm';
 import { getDb } from './dbConnection';
 import { sermons } from './schema';
-import { IError, IPage, ISermon } from '@/app/variables/interfaces';
+import { ISermon } from '@/app/variables/interfaces';
+import {
+  IPage,
+  IPaginatedResponse,
+  DbResult,
+  formatDate,
+  handleDbConnection,
+  createErrorResponse,
+  calculatePagination,
+} from './utils';
 
-export interface ISermons {
-  total: number;
-  items: ISermon[];
-  totalPages: number;
-}
+export type SermonsResponse = IPaginatedResponse<ISermon>;
 
 interface GetSermonsParams extends Required<Pick<IPage, 'limit' | 'offset'>> {
   type: number;
@@ -23,112 +24,120 @@ export async function getSermons({
   offset = 0,
   type,
   search,
-}: GetSermonsParams): Promise<ISermons | IError> {
+}: GetSermonsParams): DbResult<SermonsResponse> {
   try {
-    const db = (await getDb()) as NeonHttpDatabase;
-    if (!db) throw new Error('Database connection failed');
-
-    let whereClause: SQL = eq(sermons.type, type);
-    if (search) {
-      whereClause = sql`${whereClause} AND (${ilike(sermons.name, `%${search}%`)} OR ${ilike(sermons.desc, `%${search}%`)} OR ${ilike(sermons.nameEn, `%${search}%`)} OR ${ilike(sermons.descEn, `%${search}%`)})`;
+    const db = await handleDbConnection(getDb, 'GET_SERMONS');
+    if (!db) {
+      return createErrorResponse(
+        new Error('Database connection failed'),
+        'Failed to connect to database'
+      );
     }
 
-    const items = await db
-      .select({
-        id: sermons.id,
-        name: sermons.name,
-        nameEn: sermons.nameEn,
-        desc: sermons.desc,
-        descEn: sermons.descEn,
-        url: sermons.url,
-        type: sermons.type,
-        viewCount: sermons.viewCount,
-        createdAt: sermons.createdAt,
-      })
-      .from(sermons)
-      .where(whereClause)
-      .orderBy(desc(sermons.createdAt))
-      .limit(limit)
-      .offset(offset);
+    const whereCondition = search
+      ? and(
+          eq(sermons.type, type),
+          or(
+            ilike(sermons.name, `%${search}%`),
+            ilike(sermons.desc, `%${search}%`),
+            ilike(sermons.nameEn, `%${search}%`),
+            ilike(sermons.descEn, `%${search}%`)
+          )
+        )
+      : eq(sermons.type, type);
 
-    const totalResult = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(sermons)
-      .where(whereClause);
+    const [items, totalResult] = await Promise.all([
+      db
+        .select({
+          id: sermons.id,
+          name: sermons.name,
+          nameEn: sermons.nameEn,
+          desc: sermons.desc,
+          descEn: sermons.descEn,
+          url: sermons.url,
+          type: sermons.type,
+          viewCount: sermons.viewCount,
+          createdAt: sermons.createdAt,
+        })
+        .from(sermons)
+        .where(whereCondition)
+        .orderBy(desc(sermons.createdAt))
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ count: sql<number>`count(*)` })
+        .from(sermons)
+        .where(whereCondition),
+    ]);
 
-    const total = Number(totalResult[0].count);
-    const totalPages = Math.ceil(total / limit);
+    const { total, totalPages } = calculatePagination(totalResult[0].count, limit);
 
     return {
       total,
       totalPages,
       items: items.map((item) => ({
         ...item,
-        createdAt: item.createdAt ? DateTime.fromJSDate(item.createdAt).toISO() : null,
+        createdAt: formatDate(item.createdAt),
       })),
     };
   } catch (error) {
-    console.error('Error in getSermons:', error);
-    return {
-      message: 'Failed to fetch sermons',
-    };
+    return createErrorResponse(error, 'Failed to fetch sermons');
   }
 }
 
-export interface ISermonsById {
+export interface SermonIds {
   ids: { id: number | null }[];
   sermons: ISermon[];
 }
 
-export type ISermonType = Awaited<IError> | Awaited<ISermonsById> | null;
-
-export async function getSermonsById(id: number, type: number) {
+export async function getSermonsById(id: number, type: number): DbResult<SermonIds> {
   try {
-    const db = (await getDb()) as NeonHttpDatabase;
-    if (!db) throw new Error('Database connection failed');
+    const db = await handleDbConnection(getDb, 'GET_SERMONS_BY_ID');
+    if (!db) {
+      return createErrorResponse(
+        new Error('Database connection failed'),
+        'Failed to connect to database'
+      );
+    }
 
-    const ids = await db
-      .select({ id: sermons.id })
-      .from(sermons)
-      .orderBy(desc(sermons.createdAt))
-      .where(eq(sermons.type, type));
-
-    const sermonsData = await db
-      .select({
-        id: sermons.id,
-        name: sermons.name,
-        nameEn: sermons.nameEn,
-        desc: sermons.desc,
-        descEn: sermons.descEn,
-        url: sermons.url,
-        type: sermons.type,
-        viewCount: sermons.viewCount,
-        createdAt: sermons.createdAt,
-      })
-      .from(sermons)
-      .where(eq(sermons.id, id));
-
-    const transformedSermons = sermonsData.map((sermon) => ({
-      ...sermon,
-      createdAt: sermon.createdAt
-        ? DateTime.fromJSDate(new Date(sermon.createdAt)).setZone('Asia/Seoul').toISO()
-        : null,
-    }));
+    const [ids, sermonsData] = await Promise.all([
+      db
+        .select({ id: sermons.id })
+        .from(sermons)
+        .orderBy(desc(sermons.createdAt))
+        .where(eq(sermons.type, type)),
+      db
+        .select({
+          id: sermons.id,
+          name: sermons.name,
+          nameEn: sermons.nameEn,
+          desc: sermons.desc,
+          descEn: sermons.descEn,
+          url: sermons.url,
+          type: sermons.type,
+          viewCount: sermons.viewCount,
+          createdAt: sermons.createdAt,
+        })
+        .from(sermons)
+        .where(eq(sermons.id, id)),
+    ]);
 
     return {
       ids,
-      sermons: transformedSermons,
+      sermons: sermonsData.map((sermon) => ({
+        ...sermon,
+        createdAt: formatDate(sermon.createdAt),
+      })),
     };
   } catch (error) {
-    console.error('[GET_SERMON_BY_ID_ERROR]', error);
-    return error as { message: string };
+    return createErrorResponse(error, 'Failed to fetch sermons by id');
   }
 }
 
 export async function getSermonById(id: string): Promise<ISermon | null> {
   try {
-    const db = (await getDb()) as NeonHttpDatabase;
-    if (!db) throw new Error('Database connection failed');
+    const db = await handleDbConnection(getDb, 'GET_SERMON_BY_ID');
+    if (!db) return null;
 
     const result = await db
       .select({
@@ -146,19 +155,15 @@ export async function getSermonById(id: string): Promise<ISermon | null> {
       .where(eq(sermons.id, parseInt(id)))
       .limit(1);
 
-    if (!result || result.length === 0) {
-      return null;
-    }
+    if (!result.length) return null;
 
+    const sermon = result[0];
     return {
-      ...result[0],
-      createdAt: result[0].createdAt 
-        ? DateTime.fromJSDate(new Date(result[0].createdAt)).setZone('Asia/Seoul').toISO()
-        : null,
-    } as ISermon;
-
+      ...sermon,
+      createdAt: formatDate(sermon.createdAt),
+    };
   } catch (error) {
-    console.error('Error fetching sermon by ID:', error);
-    throw error;
+    console.error('[GET_SERMON_BY_ID_ERROR]', error);
+    return null;
   }
 }

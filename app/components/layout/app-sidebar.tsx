@@ -55,11 +55,11 @@ export function AppSidebar() {
     const currentPath = pathname.split('/').slice(2).join('/');
     const comparePath = path.startsWith('/') ? path.slice(1) : path;
     return currentPath.split('?')[0] === comparePath;
-  }
+  };
 
   const getIconColor = (path: string) => {
     if (!isActive(path)) return 'text-muted-foreground';
-    
+
     switch (path) {
       case '/':
         return 'text-blue-500';
@@ -93,7 +93,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip={t('name')} asChild>
-              <Link href="/">
+              <Link href="/public">
                 <HomeIcon className={cn('h-4 w-4', getIconColor('/'))} />
                 <span className={cn(getIconColor('/'))}>{t('name')}</span>
               </Link>
@@ -124,7 +124,9 @@ export function AppSidebar() {
                             <group.icon className={cn('h-4 w-4', getIconColor(group.path))} />
                           </div>
                         )}
-                        <span className={cn('ml-2', getIconColor(group.path))}>{t(group.name)}</span>
+                        <span className={cn('ml-2', getIconColor(group.path))}>
+                          {t(group.name)}
+                        </span>
                         {group.items.length > 0 && (
                           <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                         )}

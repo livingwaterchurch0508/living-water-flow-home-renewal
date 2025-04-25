@@ -1,10 +1,12 @@
 'use client';
 
-import { cn } from '@/app/lib/utils';
 import Image from 'next/image';
-import { getRelativeTime } from '@/app/lib/date';
-import ImageGalleryDialog from '@/app/components/magicui/image-gallery-dialog';
 import { useParams } from 'next/navigation';
+
+import ImageGalleryDialog from '@/app/components/magicui/image-gallery-dialog';
+
+import { cn } from '@/app/lib/utils';
+import { getRelativeTime } from '@/app/lib/date';
 
 interface CommunityCardProps {
   name: string;
@@ -40,9 +42,9 @@ export function CommunityCard({
 
   return (
     <div className={cn('relative', variant === 'home' ? 'w-[300px]' : 'w-full', className)}>
-      <ImageGalleryDialog 
-        images={images} 
-        thumbnailIndex={0} 
+      <ImageGalleryDialog
+        images={images}
+        thumbnailIndex={0}
         title={name}
         onClose={onDialogClose}
         autoOpen={autoOpen}

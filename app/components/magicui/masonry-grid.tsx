@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+
 import { cn } from '@/app/lib/utils';
 
 interface MasonryGridProps {
@@ -51,11 +52,11 @@ interface MasonryItemProps {
 
 export function MasonryItem({ children, className, span }: MasonryItemProps) {
   return (
-    <div 
+    <div
       className={cn('h-full w-full rounded-xl overflow-hidden', className)}
       style={{ gridRow: `span ${span || 12}` }}
     >
       {children}
     </div>
   );
-} 
+}

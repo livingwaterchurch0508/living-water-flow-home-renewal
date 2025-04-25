@@ -10,9 +10,9 @@ import { ContentCard } from '@/app/components/cards/ContentCard';
 import { SermonCard } from '@/app/components/cards/SermonCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import { useSidebar } from '@/app/components/ui/sidebar';
-import { MasonryGrid, MasonryItem } from '@/app/components/masonry/masonry-grid';
-import { HeroSection } from '@/app/components/hero-section';
-import { TabSection } from '@/app/components/ui/tab-section';
+import { MasonryGrid, MasonryItem } from '@/app/components/magicui/masonry-grid';
+import { HeroSection } from '@/app/components/layout/hero-section';
+import { TabSection } from '@/app/components/layout/tab-section';
 
 import { useInfiniteSermons } from '@/app/hooks/use-sermons';
 import { cn } from '@/app/lib/utils';
@@ -230,7 +230,6 @@ export default function SermonsPage() {
           {sermons.map((sermon) => (
             <div key={sermon.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
               <ContentCard
-                id={sermon.id}
                 name={locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''}
                 desc={locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''}
                 url={sermon.url || ''}
@@ -328,7 +327,6 @@ export default function SermonsPage() {
             />
           ) : (
             <ContentCard
-              id={selectedSermonData.id}
               name={
                 locale === 'en'
                   ? selectedSermonData.nameEn || selectedSermonData.name

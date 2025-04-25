@@ -9,8 +9,8 @@ import { useQuery } from '@tanstack/react-query';
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import { useSidebar } from '@/app/components/ui/sidebar';
-import { HeroSection } from '@/app/components/hero-section';
-import { TabSection } from '@/app/components/ui/tab-section';
+import { HeroSection } from '@/app/components/layout/hero-section';
+import { TabSection } from '@/app/components/layout/tab-section';
 
 import { useInfiniteHymns } from '@/app/hooks/use-hymns';
 import { cn } from '@/app/lib/utils';
@@ -153,7 +153,6 @@ export default function HymnsPage() {
               {hymns.map((hymn) => (
                 <div key={hymn.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
                   <ContentCard
-                    id={hymn.id}
                     name={locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || ''}
                     desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
                     url={hymn.url || ''}
@@ -196,7 +195,6 @@ export default function HymnsPage() {
             </div>
           ) : (
             <ContentCard
-              id={selectedHymnData.id}
               name={
                 locale === 'en'
                   ? selectedHymnData.nameEn || selectedHymnData.name

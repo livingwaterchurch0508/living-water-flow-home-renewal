@@ -1,5 +1,5 @@
+import { Church, BookOpen, Music, Newspaper, MapPin } from 'lucide-react';
 import {
-  API_ROUTES,
   HYMN_TAB,
   INFO_TAB,
   INTRODUCE_TAB,
@@ -8,22 +8,13 @@ import {
   SERMON_TAB,
   SOUL_TYPE,
 } from '@/app/variables/enums';
-import { Church, BookOpen, Music, Newspaper, MapPin } from 'lucide-react';
+
 export const ROUTER_PATHS = {
   [MENU_TAB.INTRODUCE]: 'introduces',
   [MENU_TAB.SERMON]: 'sermons',
   [MENU_TAB.HYMN]: 'hymns',
   [MENU_TAB.NEWS]: 'news',
   [MENU_TAB.INFO]: 'infos',
-};
-
-export const API_PATHS = {
-  [API_ROUTES.GET_HYMNS]: '/api/hymns',
-  [API_ROUTES.GET_HYMN_BY_ID]: '/api/hymns/',
-  [API_ROUTES.GET_SERMONS]: '/api/sermons',
-  [API_ROUTES.GET_SERMON_BY_ID]: '/api/sermons/',
-  [API_ROUTES.GET_COMMUNITIES]: '/api/communities',
-  [API_ROUTES.GET_COMMUNITY_BY_ID]: '/api/communities/',
 };
 
 export const YOUTUBE_URL = {

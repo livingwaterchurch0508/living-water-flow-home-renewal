@@ -19,4 +19,4 @@ export function TextReveal({ text, className }: TextRevealProps) {
       {text}
     </motion.div>
   );
-} 
+}

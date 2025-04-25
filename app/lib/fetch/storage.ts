@@ -26,7 +26,7 @@ class StorageClient {
           'base64'
         ).toString('utf-8');
         const credentials: Credentials = JSON.parse(credentialsJson);
-        
+
         const options: StorageOptions = {
           projectId: process.env.GOOGLE_CLOUD_PROJECT || credentials.project_id,
           credentials,
@@ -43,7 +43,7 @@ class StorageClient {
       else if (process.env.VERCEL) {
         let credentials: Credentials | null = null;
         const paths = ['/var/task/livingwater.json', '/vercel/path0/livingwater.json'];
-        
+
         for (const path of paths) {
           try {
             if (fs.existsSync(path)) {
@@ -53,7 +53,11 @@ class StorageClient {
               break;
             }
           } catch (error: unknown) {
-            console.warn('[STORAGE] Failed to read from:', path, error instanceof Error ? error.message : 'Unknown error');
+            console.warn(
+              '[STORAGE] Failed to read from:',
+              path,
+              error instanceof Error ? error.message : 'Unknown error'
+            );
           }
         }
 

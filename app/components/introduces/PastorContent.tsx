@@ -25,4 +25,4 @@ export function PastorContent() {
       </div>
     </ContentCard>
   );
-} 
+}

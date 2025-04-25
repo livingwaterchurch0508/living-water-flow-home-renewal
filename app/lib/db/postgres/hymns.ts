@@ -1,34 +1,39 @@
-import { NeonHttpDatabase } from 'drizzle-orm/neon-http';
-import { and, desc, eq, ilike, or, sql } from 'drizzle-orm';
-import { DateTime } from 'luxon';
-
+import { desc, eq, ilike, or, and, sql } from 'drizzle-orm';
 import { getDb } from './dbConnection';
 import { hymns } from './schema';
-import { IError, IHymn, IPage } from '@/app/variables/interfaces';
+import { IHymn } from '@/app/variables/interfaces';
 import { HYMN_TAB } from '@/app/variables/enums';
+import {
+  IPage,
+  IPaginatedResponse,
+  DbResult,
+  formatDate,
+  handleDbConnection,
+  createErrorResponse,
+  calculatePagination,
+} from './utils';
 
-export interface IHymns {
-  total: number;
-  items: IHymn[];
-  totalPages: number;
-}
+export type HymnsResponse = IPaginatedResponse<IHymn>;
 
 interface GetHymnsParams extends Required<Pick<IPage, 'limit' | 'offset'>> {
   type: number;
   search?: string;
 }
 
-export type GetHymnsResult = IHymns | IError;
-
 export async function getHymns({
-  limit,
-  offset,
+  limit = 10,
+  offset = 0,
   type,
   search,
-}: GetHymnsParams): Promise<GetHymnsResult> {
+}: GetHymnsParams): DbResult<HymnsResponse> {
   try {
-    const db = (await getDb()) as NeonHttpDatabase;
-    if (!db) throw new Error('Database connection failed');
+    const db = await handleDbConnection(getDb, 'GET_HYMNS');
+    if (!db) {
+      return createErrorResponse(
+        new Error('Database connection failed'),
+        'Failed to connect to database'
+      );
+    }
 
     const whereCondition = search
       ? and(
@@ -66,83 +71,74 @@ export async function getHymns({
         .where(whereCondition),
     ]);
 
-    const total = Number(totalResult[0].count);
-    const totalPages = Math.ceil(total / limit);
+    const { total, totalPages } = calculatePagination(totalResult[0].count, limit);
 
     return {
       total,
       totalPages,
       items: items.map((item) => ({
         ...item,
-        createdAt: item.createdAt ? DateTime.fromJSDate(item.createdAt).toISO() : null,
+        createdAt: formatDate(item.createdAt),
       })),
     };
   } catch (error) {
-    console.error('Error in getHymns:', error);
-    return {
-      message: 'Failed to fetch hymns',
-    };
+    return createErrorResponse(error, 'Failed to fetch hymns');
   }
 }
 
-export interface IHymnsById {
+export interface HymnIds {
   ids: { id: number | null }[];
   hymns: IHymn[];
 }
 
-export type GetHymnsByIdResult = IHymnsById | IError;
-
-export async function getHymnsById(id: number, type: HYMN_TAB): Promise<GetHymnsByIdResult> {
+export async function getHymnsById(id: number, type: HYMN_TAB): DbResult<HymnIds> {
   try {
-    const db = (await getDb()) as NeonHttpDatabase;
-    if (!db) throw new Error('Database connection failed');
+    const db = await handleDbConnection(getDb, 'GET_HYMNS_BY_ID');
+    if (!db) {
+      return createErrorResponse(
+        new Error('Database connection failed'),
+        'Failed to connect to database'
+      );
+    }
 
-    const ids = await db
-      .select({ id: hymns.id })
-      .from(hymns)
-      .orderBy(desc(hymns.createdAt))
-      .where(eq(hymns.type, type));
-
-    const hymnsData = await db
-      .select({
-        id: hymns.id,
-        name: hymns.name,
-        nameEn: hymns.nameEn,
-        desc: hymns.desc,
-        descEn: hymns.descEn,
-        url: hymns.url,
-        type: hymns.type,
-        viewCount: hymns.viewCount,
-        createdAt: hymns.createdAt,
-      })
-      .from(hymns)
-      .where(eq(hymns.id, id));
-
-    const transformedHymns = hymnsData.map((hymn) => ({
-      ...hymn,
-      createdAt: hymn.createdAt ? DateTime.fromJSDate(hymn.createdAt).toISO() : null,
-    }));
+    const [ids, hymnsData] = await Promise.all([
+      db
+        .select({ id: hymns.id })
+        .from(hymns)
+        .orderBy(desc(hymns.createdAt))
+        .where(eq(hymns.type, type)),
+      db
+        .select({
+          id: hymns.id,
+          name: hymns.name,
+          nameEn: hymns.nameEn,
+          desc: hymns.desc,
+          descEn: hymns.descEn,
+          url: hymns.url,
+          type: hymns.type,
+          viewCount: hymns.viewCount,
+          createdAt: hymns.createdAt,
+        })
+        .from(hymns)
+        .where(eq(hymns.id, id)),
+    ]);
 
     return {
       ids,
-      hymns: transformedHymns,
+      hymns: hymnsData.map((hymn) => ({
+        ...hymn,
+        createdAt: formatDate(hymn.createdAt),
+      })),
     };
   } catch (error) {
-    if (error instanceof Error) {
-      return {
-        message: error.message,
-      };
-    }
-    return {
-      message: 'An unknown error occurred',
-    };
+    return createErrorResponse(error, 'Failed to fetch hymns by id');
   }
 }
 
 export async function getHymnById(id: string): Promise<IHymn | null> {
   try {
-    const db = (await getDb()) as NeonHttpDatabase;
-    if (!db) throw new Error('Database connection failed');
+    const db = await handleDbConnection(getDb, 'GET_HYMN_BY_ID');
+    if (!db) return null;
 
     const result = await db
       .select({
@@ -160,17 +156,15 @@ export async function getHymnById(id: string): Promise<IHymn | null> {
       .where(eq(hymns.id, parseInt(id)))
       .limit(1);
 
-    if (!result.length) {
-      return null;
-    }
+    if (!result.length) return null;
 
     const hymn = result[0];
     return {
       ...hymn,
-      createdAt: hymn.createdAt ? DateTime.fromJSDate(hymn.createdAt).toISO() : null,
+      createdAt: formatDate(hymn.createdAt),
     };
   } catch (error) {
-    console.error('Error in getHymnById:', error);
+    console.error('[GET_HYMN_BY_ID_ERROR]', error);
     return null;
   }
 }

@@ -43,43 +43,44 @@ export async function getCommunities({
   type = NEWS_TYPES.ALL,
   offset = 0,
   limit = 10,
-}: IGetCommunities) {
+}: IGetCommunities): Promise<ICommunitiesType> {
   try {
     const db = (await getDb()) as NeonHttpDatabase;
-    if (!db) throw new Error('Database connection failed');
-
-    const totalQuery = db.select({ total: sql<number>`count(*) as total` }).from(communities);
-
-    if (type !== NEWS_TYPES.ALL) {
-      totalQuery.where(eq(communities.type, type));
+    if (!db) {
+      console.error('[GET_COMMUNITIES_ERROR] Database connection failed');
+      return { message: 'Database connection failed' };
     }
 
-    const [results] = await totalQuery;
-    const total = Number(results.total) || 0;
+    const whereCondition = type !== NEWS_TYPES.ALL ? eq(communities.type, type) : undefined;
 
-    const query = db
-      .select({
-        community: {
-          ...communities,
-          nameEn: communities.nameEn,
-          descEn: communities.descEn,
-          viewCount: communities.viewCount,
-        },
-        file: files,
-      })
-      .from(communities)
-      .leftJoin(files, eq(communities.id, files.communityId))
-      .orderBy(desc(communities.createdAt))
-      .limit(limit)
-      .offset(offset);
+    const [rows, totalResult] = await Promise.all([
+      db
+        .select({
+          community: {
+            ...communities,
+            nameEn: communities.nameEn,
+            descEn: communities.descEn,
+            viewCount: communities.viewCount,
+          },
+          file: files,
+        })
+        .from(communities)
+        .leftJoin(files, eq(communities.id, files.communityId))
+        .where(whereCondition)
+        .orderBy(desc(communities.createdAt))
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ total: sql<number>`count(*) as total` })
+        .from(communities)
+        .where(whereCondition),
+    ]);
 
-    if (type !== NEWS_TYPES.ALL) {
-      query.where(eq(communities.type, type));
-    }
+    const total = Number(totalResult[0].total) || 0;
+    const totalPages = Math.ceil(total / limit);
 
-    const rows = await query;
-
-    const result = rows.reduce<
+    // 결과를 커뮤니티와 파일 목록으로 구조화
+    const communitiesMap = rows.reduce<
       Record<
         number,
         {
@@ -99,16 +100,18 @@ export async function getCommunities({
           files: [],
         };
       }
+
       if (file) {
         acc[community.id].files.push({
           ...file,
           createdAt: formatDate(file.createdAt),
         });
       }
+
       return acc;
     }, {});
 
-    const transformedCommunities = Object.values(result)
+    const transformedCommunities = Object.values(communitiesMap)
       .map(({ community, files }) => ({
         ...community,
         files,
@@ -121,11 +124,13 @@ export async function getCommunities({
     return {
       total,
       communities: transformedCommunities,
-      totalPages: Math.ceil(total / limit),
+      totalPages,
     };
   } catch (error) {
     console.error('[GET_COMMUNITIES_ERROR]', error);
-    return error as { message: string };
+    return {
+      message: error instanceof Error ? error.message : 'Failed to fetch communities',
+    };
   }
 }
 
@@ -136,32 +141,37 @@ export interface ICommunitiesById {
 
 export type ICommunityType = Awaited<IError> | Awaited<ICommunitiesById> | null;
 
-export async function getCommunitiesById(id: number, type: NEWS_TAB) {
+export async function getCommunitiesById(id: number, type: NEWS_TAB): Promise<ICommunityType> {
   try {
     const db = (await getDb()) as NeonHttpDatabase;
-    if (!db) throw new Error('Database connection failed');
+    if (!db) {
+      console.error('[GET_COMMUNITIES_BY_ID_ERROR] Database connection failed');
+      return { message: 'Database connection failed' };
+    }
 
-    const ids = await db
-      .select({ id: communities.id })
-      .from(communities)
-      .orderBy(desc(communities.createdAt))
-      .where(eq(communities.type, type));
+    const [ids, rows] = await Promise.all([
+      db
+        .select({ id: communities.id })
+        .from(communities)
+        .orderBy(desc(communities.createdAt))
+        .where(eq(communities.type, type)),
+      db
+        .select({
+          community: {
+            ...communities,
+            nameEn: communities.nameEn,
+            descEn: communities.descEn,
+            viewCount: communities.viewCount,
+          },
+          file: files,
+        })
+        .from(communities)
+        .leftJoin(files, eq(communities.id, files.communityId))
+        .where(and(inArray(communities.id, [id]), eq(communities.type, type)))
+        .orderBy(desc(communities.createdAt)),
+    ]);
 
-    const rows = await db
-      .select({
-        community: {
-          ...communities,
-          nameEn: communities.nameEn,
-          descEn: communities.descEn,
-          viewCount: communities.viewCount,
-        },
-        file: files,
-      })
-      .from(communities)
-      .leftJoin(files, eq(communities.id, files.communityId))
-      .where(and(inArray(communities.id, [id]), eq(communities.type, type)))
-      .orderBy(desc(communities.createdAt));
-
+    // 결과를 커뮤니티와 파일 목록으로 구조화
     const result = rows.reduce<
       Record<
         number,
@@ -182,12 +192,14 @@ export async function getCommunitiesById(id: number, type: NEWS_TAB) {
           files: [],
         };
       }
+
       if (file) {
         acc[community.id].files.push({
           ...file,
           createdAt: formatDate(file.createdAt),
         });
       }
+
       return acc;
     }, {});
 
@@ -199,15 +211,20 @@ export async function getCommunitiesById(id: number, type: NEWS_TAB) {
       })),
     };
   } catch (error) {
-    console.error('[GET_COMMUNITY_BY_ID_ERROR]', error);
-    return error as { message: string };
+    console.error('[GET_COMMUNITIES_BY_ID_ERROR]', error);
+    return {
+      message: error instanceof Error ? error.message : 'Failed to fetch communities',
+    };
   }
 }
 
 export async function getCommunityById(id: number) {
   try {
     const db = (await getDb()) as NeonHttpDatabase;
-    if (!db) throw new Error('Database connection failed');
+    if (!db) {
+      console.error('[GET_COMMUNITY_BY_ID_ERROR] Database connection failed');
+      return null;
+    }
 
     const rows = await db
       .select({
@@ -223,22 +240,23 @@ export async function getCommunityById(id: number) {
       .leftJoin(files, eq(communities.id, files.communityId))
       .where(eq(communities.id, id));
 
-    if (rows.length === 0) return null;
+    if (rows.length === 0) {
+      return null;
+    }
 
     // 결과를 커뮤니티와 파일 목록으로 구조화
     const result = rows.reduce<{
-      community: typeof rows[0]['community'];
-      files: (Omit<typeof files.$inferSelect, 'createdAt'> & { createdAt: string | null })[];
+      community: Community;
+      files: (Omit<File, 'createdAt'> & { createdAt: string | null })[];
     }>(
       (acc, row) => {
         if (!acc.community) {
           acc.community = row.community;
         }
         if (row.file) {
-          const { createdAt, ...fileWithoutCreatedAt } = row.file;
           acc.files.push({
-            ...fileWithoutCreatedAt,
-            createdAt: formatDate(createdAt),
+            ...row.file,
+            createdAt: formatDate(row.file.createdAt),
           });
         }
         return acc;
@@ -252,7 +270,7 @@ export async function getCommunityById(id: number) {
       files: result.files,
     };
   } catch (error) {
-    console.error('Error fetching community by ID:', error);
-    throw error;
+    console.error('[GET_COMMUNITY_BY_ID_ERROR]', error);
+    return null;
   }
 }

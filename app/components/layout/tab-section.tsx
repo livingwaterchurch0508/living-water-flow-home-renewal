@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { useSidebar } from './sidebar';
+import { useSidebar } from '../ui/sidebar';
 
 import { cn } from '@/app/lib/utils';
 import { SECTION_WIDTH } from '@/app/variables/constants';
@@ -66,7 +66,8 @@ export function TabSection<T extends string | number>({
               aria-selected={activeTab === tab.id}
               aria-controls={`panel-${tab.id}`}
               className={cn(
-                'px-6 py-2 rounded-full transition-colors',
+                'px-4 sm:px-6 py-2 rounded-full transition-colors',
+                'whitespace-nowrap text-sm',
                 activeTab === tab.id ? cn(accentColor, 'text-white') : 'bg-muted hover:bg-muted/80'
               )}
             >

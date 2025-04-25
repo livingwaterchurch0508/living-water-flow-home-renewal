@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getHymnById } from '@/app/lib/db/postgres/hymns';
 import { z } from 'zod';
-import {
-  BaseItemSchema,
-  handleApiError,
-  ApiResponse,
-} from '@/app/lib/api-utils';
+import { BaseItemSchema, handleApiError, ApiResponse } from '@/app/lib/api-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,10 +11,7 @@ const HymnSchema = BaseItemSchema.extend({
 
 export type HymnResponse = z.infer<typeof HymnSchema>;
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     if (!id) {
@@ -32,7 +25,7 @@ export async function GET(
     }
 
     const hymn = await getHymnById(id);
-    
+
     if (!hymn) {
       return NextResponse.json(
         {
@@ -58,4 +51,4 @@ export async function GET(
   }
 }
 
-export type HymnGetResponse = ApiResponse<HymnResponse>; 
+export type HymnGetResponse = ApiResponse<HymnResponse>;

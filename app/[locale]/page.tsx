@@ -12,16 +12,16 @@ import { useSidebar } from '@/app/components/ui/sidebar';
 import { Skeleton } from '@/app/components/ui/skeleton';
 import Youtube from '@/app/components/icon/Youtube';
 import { buttonVariants } from '@/app/components/ui/button';
-import { MasonryGrid, MasonryItem } from '@/app/components/masonry/masonry-grid';
+import { MasonryGrid, MasonryItem } from '@/app/components/magicui/masonry-grid';
 import { SermonCard } from '@/app/components/cards/SermonCard';
-import { HeroSection } from '@/app/components/hero-section';
+import { HeroSection } from '@/app/components/layout/hero-section';
 
 import { useHymns } from '@/app/hooks/use-hymns';
 import { useSermons } from '@/app/hooks/use-sermons';
 import { useCommunities } from '@/app/hooks/use-communities';
 import { cn } from '@/app/lib/utils';
 
-import { YOUTUBE_URL, ROUTER_PATHS, SECTION_WIDTH  } from '@/app/variables/constants';
+import { YOUTUBE_URL, ROUTER_PATHS, SECTION_WIDTH } from '@/app/variables/constants';
 import { MENU_TAB, SERMON_TAB, HYMN_TAB, INTRODUCE_TAB } from '@/app/variables/enums';
 import type { IHymn, ISermon, ICommunity } from '@/app/variables/interfaces';
 
@@ -148,9 +148,7 @@ export default function Home() {
       <section
         className={cn(
           'space-y-8 transition-[width] duration-200',
-          state === 'expanded'
-            ? SECTION_WIDTH.EXPANDED
-            : SECTION_WIDTH.COLLAPSED
+          state === 'expanded' ? SECTION_WIDTH.EXPANDED : SECTION_WIDTH.COLLAPSED
         )}
       >
         <div className="flex items-center justify-between">
@@ -182,7 +180,6 @@ export default function Home() {
                 hymns.map((hymn) => (
                   <CarouselItem key={hymn.id} className="pl-4 basis-auto">
                     <ContentCard
-                      id={hymn.id}
                       name={locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || ''}
                       desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
                       url={hymn.url || ''}
@@ -200,9 +197,7 @@ export default function Home() {
       <section
         className={cn(
           'space-y-8 transition-[width] duration-200',
-          state === 'expanded'
-            ? SECTION_WIDTH.EXPANDED
-            : SECTION_WIDTH.COLLAPSED
+          state === 'expanded' ? SECTION_WIDTH.EXPANDED : SECTION_WIDTH.COLLAPSED
         )}
       >
         <div className="flex items-center justify-between">
@@ -234,7 +229,6 @@ export default function Home() {
                 sermons.map((sermon) => (
                   <CarouselItem key={sermon.id} className="pl-4 basis-auto">
                     <ContentCard
-                      id={sermon.id}
                       name={
                         locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''
                       }
@@ -256,9 +250,7 @@ export default function Home() {
       <section
         className={cn(
           'space-y-8 transition-[width] duration-200',
-          state === 'expanded'
-            ? SECTION_WIDTH.EXPANDED
-            : SECTION_WIDTH.COLLAPSED
+          state === 'expanded' ? SECTION_WIDTH.EXPANDED : SECTION_WIDTH.COLLAPSED
         )}
       >
         <div className="flex items-center justify-between">
@@ -316,9 +308,7 @@ export default function Home() {
       <section
         className={cn(
           'space-y-8 transition-[width] duration-200',
-          state === 'expanded'
-            ? SECTION_WIDTH.EXPANDED
-            : SECTION_WIDTH.COLLAPSED
+          state === 'expanded' ? SECTION_WIDTH.EXPANDED : SECTION_WIDTH.COLLAPSED
         )}
       >
         <div className="flex items-center justify-between">

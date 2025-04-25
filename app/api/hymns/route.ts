@@ -7,8 +7,9 @@ import {
   createResponseSchema,
   handleApiError,
   ApiResponse,
+  createEmptyResponse,
 } from '@/app/lib/api-utils';
-import { IError, IHymn } from '@/app/variables/interfaces';
+import { IHymnsResponse } from '@/app/variables/interfaces';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,11 +25,16 @@ const QuerySchema = BaseQuerySchema.extend({
   search: z.string().optional(),
 });
 
-// Type guard for IHymns
-function isHymnsResponse(
-  result: IError | { total: number; totalPages: number; items: IHymn[] }
-): result is { total: number; totalPages: number; items: IHymn[] } {
-  return result && 'total' in result && 'totalPages' in result && 'items' in result;
+// Type guard for IHymnsResponse
+function isHymnsResponse(result: unknown): result is IHymnsResponse {
+  return (
+    result !== null &&
+    typeof result === 'object' &&
+    'total' in result &&
+    'totalPages' in result &&
+    'items' in result &&
+    Array.isArray((result as IHymnsResponse).items)
+  );
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
@@ -52,14 +58,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     });
 
     if (!result) {
-      return NextResponse.json({
-        payload: {
-          items: [],
-          total: 0,
-          totalPages: 0,
-        },
-        status: 'success',
-      });
+      return createEmptyResponse();
     }
 
     if ('message' in result) {

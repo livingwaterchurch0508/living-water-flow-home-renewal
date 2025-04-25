@@ -29,10 +29,7 @@ const CommunitySchema = BaseItemSchema.extend({
 
 export type CommunityResponse = z.infer<typeof CommunitySchema>;
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     if (!id) {
@@ -46,7 +43,7 @@ export async function GET(
     }
 
     const community = await getCommunityById(parseInt(id));
-    
+
     if (!community) {
       return NextResponse.json(
         {
@@ -72,4 +69,4 @@ export async function GET(
   }
 }
 
-export type CommunityGetResponse = ApiResponse<CommunityResponse>; 
+export type CommunityGetResponse = ApiResponse<CommunityResponse>;

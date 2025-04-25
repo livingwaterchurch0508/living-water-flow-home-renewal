@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSermons, ISermons } from '@/app/lib/db/postgres/sermons';
+import { getSermons } from '@/app/lib/db/postgres/sermons';
 import { z } from 'zod';
 import {
   BaseItemSchema,
@@ -8,7 +8,7 @@ import {
   createEmptyResponse,
   ApiResponse,
 } from '@/app/lib/api-utils';
-import { IError } from '@/app/variables/interfaces';
+import { ISermonsResponse } from '@/app/variables/interfaces';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,9 +27,16 @@ const QuerySchema = z.object({
   search: z.string().nullable().optional(),
 });
 
-// Type guard to check if the result is ISermons
-function isSermons(result: ISermons | IError): result is ISermons {
-  return 'items' in result && 'total' in result && 'totalPages' in result;
+// Type guard to check if the result is ISermonsResponse
+function isSermonsResponse(result: unknown): result is ISermonsResponse {
+  return (
+    result !== null &&
+    typeof result === 'object' &&
+    'total' in result &&
+    'totalPages' in result &&
+    'items' in result &&
+    Array.isArray((result as ISermonsResponse).items)
+  );
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
@@ -64,7 +71,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    if (!isSermons(result)) {
+    if (!isSermonsResponse(result)) {
       return NextResponse.json(
         {
           error: 'Invalid response format',
@@ -74,16 +81,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Transform the result to match the expected schema
-    const transformedResult = {
-      ...result,
-      items: result.items,
+    // Validate response data
+    const validatedData = ResponseSchema.parse({
       total: result.total,
       totalPages: result.totalPages,
-    };
-
-    // Validate response data
-    const validatedData = ResponseSchema.parse(transformedResult);
+      items: result.items,
+    });
 
     return NextResponse.json(
       {
