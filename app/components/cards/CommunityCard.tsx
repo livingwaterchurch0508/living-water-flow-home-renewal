@@ -67,10 +67,10 @@ export function CommunityCard({
             <div className="absolute inset-0 p-4 sm:p-6">
               <div className="relative z-10 h-full flex flex-col">
                 <div className="flex-1 space-y-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-white line-clamp-2">
+                  <h3 data-testid="community-card-title" className="text-base sm:text-lg font-semibold text-white line-clamp-2">
                     {name}
                   </h3>
-                  <p className="text-xs sm:text-sm text-neutral-200 line-clamp-3">{desc}</p>
+                  <p data-testid="community-card-desc" className="text-xs sm:text-sm text-neutral-200 line-clamp-3">{desc}</p>
                 </div>
                 <div className="flex items-center justify-end gap-2 text-xs text-neutral-300">
                   <span>{relativeTime}</span>

@@ -154,6 +154,7 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">{t('Hymn.title')}</h2>
           <Link
+            data-testid="hymn-view-all"
             href={`/${ROUTER_PATHS[MENU_TAB.HYMN]}?type=0`}
             className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
           >
@@ -180,6 +181,7 @@ export default function Home() {
                 hymns.map((hymn) => (
                   <CarouselItem key={hymn.id} className="pl-4 basis-auto">
                     <ContentCard
+                      type="hymn"
                       name={locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || ''}
                       desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
                       url={hymn.url || ''}
@@ -203,6 +205,7 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">{t('Sermon.title')}</h2>
           <Link
+            data-testid="sermon-view-all"
             href={`/${ROUTER_PATHS[MENU_TAB.SERMON]}?type=0`}
             className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
           >
@@ -229,6 +232,7 @@ export default function Home() {
                 sermons.map((sermon) => (
                   <CarouselItem key={sermon.id} className="pl-4 basis-auto">
                     <ContentCard
+                      type="sermon"
                       name={
                         locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''
                       }
@@ -256,6 +260,7 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">{t('News.title')}</h2>
           <Link
+            data-testid="news-view-all"
             href={`/${ROUTER_PATHS[MENU_TAB.NEWS]}?type=0`}
             className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
           >
@@ -314,6 +319,7 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold">{t('Spirit.title')}</h2>
           <Link
+            data-testid="spirit-view-all"
             href={`/${ROUTER_PATHS[MENU_TAB.SERMON]}?type=${SERMON_TAB.SOUL}`}
             className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
           >
@@ -358,6 +364,7 @@ export default function Home() {
                 return (
                   <MasonryItem key={sermon.id} span={span}>
                     <button
+                      data-testid="sermon-card-button"
                       onClick={() => setSelectedSermon({ name, desc })}
                       className={cn(
                         'group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300',
@@ -366,10 +373,10 @@ export default function Home() {
                       )}
                     >
                       <div className="space-y-1 sm:space-y-2 text-left">
-                        <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">
+                        <h3 data-testid="sermon-card-title" className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">
                           {name}
                         </h3>
-                        <p className="text-base sm:text-base text-muted-foreground">{desc}</p>
+                        <p data-testid="sermon-card-desc" className="text-base sm:text-base text-muted-foreground">{desc}</p>
                       </div>
                     </button>
                   </MasonryItem>

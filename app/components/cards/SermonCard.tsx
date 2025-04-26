@@ -37,6 +37,7 @@ export function SermonCard({ name, desc, autoOpen = false, onDialogClose }: Serm
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
+        data-testid="sermon-card-dialog-content"
         className={cn(
           'sm:max-w-xl border-none p-0',
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
@@ -64,7 +65,7 @@ export function SermonCard({ name, desc, autoOpen = false, onDialogClose }: Serm
                   {name}
                 </h2>
               </DialogTitle>
-              {desc && (
+              {desc && ( 
                 <DialogDescription asChild>
                   <motion.div
                     className="prose prose-neutral dark:prose-invert max-w-none"

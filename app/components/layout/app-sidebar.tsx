@@ -64,7 +64,7 @@ export function AppSidebar() {
 
     switch (path) {
       case '/':
-        return 'text-blue-500';
+        return 'text-violet-500';
       case `${ROUTER_PATHS[MENU_TAB.INTRODUCE]}`:
         return 'text-indigo-500';
       case `${ROUTER_PATHS[MENU_TAB.SERMON]}`:
@@ -74,7 +74,7 @@ export function AppSidebar() {
       case `${ROUTER_PATHS[MENU_TAB.NEWS]}`:
         return 'text-emerald-500';
       case `${ROUTER_PATHS[MENU_TAB.INFO]}`:
-        return 'text-violet-500';
+        return 'text-cyan-500';
       default:
         return 'text-muted-foreground';
     }

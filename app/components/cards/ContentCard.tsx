@@ -12,6 +12,7 @@ import { getRelativeTime } from '@/app/lib/date';
 import { YOUTUBE_URL } from '@/app/variables/constants';
 
 interface ContentCardProps {
+  type: 'hymn' | 'sermon' ;
   name: string;
   desc: string;
   url: string;
@@ -23,6 +24,7 @@ interface ContentCardProps {
 }
 
 export function ContentCard({
+  type,
   name,
   desc,
   url,
@@ -52,7 +54,11 @@ export function ContentCard({
   return (
     <>
       <div className={cn('relative', variant === 'home' ? 'w-[300px]' : 'w-full', className)}>
-        <div className="group/card relative cursor-pointer" onClick={() => setIsVideoOpen(true)}>
+        <div
+          data-testid="content-card"
+          className="group/card relative cursor-pointer"
+          onClick={() => setIsVideoOpen(true)}
+        >
           <div
             className={cn(
               'group relative overflow-hidden rounded-lg bg-gradient-to-b from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900',
@@ -77,10 +83,12 @@ export function ContentCard({
               <div className="absolute inset-0 p-4 sm:p-6">
                 <div className="relative z-10 h-full flex flex-col">
                   <div className="flex-1 space-y-2">
-                    <h3 className="text-base sm:text-lg font-semibold text-white line-clamp-2 mb-2">
+                    <h3 className="text-base sm:text-lg font-semibold text-white line-clamp-2 mb-2" data-testid={`content-card-title-${type}`}>
                       {name}
                     </h3>
-                    <p className="text-xs sm:text-sm text-neutral-200 line-clamp-2">{desc}</p>
+                    <p className="text-xs sm:text-sm text-neutral-200 line-clamp-2" data-testid={`content-card-desc-${type}`}>
+                      {desc}
+                    </p>
                   </div>
                   <div className="flex items-center justify-end gap-2 text-xs text-neutral-300">
                     <span>{relativeTime}</span>
@@ -109,6 +117,7 @@ export function ContentCard({
         createPortal(
           <AnimatePresence>
             <motion.div
+              data-testid="content-card-dialog"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={handleClose}
@@ -124,6 +133,7 @@ export function ContentCard({
                 onClick={(e) => e.stopPropagation()}
               >
                 <motion.button
+                  data-testid="content-card-close-button"
                   className="absolute -top-12 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
                   onClick={handleClose}
                 >

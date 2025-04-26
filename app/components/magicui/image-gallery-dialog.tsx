@@ -128,6 +128,7 @@ export default function ImageGalleryDialog({
   return (
     <div className={cn('relative', className)}>
       <div
+        data-testid="community-card"
         className="group relative cursor-pointer overflow-hidden"
         onClick={() => setIsOpen(true)}
       >
@@ -190,6 +191,7 @@ export default function ImageGalleryDialog({
                     ))}
                   </PhotoProvider>
                   <motion.button
+                    data-testid="community-card-close-button"
                     onClick={handleClose}
                     className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
                   >
@@ -220,6 +222,7 @@ export default function ImageGalleryDialog({
                       }}
                     >
                       <Image
+                        data-testid="community-card-image"
                         src={`${images[currentIndex].src}&size=medium`}
                         alt={images[currentIndex].alt || `Image ${currentIndex + 1}`}
                         className={cn(
