@@ -19,6 +19,10 @@
     "News": {
       "title": "News"
     },
+    "Location": {
+      "title": "Info",
+      "description": "Welcome! We will guide you to the way."
+    },
     "Common": {
       "viewMore": "more",
       "viewAll": "all"
@@ -100,7 +104,7 @@
     },
     "worship": {
       "name": "Service",
-      "details": "\uD83D\uDE4F You are a happy man. Who is the people who have gained the salvation of the Lord? - Shin Myung-ki 33:29",
+      "details": "You are a happy man. Who is the people who have gained the salvation of the Lord? - Shin Myung-ki 33:29",
       "sunday": "Sunday Service",
       "sunWorship": "11 a.m",
       "wednesday": "Wednesday Service",

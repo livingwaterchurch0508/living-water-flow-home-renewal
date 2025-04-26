@@ -21,8 +21,8 @@ export default function InfosPage() {
   return (
     <div className="min-h-screen py-10 pb-20 px-2 space-y-16">
       <HeroSection
-        title={t('Info.title')}
-        content={t('Info.description')}
+        title={t('Location.title')}
+        content={t('Location.description')}
         bg1="from-cyan-500/20"
         bg2="to-blue-500/20"
         bgDark1="dark:from-cyan-500/10"

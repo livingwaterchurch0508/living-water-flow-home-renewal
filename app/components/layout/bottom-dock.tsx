@@ -61,7 +61,7 @@ export default function BottomDock() {
                     variant: 'ghost',
                     size: 'icon',
                   }),
-                  'size-12'
+                  'size-10'
                 )}
               >
                 <HomeIcon className={cn(getIconColor('/'), 'size-4')} />
@@ -72,7 +72,7 @@ export default function BottomDock() {
             </TooltipContent>
           </Tooltip>
         </DockIcon>
-        <Separator orientation="vertical" className="h-full py-2" />
+        <Separator orientation="vertical" className="h-full py-1" />
         <DockIcon>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -83,7 +83,7 @@ export default function BottomDock() {
                     variant: 'ghost',
                     size: 'icon',
                   }),
-                  'size-12'
+                  'size-10'
                 )}
               >
                 <Church
@@ -106,7 +106,7 @@ export default function BottomDock() {
                     variant: 'ghost',
                     size: 'icon',
                   }),
-                  'size-12'
+                  'size-10'
                 )}
               >
                 <BookOpen
@@ -129,7 +129,7 @@ export default function BottomDock() {
                     variant: 'ghost',
                     size: 'icon',
                   }),
-                  'size-12'
+                  'size-10'
                 )}
               >
                 <Music className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.HYMN]}`), 'size-4')} />
@@ -150,7 +150,7 @@ export default function BottomDock() {
                     variant: 'ghost',
                     size: 'icon',
                   }),
-                  'size-12'
+                  'size-10'
                 )}
               >
                 <Newspaper
@@ -173,7 +173,7 @@ export default function BottomDock() {
                     variant: 'ghost',
                     size: 'icon',
                   }),
-                  'size-12'
+                  'size-10'
                 )}
               >
                 <MapPin className={cn(getIconColor(`/${ROUTER_PATHS[MENU_TAB.INFO]}`), 'size-4')} />
@@ -184,7 +184,7 @@ export default function BottomDock() {
             </TooltipContent>
           </Tooltip>
         </DockIcon>
-        <Separator orientation="vertical" className="h-full py-2" />
+        <Separator orientation="vertical" className="h-full py-1" />
         <DockIcon>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -195,7 +195,7 @@ export default function BottomDock() {
                     variant: 'ghost',
                     size: 'icon',
                   }),
-                  'size-12'
+                  'size-10'
                 )}
                 target="_blank"
                 rel="noopener noreferrer"

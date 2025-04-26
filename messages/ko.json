@@ -19,6 +19,10 @@
     "News": {
       "title": "교회 사역"
     },
+    "Location": {
+      "title": "교회 안내",
+      "description": "환영합니다! 오시는 길을 안내해드립니다."
+    },
     "Common": {
       "viewMore": "더보기",
       "viewAll": "전체보기"
@@ -101,7 +105,7 @@
     },
     "worship": {
       "name": "예배 안내",
-      "details": "\uD83D\uDE4F 너는 행복한 사람이로다 여호와의 구원을 너같이 얻은 백성이 누구냐 - 신명기 33:29",
+      "details": "너는 행복한 사람이로다 여호와의 구원을 너같이 얻은 백성이 누구냐 - 신명기 33:29",
       "sunday": "주일예배",
       "sunWorship": "오전 11시",
       "wednesday": "수요예배",
