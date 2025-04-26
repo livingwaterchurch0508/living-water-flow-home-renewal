@@ -8,28 +8,6 @@ import fs from 'fs';
 // Create a new cache instance (TTL: 3600 seconds, 1 hour)
 const cache = new NodeCache({ stdTTL: 3600 });
 
-async function compressImage(buffer: Buffer): Promise<Buffer> {
-  try {
-    return await sharp(buffer).rotate().webp({ quality: 80 }).toBuffer();
-  } catch (error) {
-    console.error('[COMPRESS_IMAGE_ERROR]', error);
-    return buffer; // Return original buffer if compression fails
-  }
-}
-
-// Helper function to convert stream to buffer
-async function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
-    stream.on('error', (error) => {
-      console.error('[STREAM_TO_BUFFER_ERROR]', error);
-      reject(error);
-    });
-    stream.on('end', () => resolve(Buffer.concat(chunks)));
-  });
-}
-
 // Helper function to get local fallback image
 async function getLocalFallbackImage(): Promise<Buffer> {
   try {
@@ -39,6 +17,10 @@ async function getLocalFallbackImage(): Promise<Buffer> {
     console.error('[FALLBACK_IMAGE_ERROR]', error);
     throw new Error('Fallback image not found');
   }
+}
+
+interface ImageOptions {
+  width?: number;
 }
 
 export async function GET(req: NextRequest) {
@@ -52,7 +34,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Check if the image buffer is already cached
-    const cachedBuffer = cache.get<Buffer>(imageName);
+    const size = req.nextUrl.searchParams.get('size');
+    const cacheKey = imageName + (size || '');
+    const cachedBuffer = cache.get<Buffer>(cacheKey);
     if (cachedBuffer) {
       console.log('[GET_IMAGE] Serving cached image:', imageName);
       return new NextResponse(cachedBuffer, {
@@ -92,28 +76,90 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Download and process the image
-    console.log('[GET_IMAGE] Processing image:', imageName);
+    // Get metadata for content type
     const [metadata] = await file.getMetadata();
     const contentType = metadata.contentType || 'image/jpeg';
+    
+    // Set image options based on size parameter
+    const imageOptions: ImageOptions = {};
+    if (size === 'thumbnail') {
+      imageOptions.width = 300;
+    } else if (size === 'small') {
+      imageOptions.width = 500;
+    } else if (size === 'medium') {
+      imageOptions.width = 800;
+    } else if (size === 'large') {
+      imageOptions.width = 1200;
+    }
+    // original size will not set any width, keeping the original dimensions
 
-    const fileStream = file.createReadStream();
-    const buffer = await streamToBuffer(fileStream);
+    // Download the file
+    const [fileContent] = await file.download();
+    
+    // Create sharp instance for all image processing
+    const image = sharp(fileContent, { 
+      failOnError: false,
+      animated: true
+    });
 
+    // 이미지 메타데이터 확인
+    const imageMetadata = await image.metadata();
+    console.log('[IMAGE_METADATA]', {
+      width: imageMetadata.width,
+      height: imageMetadata.height,
+      orientation: imageMetadata.orientation,
+      format: imageMetadata.format
+    });
+
+    // orientation에 따른 회전 각도 설정
+    let rotationAngle = 0;
+    switch (imageMetadata.orientation) {
+      case 3: // 180도 회전
+        rotationAngle = 180;
+        break;
+      case 6: // 시계 방향 90도 회전 (세로)
+        rotationAngle = 90;
+        break;
+      case 8: // 반시계 방향 90도 회전 (세로)
+        rotationAngle = 270;
+        break;
+    }
+    
+    // Process image
     let processedBuffer: Buffer;
-    if (contentType.startsWith('image/')) {
-      processedBuffer = await compressImage(buffer);
+    if (size === 'original') {
+      // original은 원본 그대로 유지
+      processedBuffer = fileContent;
+    } else if (imageOptions.width && contentType.startsWith('image/')) {
+      processedBuffer = await image
+        .rotate(rotationAngle)
+        .resize({
+          width: imageOptions.width,
+          withoutEnlargement: true,
+          fit: 'inside'
+        })
+        .withMetadata()
+        .webp({ quality: 80 })
+        .toBuffer();
     } else {
-      processedBuffer = buffer;
+      processedBuffer = fileContent;
     }
 
-    // Cache the processed image buffer
-    cache.set(imageName, processedBuffer);
-    console.log('[GET_IMAGE] Image processed and cached:', imageName);
+    // 처리된 이미지 메타데이터 확인
+    const processedMetadata = await sharp(processedBuffer).metadata();
+    console.log('[PROCESSED_IMAGE_METADATA]', {
+      width: processedMetadata.width,
+      height: processedMetadata.height,
+      orientation: processedMetadata.orientation,
+      format: processedMetadata.format
+    });
+
+    // Cache the processed image
+    cache.set(cacheKey, processedBuffer);
 
     return new NextResponse(processedBuffer, {
       headers: {
-        'Content-Type': contentType.startsWith('image/') ? 'image/webp' : contentType,
+        'Content-Type': size !== 'original' && contentType.startsWith('image/') ? 'image/webp' : contentType,
         'Cache-Control': 'public, max-age=3600',
       },
     });

@@ -52,7 +52,7 @@ export function CommunityCard({
         <div className="group relative overflow-hidden rounded-lg">
           <div className={cn('relative aspect-video', variant === 'home' ? 'w-[300px]' : 'w-full')}>
             <Image
-              src={images[0].src}
+              src={`${images[0].src}&size=small`}
               alt={name}
               fill
               className="object-cover transition-all duration-200 group-hover:scale-105"

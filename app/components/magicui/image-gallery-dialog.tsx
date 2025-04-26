@@ -135,7 +135,7 @@ export default function ImageGalleryDialog({
           <>
             <div className="relative h-48 w-full overflow-hidden md:h-64">
               <Image
-                src={images[thumbnailIndex].src}
+                src={`${images[thumbnailIndex].src}&size=thumbnail`}
                 alt={images[thumbnailIndex].alt || 'Gallery thumbnail'}
                 className="transition-all duration-200 ease-out group-hover:scale-105 group-hover:brightness-90"
                 fill
@@ -180,7 +180,7 @@ export default function ImageGalleryDialog({
                     }
                   >
                     {images.map((img, idx) => (
-                      <PhotoView key={idx} src={img.src}>
+                      <PhotoView key={idx} src={`${img.src}&size=original`}>
                         <div style={{ display: idx === currentIndex ? 'block' : 'none' }}>
                           <motion.button className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black">
                             <Maximize2 className="size-5" />
@@ -220,7 +220,7 @@ export default function ImageGalleryDialog({
                       }}
                     >
                       <Image
-                        src={images[currentIndex].src}
+                        src={`${images[currentIndex].src}&size=medium`}
                         alt={images[currentIndex].alt || `Image ${currentIndex + 1}`}
                         className={cn(
                           'object-contain transition-opacity duration-200',
@@ -283,7 +283,7 @@ export default function ImageGalleryDialog({
                       >
                         <div className="relative size-14">
                           <Image
-                            src={image.src}
+                            src={`${image.src}&size=thumbnail`}
                             alt={image.alt || `Thumbnail ${index + 1}`}
                             className="object-cover"
                             fill
