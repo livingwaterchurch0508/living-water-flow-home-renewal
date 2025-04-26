@@ -20,8 +20,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: '생수가 흐르는 교회',
-  description: '생수가 흐르는 교회에 오신 것을 환영합니다.',
+  title: '생수가 흐르는 교회💒',
+  description: '생수가 흐르는 교회에 오신걸 환영합니다!',
+  openGraph: {
+    title: '생수가 흐르는 교회💒',
+    description: '생수가 흐르는 교회에 오신걸 환영합니다!',
+    images: [
+      {
+        url: 'https://livingwater-church.co.kr/home_banner.png',
+        width: 1134,
+        height: 805,
+        alt: '홈 배너',
+      },
+    ],
+    type: 'website',
+  },
 };
 
 export default async function RootLayout({

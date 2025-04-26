@@ -167,13 +167,6 @@ export function Nav() {
           <div className="flex items-center gap-1 md:gap-2">
             <SidebarTrigger />
             <Link href={`/${locale}`} className="flex items-center gap-1 md:gap-2">
-              <Image
-                src="/images/logo.png"
-                alt="Living Water Church Logo"
-                width={40}
-                height={40}
-                className="w-10 h-10 object-contain"
-              />
               <span className="hidden lg:block text-lg font-semibold">{t('name')}</span>
             </Link>
           </div>

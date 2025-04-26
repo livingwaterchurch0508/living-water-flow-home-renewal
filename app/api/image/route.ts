@@ -11,7 +11,7 @@ const cache = new NodeCache({ stdTTL: 3600 });
 // Helper function to get local fallback image
 async function getLocalFallbackImage(): Promise<Buffer> {
   try {
-    const fallbackPath = path.join(process.cwd(), 'public', 'images', 'fallback.jpg');
+    const fallbackPath = path.join(process.cwd(), 'public', 'fallback.png');
     return await fs.promises.readFile(fallbackPath);
   } catch (error) {
     console.error('[FALLBACK_IMAGE_ERROR]', error);
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
     // Get metadata for content type
     const [metadata] = await file.getMetadata();
     const contentType = metadata.contentType || 'image/jpeg';
-    
+
     // Set image options based on size parameter
     const imageOptions: ImageOptions = {};
     if (size === 'thumbnail') {
@@ -95,11 +95,11 @@ export async function GET(req: NextRequest) {
 
     // Download the file
     const [fileContent] = await file.download();
-    
+
     // Create sharp instance for all image processing
-    const image = sharp(fileContent, { 
+    const image = sharp(fileContent, {
       failOnError: false,
-      animated: true
+      animated: true,
     });
 
     // 이미지 메타데이터 확인
@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
       width: imageMetadata.width,
       height: imageMetadata.height,
       orientation: imageMetadata.orientation,
-      format: imageMetadata.format
+      format: imageMetadata.format,
     });
 
     // orientation에 따른 회전 각도 설정
@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
         rotationAngle = 270;
         break;
     }
-    
+
     // Process image
     let processedBuffer: Buffer;
     if (size === 'original') {
@@ -136,7 +136,7 @@ export async function GET(req: NextRequest) {
         .resize({
           width: imageOptions.width,
           withoutEnlargement: true,
-          fit: 'inside'
+          fit: 'inside',
         })
         .withMetadata()
         .webp({ quality: 80 })
@@ -151,7 +151,7 @@ export async function GET(req: NextRequest) {
       width: processedMetadata.width,
       height: processedMetadata.height,
       orientation: processedMetadata.orientation,
-      format: processedMetadata.format
+      format: processedMetadata.format,
     });
 
     // Cache the processed image
@@ -159,7 +159,8 @@ export async function GET(req: NextRequest) {
 
     return new NextResponse(processedBuffer, {
       headers: {
-        'Content-Type': size !== 'original' && contentType.startsWith('image/') ? 'image/webp' : contentType,
+        'Content-Type':
+          size !== 'original' && contentType.startsWith('image/') ? 'image/webp' : contentType,
         'Cache-Control': 'public, max-age=3600',
       },
     });

@@ -11,7 +11,7 @@ export function PastorContent() {
       <div className="grid gap-8 md:grid-cols-2">
         <div className="relative aspect-[3/4] overflow-hidden rounded-lg">
           <Image
-            src="/images/pastor.jpeg"
+            src="/pastor.jpeg"
             alt={t('pastor.name')}
             className="object-cover w-full h-full"
             fill
