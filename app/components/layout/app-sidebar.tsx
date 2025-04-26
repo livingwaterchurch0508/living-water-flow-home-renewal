@@ -20,6 +20,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
   SidebarFooter,
+  useSidebar,
 } from '@/app/components/ui/sidebar';
 import {
   Collapsible,
@@ -37,6 +38,7 @@ export function AppSidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const [openGroups, setOpenGroups] = useState<{ [key: string]: boolean }>({});
+  const { setOpenMobile } = useSidebar();
 
   useEffect(() => {
     // 초기 상태 설정: isActive가 true인 그룹들을 열린 상태로 설정
@@ -78,9 +80,18 @@ export function AppSidebar() {
     }
   };
 
+  const handleMenuClick = (path: string, detailTab?: number) => {
+    if (detailTab !== undefined) {
+      router.push(`/${path}?type=${detailTab}`);
+    } else {
+      router.push(`/${path}?type=0`);
+    }
+    setOpenMobile(false); // 모바일에서 메뉴 클릭 시 사이드바 닫기
+  };
+
   const handleIconClick = (e: React.MouseEvent, path: string) => {
     e.stopPropagation();
-    router.push(`/${path}?type=0`);
+    handleMenuClick(path);
   };
 
   const handleGroupToggle = (groupName: string, open: boolean) => {
@@ -93,7 +104,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip={t('name')} asChild>
-              <Link href="/public">
+              <Link href="/" onClick={() => setOpenMobile(false)}>
                 <HomeIcon className={cn('h-4 w-4', getIconColor('/'))} />
                 <span className={cn(getIconColor('/'))}>{t('name')}</span>
               </Link>
@@ -115,7 +126,14 @@ export function AppSidebar() {
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton tooltip={t(group.name)} asChild={group.items.length > 0}>
-                      <div className="flex items-center w-full">
+                      <div 
+                        className="flex items-center w-full"
+                        onClick={() => {
+                          if (group.items.length === 0) {
+                            handleMenuClick(group.path);
+                          }
+                        }}
+                      >
                         {group.icon && (
                           <div
                             onClick={(e) => handleIconClick(e, group.path)}
@@ -145,7 +163,13 @@ export function AppSidebar() {
                           <SidebarMenuSub>
                             {group.items.map((item) => (
                               <SidebarMenuSubItem key={item.name}>
-                                <SidebarMenuSubButton asChild>
+                                <SidebarMenuSubButton 
+                                  asChild
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleMenuClick(ROUTER_PATHS[item.menuTab], item.detailTab);
+                                  }}
+                                >
                                   <Link
                                     href={`/${ROUTER_PATHS[item.menuTab]}?type=${item.detailTab}`}
                                   >
@@ -169,7 +193,12 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip={t('youtube')} asChild>
-              <Link href={YOUTUBE_URL.CHANNEL} target="_blank" rel="noopener noreferrer">
+              <Link 
+                href={YOUTUBE_URL.CHANNEL} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => setOpenMobile(false)}
+              >
                 <Youtube className="h-4 w-4 text-muted-foreground hover:text-red-500 transition-colors duration-200" />
                 <span>{t('youtube')}</span>
               </Link>

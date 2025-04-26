@@ -163,22 +163,22 @@ export function Nav() {
         }}
         transition={{ duration: 0.2 }}
       >
-        <div className="flex h-14 w-full items-center px-4">
-          <div className="flex items-center gap-2">
+        <div className="flex h-14 w-full items-center px-2 md:px-4">
+          <div className="flex items-center gap-1 md:gap-2">
             <SidebarTrigger />
-            <Link href={`/${locale}`} className="flex items-center gap-2">
+            <Link href={`/${locale}`} className="flex items-center gap-1 md:gap-2">
               <Image
                 src="/images/logo.png"
                 alt="Living Water Church Logo"
-                width={32}
-                height={32}
-                className="w-8 h-8"
+                width={40}
+                height={40}
+                className="w-10 h-10 object-contain"
               />
               <span className="hidden lg:block text-lg font-semibold">{t('name')}</span>
             </Link>
           </div>
 
-          <div className="flex-1 flex items-center justify-center px-4">
+          <div className="flex-1 flex items-center justify-center px-2 md:px-4">
             <Button
               variant="outline"
               className="relative h-8 w-full max-w-[600px] justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
@@ -192,7 +192,7 @@ export function Nav() {
             </Button>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <DropdownMenu>
               <Tooltip>
                 <TooltipTrigger asChild>

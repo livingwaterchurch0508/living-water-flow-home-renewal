@@ -55,7 +55,7 @@ export default function BottomDock() {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href={'/public'}
+                href={'/'}
                 className={cn(
                   buttonVariants({
                     variant: 'ghost',
