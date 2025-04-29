@@ -234,6 +234,7 @@ export default function SermonsPage() {
                 desc={locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''}
                 url={sermon.url || ''}
                 createdAt={sermon.createdAt || ''}
+                type="sermon"
               />
             </div>
           ))}
@@ -341,6 +342,7 @@ export default function SermonsPage() {
               createdAt={selectedSermonData.createdAt}
               autoOpen={true}
               onDialogClose={handleCloseDialog}
+              type="sermon"
             />
           )}
         </>

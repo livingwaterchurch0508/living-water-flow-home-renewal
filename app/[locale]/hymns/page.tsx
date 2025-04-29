@@ -157,6 +157,7 @@ export default function HymnsPage() {
                     desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
                     url={hymn.url || ''}
                     createdAt={hymn.createdAt || ''}
+                    type="hymn"
                   />
                 </div>
               ))}
@@ -209,6 +210,7 @@ export default function HymnsPage() {
               createdAt={selectedHymnData.createdAt}
               autoOpen={true}
               onDialogClose={handleCloseDialog}
+              type="hymn"
             />
           )}
         </>
