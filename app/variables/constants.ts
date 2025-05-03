@@ -137,5 +137,11 @@ export function getBaseUrl() {
   if (typeof window !== 'undefined') {
     return window.location.origin;
   }
-  return (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) || 'http://localhost:3000';
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  if (process.env.BASE_URL) {
+    return process.env.BASE_URL;
+  }
+  return 'http://localhost:3000';
 }
