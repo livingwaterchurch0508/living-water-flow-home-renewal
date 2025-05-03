@@ -25,7 +25,8 @@
     },
     "Common": {
       "viewMore": "더보기",
-      "viewAll": "전체보기"
+      "viewAll": "전체보기",
+      "noData": "데이터가 없습니다."
     }
   },
   "Menu": {

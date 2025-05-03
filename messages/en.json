@@ -25,7 +25,8 @@
     },
     "Common": {
       "viewMore": "more",
-      "viewAll": "all"
+      "viewAll": "all",
+      "noData": "No data"
     }
   },
   "Menu": {
