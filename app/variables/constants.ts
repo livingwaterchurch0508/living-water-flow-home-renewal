@@ -134,15 +134,14 @@ export const SECTION_WIDTH = {
 } as const;
 
 export function getBaseUrl() {
-  return '';
-  // if (typeof window !== 'undefined') {
-  //   return window.location.origin;
-  // }
-  // if (process.env.VERCEL_URL) {
-  //   return `https://${process.env.VERCEL_URL}`;
-  // }
-  // if (process.env.BASE_URL) {
-  //   return process.env.BASE_URL;
-  // }
-  // return 'http://localhost:3000';
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  if (process.env.BASE_URL) {
+    return process.env.BASE_URL;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return 'http://localhost:3000';
 }
