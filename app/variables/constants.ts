@@ -15,7 +15,7 @@ export const ROUTER_PATHS = {
   [MENU_TAB.HYMN]: 'hymns',
   [MENU_TAB.NEWS]: 'news',
   [MENU_TAB.INFO]: 'infos',
-};
+} as const;
 
 export const YOUTUBE_URL = {
   THUMB_NAIL: 'https://img.youtube.com/vi/',
@@ -132,3 +132,10 @@ export const SECTION_WIDTH = {
   EXPANDED: 'w-full md:w-[calc(100vw-291px)]',
   COLLAPSED: 'w-full md:w-[calc(100vw-83px)]',
 } as const;
+
+export function getBaseUrl() {
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  return (process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`) || 'http://localhost:3000';
+}

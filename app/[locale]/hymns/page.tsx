@@ -1,21 +1,32 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { MusicIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-
-import { ContentCard } from '@/app/components/cards/ContentCard';
-import { Skeleton } from '@/app/components/ui/skeleton';
 import { useSidebar } from '@/app/components/ui/sidebar';
 import { HeroSection } from '@/app/components/layout/hero-section';
 import { TabSection } from '@/app/components/layout/tab-section';
-
 import { useInfiniteHymns } from '@/app/hooks/use-hymns';
 import { cn } from '@/app/lib/utils';
 import { HYMN_TAB } from '@/app/variables/enums';
 import { SECTION_WIDTH } from '@/app/variables/constants';
+import { ContentCard } from '@/app/components/cards/ContentCard';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { ContentListSkeleton } from '@/app/components/ui/ContentListSkeleton';
+import { DetailSkeleton } from '@/app/components/ui/DetailSkeleton';
+
+// URL 파라미터에서 특정 param을 제거하고 /hymns로 push하는 함수
+function removeParamAndPush(
+  param: string,
+  searchParams: URLSearchParams,
+  router: AppRouterInstance
+) {
+  const params = new URLSearchParams(searchParams);
+  params.delete(param);
+  router.push(`/hymns?${params.toString()}`);
+}
 
 export default function HymnsPage() {
   const menuT = useTranslations('Menu');
@@ -37,17 +48,13 @@ export default function HymnsPage() {
       const response = await fetch(`/api/hymns/${selectedId}`);
       if (!response.ok) {
         // 에러 발생 시 URL 파라미터에서 id 제거
-        const params = new URLSearchParams(searchParams);
-        params.delete('id');
-        router.push(`/hymns?${params.toString()}`);
+        removeParamAndPush('id', searchParams, router);
         return null;
       }
       const data = await response.json();
       if (data.status === 'error' || !data.payload) {
         // 데이터가 없을 때도 URL 파라미터에서 id 제거
-        const params = new URLSearchParams(searchParams);
-        params.delete('id');
-        router.push(`/hymns?${params.toString()}`);
+        removeParamAndPush('id', searchParams, router);
         return null;
       }
       return data.payload;
@@ -57,9 +64,7 @@ export default function HymnsPage() {
 
   // Dialog 닫을 때 id 파라미터 제거
   const handleCloseDialog = () => {
-    const params = new URLSearchParams(searchParams);
-    params.delete('id');
-    router.push(`/hymns?${params.toString()}`);
+    removeParamAndPush('id', searchParams, router);
   };
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
@@ -68,9 +73,18 @@ export default function HymnsPage() {
       type: currentType,
     });
 
-  const hymns = data?.pages.flatMap((page) => page.payload.items) ?? [];
+  const hymns = (data?.pages ?? []).flatMap((page) => page.payload.items);
+
+  const hymnsForRender = useMemo(() => {
+    return hymns.map((hymn) => ({
+      ...hymn,
+      name: locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || '',
+      desc: locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || '',
+    }));
+  }, [hymns, locale]);
 
   useEffect(() => {
+    if (!observerTarget.current) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
@@ -79,13 +93,12 @@ export default function HymnsPage() {
       },
       { threshold: 0.1 }
     );
+    observer.observe(observerTarget.current);
 
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+    return () => {
+      observer.disconnect();
+    };
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, observerTarget]);
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -129,20 +142,17 @@ export default function HymnsPage() {
         {isError ? (
           <div className="text-center py-20">
             <p className="text-lg text-red-500 mb-2">{errorT('fetchFailed')}</p>
-            <p className="text-sm text-muted-foreground">{error?.message}</p>
+            {error?.message ? (
+              <p className="text-sm text-muted-foreground">{error.message}</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                알 수 없는 오류가 발생했습니다. 네트워크 상태를 확인하거나, 잠시 후 다시 시도해
+                주세요.
+              </p>
+            )}
           </div>
         ) : isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-            {[...Array(12)].map((_, i) => (
-              <div key={i} className="flex flex-col bg-card rounded-xl overflow-hidden">
-                <Skeleton className="w-full aspect-video" />
-                <div className="p-4 space-y-2.5">
-                  <Skeleton className="h-5 w-[85%]" />
-                  <Skeleton className="h-4 w-[60%]" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <ContentListSkeleton count={12} />
         ) : hymns.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-lg text-muted-foreground">{searchT('noResults')}</p>
@@ -150,34 +160,23 @@ export default function HymnsPage() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-              {hymns.map((hymn) => (
-                <div key={hymn.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
-                  <ContentCard
-                    name={locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || ''}
-                    desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
-                    url={hymn.url || ''}
-                    createdAt={hymn.createdAt || ''}
-                    type="hymn"
-                  />
-                </div>
+              {hymnsForRender.map((hymn) => (
+                <ContentCard
+                  key={hymn.id}
+                  name={hymn.name}
+                  desc={hymn.desc}
+                  url={hymn.url || ''}
+                  createdAt={hymn.createdAt || ''}
+                  type="hymn"
+                  autoOpen={false}
+                  onDialogClose={handleCloseDialog}
+                />
               ))}
             </div>
 
             {/* 무한 스크롤 로딩 인디케이터 */}
             <div ref={observerTarget} className="mt-8">
-              {isFetchingNextPage && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="flex flex-col bg-card rounded-xl overflow-hidden">
-                      <Skeleton className="w-full aspect-video" />
-                      <div className="p-4 space-y-2.5">
-                        <Skeleton className="h-5 w-[85%]" />
-                        <Skeleton className="h-4 w-[60%]" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {isFetchingNextPage && <ContentListSkeleton count={12} />}
             </div>
           </>
         )}
@@ -187,13 +186,7 @@ export default function HymnsPage() {
       {selectedId && selectedHymnData && (
         <>
           {isLoadingHymn ? (
-            <div className="w-full aspect-video bg-card rounded-xl p-8">
-              <div className="h-full flex flex-col gap-4">
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-6 w-1/2" />
-                <Skeleton className="flex-1 w-full" />
-              </div>
-            </div>
+            <DetailSkeleton />
           ) : (
             <ContentCard
               name={

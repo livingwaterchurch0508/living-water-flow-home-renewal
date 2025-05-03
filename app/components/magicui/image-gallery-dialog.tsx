@@ -179,6 +179,7 @@ export default function ImageGalleryDialog({
                         ? 'cubic-bezier(0.36, 0, 0.66, -0.56)'
                         : 'cubic-bezier(0.34, 1.56, 0.64, 1)'
                     }
+                    onIndexChange={setCurrentIndex}
                   >
                     {images.map((img, idx) => (
                       <PhotoView key={idx} src={`${img.src}&size=original`}>
@@ -212,9 +213,6 @@ export default function ImageGalleryDialog({
                       initial={{ opacity: 0, x: 0 }}
                       animate={controls}
                       style={{ x, opacity }}
-                      drag={images.length > 1 ? 'x' : false}
-                      dragConstraints={{ left: 0, right: 0 }}
-                      dragElastic={images.length > 1 ? 1 : 0}
                       onDragEnd={images.length > 1 ? handleDragEnd : undefined}
                       transition={{
                         x: { type: 'spring', stiffness: 300, damping: 30 },

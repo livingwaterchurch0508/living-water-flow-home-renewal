@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { BookOpenIcon } from 'lucide-react';
@@ -8,7 +8,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { SermonCard } from '@/app/components/cards/SermonCard';
-import { Skeleton } from '@/app/components/ui/skeleton';
 import { useSidebar } from '@/app/components/ui/sidebar';
 import { MasonryGrid, MasonryItem } from '@/app/components/magicui/masonry-grid';
 import { HeroSection } from '@/app/components/layout/hero-section';
@@ -18,6 +17,23 @@ import { useInfiniteSermons } from '@/app/hooks/use-sermons';
 import { cn } from '@/app/lib/utils';
 import { SERMON_TAB } from '@/app/variables/enums';
 import { SECTION_WIDTH } from '@/app/variables/constants';
+import { DetailSkeleton } from '@/app/components/ui/DetailSkeleton';
+import { ContentListSkeleton } from '@/app/components/ui/ContentListSkeleton';
+
+// URL 파라미터에서 특정 param을 제거하고 /sermons로 push하는 함수
+function removeParamAndPush(
+  param: string,
+  searchParams: URLSearchParams,
+  router: unknown,
+  basePath: string
+) {
+  const params = new URLSearchParams(searchParams);
+  params.delete(param);
+  const paramString = params.toString();
+  (router as { push: (url: string) => void }).push(
+    paramString ? `${basePath}?${paramString}` : basePath
+  );
+}
 
 export default function SermonsPage() {
   const t = useTranslations('Main');
@@ -27,7 +43,8 @@ export default function SermonsPage() {
   const { state } = useSidebar();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentType = Number(searchParams.get('type')) || SERMON_TAB.RHEMA;
+  const currentType = searchParams.get('type') ?? SERMON_TAB.RHEMA.toString();
+  const currentTypeNumber = Number(currentType);
   const selectedId = searchParams.get('id');
   const observerTarget = useRef<HTMLDivElement>(null);
   const [selectedSermon, setSelectedSermon] = useState<{ name: string; desc: string } | null>(null);
@@ -37,41 +54,47 @@ export default function SermonsPage() {
     queryKey: ['sermon', selectedId],
     queryFn: async () => {
       if (!selectedId) return null;
-      const response = await fetch(`/api/sermons/${selectedId}`);
-      if (!response.ok) {
-        // 에러 발생 시 URL 파라미터에서 id 제거
-        const params = new URLSearchParams(searchParams);
-        params.delete('id');
-        router.push(`/sermons?${params.toString()}`);
+      try {
+        const response = await fetch(`/api/sermons/${selectedId}`);
+        if (!response.ok) {
+          removeParamAndPush('id', searchParams, router, '/sermons');
+          return null;
+        }
+        const data = await response.json();
+        if (data.status === 'error' || !data.payload) {
+          removeParamAndPush('id', searchParams, router, '/sermons');
+          return null;
+        }
+        return data.payload;
+      } catch {
+        removeParamAndPush('id', searchParams, router, '/sermons');
         return null;
       }
-      const data = await response.json();
-      if (data.status === 'error' || !data.payload) {
-        // 데이터가 없을 때도 URL 파라미터에서 id 제거
-        const params = new URLSearchParams(searchParams);
-        params.delete('id');
-        router.push(`/sermons?${params.toString()}`);
-        return null;
-      }
-      return data.payload;
     },
     enabled: !!selectedId,
   });
 
   // Dialog 닫을 때 id 파라미터 제거
   const handleCloseDialog = () => {
-    const params = new URLSearchParams(searchParams);
-    params.delete('id');
-    router.push(`/sermons?${params.toString()}`);
+    removeParamAndPush('id', searchParams, router, '/sermons');
   };
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
     useInfiniteSermons({
       limit: 12,
-      type: currentType,
+      type: currentTypeNumber,
     });
 
-  const sermons = data?.pages.flatMap((page) => page.payload.items) ?? [];
+  const sermons = (data?.pages ?? []).flatMap((page) => page.payload.items);
+
+  // sermons 다국어 변환 useMemo 적용
+  const sermonsForRender = useMemo(() => {
+    return sermons.map((sermon) => ({
+      ...sermon,
+      name: locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || '',
+      desc: locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || '',
+    }));
+  }, [sermons, locale]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -83,45 +106,14 @@ export default function SermonsPage() {
       { threshold: 0.1, rootMargin: '100px' }
     );
 
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
+    const target = observerTarget.current;
+    if (target) observer.observe(target);
 
-    return () => observer.disconnect();
+    return () => {
+      if (target) observer.unobserve(target);
+      observer.disconnect();
+    };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
-
-  const LoadingSkeleton = () => {
-    if (currentType === SERMON_TAB.SOUL) {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="space-y-2 p-6 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900"
-            >
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-2/3" />
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-        {[...Array(12)].map((_, i) => (
-          <div key={i} className="flex flex-col bg-card rounded-xl overflow-hidden">
-            <Skeleton className="w-full aspect-video" />
-            <div className="p-4 space-y-2.5">
-              <Skeleton className="h-5 w-[85%]" />
-              <Skeleton className="h-4 w-[60%]" />
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
 
   const renderContent = () => {
     if (isError) {
@@ -134,7 +126,7 @@ export default function SermonsPage() {
     }
 
     if (isLoading) {
-      return <LoadingSkeleton />;
+      return <ContentListSkeleton count={12} />;
     }
 
     if (sermons.length === 0) {
@@ -145,11 +137,11 @@ export default function SermonsPage() {
       );
     }
 
-    if (currentType === SERMON_TAB.SOUL) {
+    if (currentTypeNumber === SERMON_TAB.SOUL) {
       return (
         <>
           <MasonryGrid className="gap-2 sm:gap-3 md:gap-4">
-            {sermons.map((sermon, index) => {
+            {sermonsForRender.map((sermon, index) => {
               const contentLength = (sermon.name?.length || 0) + (sermon.desc?.length || 0);
               let span = 6;
 
@@ -169,13 +161,16 @@ export default function SermonsPage() {
               ];
               const gradientClass = gradients[index % gradients.length];
 
-              const name = locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || '';
-              const desc = locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || '';
-
               return (
                 <MasonryItem key={sermon.id} span={span}>
                   <button
-                    onClick={() => setSelectedSermon({ name, desc })}
+                    data-testid="sermon-card-button"
+                    onClick={() => {
+                      // Dialog를 URL 파라미터로만 관리하도록 변경
+                      const params = new URLSearchParams(searchParams);
+                      params.set('id', String(sermon.id));
+                      router.push(`/sermons?${params.toString()}`);
+                    }}
                     className={cn(
                       'group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300',
                       gradientClass,
@@ -184,9 +179,9 @@ export default function SermonsPage() {
                   >
                     <div className="space-y-1 sm:space-y-2 text-left">
                       <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">
-                        {name}
+                        {sermon.name}
                       </h3>
-                      <p className="text-base sm:text-base text-muted-foreground">{desc}</p>
+                      <p className="text-base sm:text-base text-muted-foreground">{sermon.desc}</p>
                     </div>
                   </button>
                 </MasonryItem>
@@ -205,20 +200,7 @@ export default function SermonsPage() {
 
           {/* 무한 스크롤 로딩 인디케이터 */}
           <div ref={observerTarget} className="mt-8">
-            {isFetchingNextPage && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="space-y-2 p-6 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900"
-                  >
-                    <Skeleton className="h-6 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-2/3" />
-                  </div>
-                ))}
-              </div>
-            )}
+            {isFetchingNextPage && <ContentListSkeleton count={12} />}
           </div>
         </>
       );
@@ -227,11 +209,11 @@ export default function SermonsPage() {
     return (
       <>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-          {sermons.map((sermon) => (
+          {sermonsForRender.map((sermon) => (
             <div key={sermon.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
               <ContentCard
-                name={locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''}
-                desc={locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''}
+                name={sermon.name}
+                desc={sermon.desc}
                 url={sermon.url || ''}
                 createdAt={sermon.createdAt || ''}
                 type="sermon"
@@ -242,19 +224,7 @@ export default function SermonsPage() {
 
         {/* 무한 스크롤 로딩 인디케이터 */}
         <div ref={observerTarget} className="mt-8">
-          {isFetchingNextPage && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="flex flex-col bg-card rounded-xl overflow-hidden">
-                  <Skeleton className="w-full aspect-video" />
-                  <div className="p-4 space-y-2.5">
-                    <Skeleton className="h-5 w-[85%]" />
-                    <Skeleton className="h-4 w-[60%]" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          {isFetchingNextPage && <ContentListSkeleton count={12} />}
         </div>
       </>
     );
@@ -278,13 +248,13 @@ export default function SermonsPage() {
 
       <TabSection
         tabs={[
-          { id: SERMON_TAB.RHEMA, label: menuT('Sermon.sermon') },
-          { id: SERMON_TAB.SOUL, label: menuT('Sermon.soul') },
+          { id: SERMON_TAB.RHEMA.toString(), label: menuT('Sermon.sermon') },
+          { id: SERMON_TAB.SOUL.toString(), label: menuT('Sermon.soul') },
         ]}
         activeTab={currentType}
-        onTabChange={(tabId) => {
+        onTabChange={(tabId: string) => {
           const params = new URLSearchParams(searchParams);
-          params.set('type', tabId.toString());
+          params.set('type', tabId);
           router.push(`/sermons?${params.toString()}`);
         }}
         accentColor="bg-blue-500"
@@ -304,14 +274,8 @@ export default function SermonsPage() {
       {selectedId && selectedSermonData && (
         <>
           {isLoadingSermon ? (
-            <div className="w-full aspect-video bg-card rounded-xl p-8">
-              <div className="h-full flex flex-col gap-4">
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-6 w-1/2" />
-                <Skeleton className="flex-1 w-full" />
-              </div>
-            </div>
-          ) : currentType === SERMON_TAB.SOUL ? (
+            <DetailSkeleton />
+          ) : currentTypeNumber === SERMON_TAB.SOUL ? (
             <SermonCard
               name={
                 locale === 'en'

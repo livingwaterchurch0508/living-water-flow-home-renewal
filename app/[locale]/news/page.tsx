@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { NewspaperIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
-import { Skeleton } from '@/app/components/ui/skeleton';
 import { useSidebar } from '@/app/components/ui/sidebar';
 import { HeroSection } from '@/app/components/layout/hero-section';
 import { TabSection } from '@/app/components/layout/tab-section';
+import { ContentListSkeleton } from '@/app/components/ui/ContentListSkeleton';
+import { DetailSkeleton } from '@/app/components/ui/DetailSkeleton';
 
 import { useInfiniteCommunities } from '@/app/hooks/use-communities';
 import { cn } from '@/app/lib/utils';
@@ -69,7 +70,16 @@ export default function NewsPage() {
       type: currentType,
     });
 
-  const communities = data?.pages.flatMap((page) => page.payload.items) ?? [];
+  const communities = (data?.pages ?? []).flatMap((page) => page.payload.items);
+
+  // communities 다국어 변환 useMemo 적용
+  const communitiesForRender = useMemo(() => {
+    return communities.map((community) => ({
+      ...community,
+      name: locale === 'en' ? community.nameEn || community.name || '' : community.name || '',
+      desc: locale === 'en' ? community.descEn || community.desc || '' : community.desc || '',
+    }));
+  }, [communities, locale]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -80,12 +90,12 @@ export default function NewsPage() {
       },
       { threshold: 0.1 }
     );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => observer.disconnect();
+    const target = observerTarget.current;
+    if (target) observer.observe(target);
+    return () => {
+      if (target) observer.unobserve(target);
+      observer.disconnect();
+    };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
@@ -131,17 +141,7 @@ export default function NewsPage() {
             <p className="text-sm text-muted-foreground">{error?.message || errorT('tryAgain')}</p>
           </div>
         ) : isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-            {[...Array(12)].map((_, i) => (
-              <div key={i} className="flex flex-col bg-card rounded-xl overflow-hidden">
-                <Skeleton className="w-full aspect-video" />
-                <div className="p-4 space-y-2.5">
-                  <Skeleton className="h-5 w-[85%]" />
-                  <Skeleton className="h-4 w-[60%]" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <ContentListSkeleton count={12} />
         ) : communities.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-lg text-muted-foreground">{searchT('noResults')}</p>
@@ -149,7 +149,7 @@ export default function NewsPage() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-              {communities.map((community) => (
+              {communitiesForRender.map((community) => (
                 <div
                   key={community.id}
                   onClick={() => {
@@ -158,16 +158,8 @@ export default function NewsPage() {
                   className="cursor-pointer"
                 >
                   <CommunityCard
-                    name={
-                      locale === 'en'
-                        ? community.nameEn || community.name || ''
-                        : community.name || ''
-                    }
-                    desc={
-                      locale === 'en'
-                        ? community.descEn || community.desc || ''
-                        : community.desc || ''
-                    }
+                    name={community.name}
+                    desc={community.desc}
                     url={community.files[0]?.url || ''}
                     createdAt={community.createdAt || ''}
                     caption={Number(community.files[0]?.caption) || 1}
@@ -182,19 +174,7 @@ export default function NewsPage() {
 
             {/* 무한 스크롤 로딩 인디케이터 */}
             <div ref={observerTarget} className="mt-8">
-              {isFetchingNextPage && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="flex flex-col bg-card rounded-xl overflow-hidden">
-                      <Skeleton className="w-full aspect-video" />
-                      <div className="p-4 space-y-2.5">
-                        <Skeleton className="h-5 w-[85%]" />
-                        <Skeleton className="h-4 w-[60%]" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {isFetchingNextPage && <ContentListSkeleton count={12} />}
             </div>
           </>
         )}
@@ -204,13 +184,7 @@ export default function NewsPage() {
       {selectedId && selectedCommunityData && (
         <>
           {isLoadingCommunity ? (
-            <div className="w-full aspect-video bg-card rounded-xl p-8">
-              <div className="h-full flex flex-col gap-4">
-                <Skeleton className="h-8 w-3/4" />
-                <Skeleton className="h-6 w-1/2" />
-                <Skeleton className="flex-1 w-full" />
-              </div>
-            </div>
+            <DetailSkeleton />
           ) : (
             <CommunityCard
               name={

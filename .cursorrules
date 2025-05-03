@@ -1,0 +1,25 @@
+{
+  "packageManager": "yarn",
+  "typescript": {
+    "enabled": true,
+    "strict": true
+  },
+  "environment": {
+    "node": {
+      "path": "/opt/homebrew/bin/node",
+      "minVersion": "18.18.0"
+    }
+  },
+  "scripts": {
+    "dev": "yarn dev",
+    "build": "yarn build",
+    "test": "yarn playwright test",
+    "lint": "yarn lint"
+  },
+  "setup": {
+    "commands": [
+      "export PATH=\"/opt/homebrew/bin:$PATH\"",
+      "source ~/.zshrc"
+    ]
+  }
+} 

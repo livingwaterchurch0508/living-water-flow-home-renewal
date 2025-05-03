@@ -78,6 +78,7 @@ export function ContentCard({
                     ? '300px'
                     : '(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'
                 }
+                priority
               />
               <div className="absolute inset-0 bg-black/40" />
               <div className="absolute inset-0 p-4 sm:p-6">

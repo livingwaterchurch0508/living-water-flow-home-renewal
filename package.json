@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "pretty": "prettier --write ./app",
-    "prebuild": "node generate-google-credentials.js"
+    "prebuild": "node generate-google-credentials.js",
+    "test-ct": "playwright-ct test"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.16.0",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/experimental-ct-react": "^1.52.0",
     "@playwright/test": "^1.52.0",
     "@tailwindcss/postcss": "^4",
     "@types/luxon": "^3.6.2",
