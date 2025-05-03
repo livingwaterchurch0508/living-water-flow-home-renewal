@@ -12,7 +12,7 @@ import { getRelativeTime } from '@/app/lib/date';
 import { YOUTUBE_URL } from '@/app/variables/constants';
 
 interface ContentCardProps {
-  type: 'hymn' | 'sermon' ;
+  type: 'hymn' | 'sermon';
   name: string;
   desc: string;
   url: string;
@@ -37,7 +37,7 @@ export function ContentCard({
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const { locale } = useParams();
   const videoSrc = `${YOUTUBE_URL.EMBED}${url}`;
-  const thumbnailSrc = `${YOUTUBE_URL.THUMB_NAIL}${url}/0.jpg`;
+  const thumbnailSrc = `${YOUTUBE_URL.THUMB_NAIL}${url}/mqdefault.jpg`;
   const relativeTime = getRelativeTime(createdAt, locale as string);
 
   useEffect(() => {
@@ -84,10 +84,16 @@ export function ContentCard({
               <div className="absolute inset-0 p-4 sm:p-6">
                 <div className="relative z-10 h-full flex flex-col">
                   <div className="flex-1 space-y-2">
-                    <h3 className="text-base sm:text-lg font-semibold text-white line-clamp-2 mb-2" data-testid={`content-card-title-${type}`}>
+                    <h3
+                      className="text-base sm:text-lg font-semibold text-white line-clamp-2 mb-2"
+                      data-testid={`content-card-title-${type}`}
+                    >
                       {name}
                     </h3>
-                    <p className="text-xs sm:text-sm text-neutral-200 line-clamp-2" data-testid={`content-card-desc-${type}`}>
+                    <p
+                      className="text-xs sm:text-sm text-neutral-200 line-clamp-2"
+                      data-testid={`content-card-desc-${type}`}
+                    >
                       {desc}
                     </p>
                   </div>

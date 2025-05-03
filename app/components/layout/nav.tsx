@@ -167,7 +167,7 @@ export function Nav() {
           <div className="flex items-center gap-1 md:gap-2">
             <SidebarTrigger />
             <Link href={`/${locale}`} className="flex items-center gap-1 md:gap-2">
-              <Image src="/logo.png" alt="logo" width={32} height={32} className="rounded-sm" />
+              <Image src="/logo.webp" alt="logo" width={32} height={32} className="rounded-sm" />
               <span className="hidden lg:block text-lg font-semibold">{t('name')}</span>
             </Link>
           </div>
