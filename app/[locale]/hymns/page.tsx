@@ -14,8 +14,8 @@ import { HYMN_TAB } from '@/app/variables/enums';
 import { SECTION_WIDTH } from '@/app/variables/constants';
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { ContentListSkeleton } from '@/app/components/ui/ContentListSkeleton';
-import { DetailSkeleton } from '@/app/components/ui/DetailSkeleton';
+import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
+import { DetailSkeleton } from '@/app/components/ui/detail-skeleton';
 
 // URL 파라미터에서 특정 param을 제거하고 /hymns로 push하는 함수
 function removeParamAndPush(

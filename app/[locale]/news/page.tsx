@@ -10,8 +10,8 @@ import { CommunityCard } from '@/app/components/cards/CommunityCard';
 import { useSidebar } from '@/app/components/ui/sidebar';
 import { HeroSection } from '@/app/components/layout/hero-section';
 import { TabSection } from '@/app/components/layout/tab-section';
-import { ContentListSkeleton } from '@/app/components/ui/ContentListSkeleton';
-import { DetailSkeleton } from '@/app/components/ui/DetailSkeleton';
+import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
+import { DetailSkeleton } from '@/app/components/ui/detail-skeleton';
 
 import { useInfiniteCommunities } from '@/app/hooks/use-communities';
 import { cn } from '@/app/lib/utils';

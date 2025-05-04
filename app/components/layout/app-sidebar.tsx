@@ -27,7 +27,7 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from '@/app/components/ui/collapsible';
-import Youtube from '@/app/components/icon/Youtube';
+import { Youtube } from '@/app/components/icon/Youtube';
 
 import { cn } from '@/app/lib/utils';
 import { Menus, ROUTER_PATHS, YOUTUBE_URL } from '@/app/variables/constants';
@@ -126,7 +126,7 @@ export function AppSidebar() {
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton tooltip={t(group.name)} asChild={group.items.length > 0}>
-                      <div 
+                      <div
                         className="flex items-center w-full"
                         onClick={() => {
                           if (group.items.length === 0) {
@@ -163,7 +163,7 @@ export function AppSidebar() {
                           <SidebarMenuSub>
                             {group.items.map((item) => (
                               <SidebarMenuSubItem key={item.name}>
-                                <SidebarMenuSubButton 
+                                <SidebarMenuSubButton
                                   asChild
                                   onClick={(e) => {
                                     e.preventDefault();
@@ -193,9 +193,9 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip={t('youtube')} asChild>
-              <Link 
-                href={YOUTUBE_URL.CHANNEL} 
-                target="_blank" 
+              <Link
+                href={YOUTUBE_URL.CHANNEL}
+                target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpenMobile(false)}
               >

@@ -6,10 +6,14 @@ import { Church, HomeIcon, Music, Newspaper, MapPin, BookOpen } from 'lucide-rea
 import { usePathname } from 'next/navigation';
 
 import { Dock, DockIcon } from '@/app/components/magicui/dock';
-import { Separator } from '@/app/components/ui/separator';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/app/components/ui/tooltip';
-import Youtube from '@/app/components/icon/Youtube';
-import { buttonVariants } from '@/app/components/ui/button';
+import {
+  Separator,
+  buttonVariants,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/app/components/ui';
+import { Youtube } from '@/app/components/icon/Youtube';
 
 import { cn } from '@/app/lib/utils';
 import { ROUTER_PATHS, YOUTUBE_URL } from '@/app/variables/constants';

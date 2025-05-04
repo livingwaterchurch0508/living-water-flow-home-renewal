@@ -8,11 +8,10 @@ import { useInView } from 'react-intersection-observer';
 
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
-import { Carousel, CarouselContent, CarouselItem } from '@/app/components/ui/carousel';
-import Youtube from '@/app/components/icon/Youtube';
-import { buttonVariants } from '@/app/components/ui/button';
-import { MasonryGrid, MasonryItem } from '@/app/components/magicui/masonry-grid';
 import { SermonCard } from '@/app/components/cards/SermonCard';
+import { Carousel, CarouselContent, CarouselItem, buttonVariants } from '@/app/components/ui';
+import { MasonryGrid, MasonryItem } from '@/app/components/magicui/masonry-grid';
+import { Youtube } from '@/app/components/icon/Youtube';
 import { HeroSection } from '@/app/components/layout/hero-section';
 import HomeSection from '@/app/components/layout/home-section';
 
@@ -20,6 +19,7 @@ import { cn } from '@/app/lib/utils';
 import { YOUTUBE_URL, ROUTER_PATHS } from '@/app/variables/constants';
 import { MENU_TAB, INTRODUCE_TAB } from '@/app/variables/enums';
 import type { IHymn, ISermon, ICommunity } from '@/app/variables/interfaces';
+import { ContentListSkeleton } from '@/app/components/ui';
 
 interface ApiResponse<T> {
   status: string;
@@ -31,10 +31,7 @@ interface HomeClientProps {
   hymns: IHymn[];
 }
 
-export default function HomeLayout({
-  locale,
-  hymns,
-}: HomeClientProps) {
+export default function HomeLayout({ locale, hymns }: HomeClientProps) {
   const t = useTranslations('Main');
   const menuT = useTranslations('Menu');
   const [selectedSermon, setSelectedSermon] = useState<{ name: string; desc: string } | null>(null);
@@ -154,7 +151,9 @@ export default function HomeLayout({
           <Carousel className="w-full">
             <CarouselContent className="-ml-4">
               {sermonsLoading ? (
-                <div className="w-full text-center py-8 text-muted-foreground">Loading...</div>
+                <div className="w-full text-center py-8 text-muted-foreground">
+                  <ContentListSkeleton count={12} />
+                </div>
               ) : sermons.length === 0 ? (
                 <div className="w-full text-center py-8 text-muted-foreground">
                   {t('Common.noData')}
@@ -164,8 +163,12 @@ export default function HomeLayout({
                   <CarouselItem key={sermon.id} className="pl-4 basis-auto">
                     <ContentCard
                       type="sermon"
-                      name={locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''}
-                      desc={locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''}
+                      name={
+                        locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''
+                      }
+                      desc={
+                        locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''
+                      }
                       url={sermon.url || ''}
                       createdAt={sermon.createdAt || ''}
                       variant="home"
@@ -187,7 +190,9 @@ export default function HomeLayout({
           <Carousel className="w-full">
             <CarouselContent className="-ml-4">
               {commLoading ? (
-                <div className="w-full text-center py-8 text-muted-foreground">Loading...</div>
+                <div className="w-full text-center py-8 text-muted-foreground">
+                  <ContentListSkeleton count={12} />
+                </div>
               ) : communities.length === 0 ? (
                 <div className="w-full text-center py-8 text-muted-foreground">
                   {t('Common.noData')}
@@ -196,8 +201,16 @@ export default function HomeLayout({
                 communities.map((community: ICommunity) => (
                   <CarouselItem key={community.id} className="pl-4 basis-auto">
                     <CommunityCard
-                      name={locale === 'en' ? community.nameEn || community.name || '' : community.name || ''}
-                      desc={locale === 'en' ? community.descEn || community.desc || '' : community.desc || ''}
+                      name={
+                        locale === 'en'
+                          ? community.nameEn || community.name || ''
+                          : community.name || ''
+                      }
+                      desc={
+                        locale === 'en'
+                          ? community.descEn || community.desc || ''
+                          : community.desc || ''
+                      }
                       url={community.files[0]?.url || ''}
                       createdAt={community.createdAt || ''}
                       caption={Number(community.files[0]?.caption) || 1}
@@ -218,7 +231,9 @@ export default function HomeLayout({
       >
         <div ref={type1Ref}>
           {type1Loading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading...</div>
+            <div className="text-center py-8 text-muted-foreground">
+              <ContentListSkeleton count={12} />
+            </div>
           ) : type1Sermons.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">{t('Common.noData')}</div>
           ) : (
@@ -241,8 +256,10 @@ export default function HomeLayout({
                     'bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 dark:from-violet-500/20 dark:to-fuchsia-500/20',
                   ];
                   const gradientClass = gradients[index % gradients.length];
-                  const name = locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || '';
-                  const desc = locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || '';
+                  const name =
+                    locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || '';
+                  const desc =
+                    locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || '';
                   return (
                     <MasonryItem key={sermon.id} span={span}>
                       <button
@@ -255,10 +272,16 @@ export default function HomeLayout({
                         )}
                       >
                         <div className="space-y-1 sm:space-y-2 text-left">
-                          <h3 data-testid="sermon-card-title" className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">
+                          <h3
+                            data-testid="sermon-card-title"
+                            className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight"
+                          >
                             {name}
                           </h3>
-                          <p data-testid="sermon-card-desc" className="text-base sm:text-base text-muted-foreground">
+                          <p
+                            data-testid="sermon-card-desc"
+                            className="text-base sm:text-base text-muted-foreground"
+                          >
                             {desc}
                           </p>
                         </div>

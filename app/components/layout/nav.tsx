@@ -30,7 +30,7 @@ import {
 import { SidebarTrigger } from '@/app/components/ui/sidebar';
 import { ModeToggle } from '@/app/components/icon/mode-toggle';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/app/components/ui/tooltip';
-import Youtube from '@/app/components/icon/Youtube';
+import { Youtube } from '@/app/components/icon/Youtube';
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
 import { SermonCard } from '@/app/components/cards/SermonCard';

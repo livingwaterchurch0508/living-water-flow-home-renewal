@@ -1,6 +1,6 @@
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
-export default function Youtube(props: IconProps) {
+export function Youtube(props: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

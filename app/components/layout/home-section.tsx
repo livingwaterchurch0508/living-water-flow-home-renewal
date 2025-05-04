@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRightIcon } from 'lucide-react';
 
 import { useSidebar } from '@/app/components/ui/sidebar';
+
 import { cn } from '@/app/lib/utils';
 import { SECTION_WIDTH } from '@/app/variables/constants';
 
