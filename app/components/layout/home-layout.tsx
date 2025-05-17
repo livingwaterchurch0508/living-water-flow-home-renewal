@@ -36,6 +36,11 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
   const menuT = useTranslations('Menu');
   const [selectedSermon, setSelectedSermon] = useState<ISermon | null>(null);
 
+  const typeColorMap: Record<number, string> = {
+    0: 'text-blue-600 dark:text-blue-400',
+    1: 'text-green-600 dark:text-green-400',
+    2: 'text-purple-600 dark:text-purple-400',
+  };
   const typeLabel = (sermonType?: SOUL_TYPE | null) => {
     switch (sermonType) {
       case SOUL_TYPE.INTRODUCE:
@@ -238,7 +243,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
       </HomeSection>
 
       <HomeSection
-        path={`${ROUTER_PATHS[MENU_TAB.SERMON]}?type=SOUL`}
+        path={`${ROUTER_PATHS[MENU_TAB.SERMON]}?type=1`}
         title={t('Spirit.title')}
         viewAll={t('Common.viewAll')}
       >
@@ -252,7 +257,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
           ) : (
             <div className="w-full">
               <MasonryGrid className="gap-2 sm:gap-3 md:gap-4">
-                {type1Sermons.map((sermon: ISermon, index: number) => {
+                {type1Sermons.map((sermon: ISermon) => {
                   const contentLength = (sermon.name?.length || 0) + (sermon.desc?.length || 0);
                   let span = 6;
                   if (contentLength > 200) {
@@ -262,13 +267,12 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
                   } else if (contentLength < 50) {
                     span = 5;
                   }
-                  const gradients = [
-                    'bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-500/20 dark:to-purple-500/20',
-                    'bg-gradient-to-br from-rose-500/10 to-orange-500/10 dark:from-rose-500/20 dark:to-orange-500/20',
-                    'bg-gradient-to-br from-green-500/10 to-emerald-500/10 dark:from-green-500/20 dark:to-emerald-500/20',
-                    'bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 dark:from-violet-500/20 dark:to-fuchsia-500/20',
-                  ];
-                  const gradientClass = gradients[index % gradients.length];
+                  const gradientMap: Record<number, string> = {
+                    0: 'bg-gradient-to-br from-blue-200/30 to-blue-100/10 dark:from-blue-500/20 dark:to-blue-400/10',
+                    1: 'bg-gradient-to-br from-green-200/30 to-green-100/10 dark:from-green-500/20 dark:to-green-400/10',
+                    2: 'bg-gradient-to-br from-purple-200/30 to-purple-100/10 dark:from-purple-500/20 dark:to-purple-400/10',
+                  };
+                  const gradientClass = gradientMap[sermon.viewCount ?? 0];
                   const name =
                     locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || '';
                   const desc =
@@ -285,7 +289,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
                         )}
                       >
                         <div className="space-y-1 sm:space-y-2 text-left">
-                          <div className="text-xs text-muted-foreground ">
+                          <div className={cn('text-xs', typeColorMap[sermon.viewCount ?? 0])}>
                             {typeLabel(sermon.viewCount)}
                           </div>
                           <h3
