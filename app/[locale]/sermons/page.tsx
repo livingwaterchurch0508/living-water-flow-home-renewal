@@ -15,10 +15,11 @@ import { TabSection } from '@/app/components/layout/tab-section';
 
 import { useInfiniteSermons } from '@/app/hooks/use-sermons';
 import { cn } from '@/app/lib/utils';
-import { SERMON_TAB } from '@/app/variables/enums';
+import { SERMON_TAB, SOUL_TYPE } from '@/app/variables/enums';
 import { SECTION_WIDTH } from '@/app/variables/constants';
 import { DetailSkeleton } from '@/app/components/ui/detail-skeleton';
 import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
+import type { ISermon } from '@/app/variables/interfaces';
 
 // URL 파라미터에서 특정 param을 제거하고 /sermons로 push하는 함수
 function removeParamAndPush(
@@ -47,7 +48,20 @@ export default function SermonsPage() {
   const currentTypeNumber = Number(currentType);
   const selectedId = searchParams.get('id');
   const observerTarget = useRef<HTMLDivElement>(null);
-  const [selectedSermon, setSelectedSermon] = useState<{ name: string; desc: string } | null>(null);
+  const [selectedSermon, setSelectedSermon] = useState<ISermon | null>(null);
+
+  const typeLabel = (sermonType?: SOUL_TYPE | null) => {
+    switch (sermonType) {
+      case SOUL_TYPE.INTRODUCE:
+        return menuT('Sermon.introduce');
+      case SOUL_TYPE.MISSION:
+        return menuT('Sermon.mission');
+      case SOUL_TYPE.SPIRIT:
+        return menuT('Sermon.spirit');
+      default:
+        return '';
+    }
+  };
 
   // 선택된 설교 데이터를 가져오는 쿼리
   const { data: selectedSermonData, isLoading: isLoadingSermon } = useQuery({
@@ -73,6 +87,13 @@ export default function SermonsPage() {
     },
     enabled: !!selectedId,
   });
+
+  // searchParams에 id가 없을 때만 state로 다이얼로그 관리
+  useEffect(() => {
+    if (selectedId) {
+      setSelectedSermon(null);
+    }
+  }, [selectedId]);
 
   // Dialog 닫을 때 id 파라미터 제거
   const handleCloseDialog = () => {
@@ -165,12 +186,7 @@ export default function SermonsPage() {
                 <MasonryItem key={sermon.id} span={span}>
                   <button
                     data-testid="sermon-card-button"
-                    onClick={() => {
-                      // Dialog를 URL 파라미터로만 관리하도록 변경
-                      const params = new URLSearchParams(searchParams);
-                      params.set('id', String(sermon.id));
-                      router.push(`/sermons?${params.toString()}`);
-                    }}
+                    onClick={() => setSelectedSermon(sermon)}
                     className={cn(
                       'group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300',
                       gradientClass,
@@ -178,6 +194,9 @@ export default function SermonsPage() {
                     )}
                   >
                     <div className="space-y-1 sm:space-y-2 text-left">
+                      <div className="text-xs text-muted-foreground mb-2 ">
+                        {typeLabel(sermon.viewCount)}
+                      </div>
                       <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">
                         {sermon.name}
                       </h3>
@@ -189,10 +208,11 @@ export default function SermonsPage() {
             })}
           </MasonryGrid>
 
-          {selectedSermon && (
+          {selectedSermon && !selectedId && (
             <SermonCard
-              name={selectedSermon.name}
-              desc={selectedSermon.desc}
+              name={selectedSermon.name || ''}
+              desc={selectedSermon.desc || ''}
+              sermonType={selectedSermon.viewCount}
               autoOpen={true}
               onDialogClose={() => setSelectedSermon(null)}
             />
@@ -287,6 +307,7 @@ export default function SermonsPage() {
                   ? selectedSermonData.descEn || selectedSermonData.desc
                   : selectedSermonData.desc
               }
+              sermonType={selectedSermonData.viewCount}
               autoOpen={true}
               onDialogClose={handleCloseDialog}
             />

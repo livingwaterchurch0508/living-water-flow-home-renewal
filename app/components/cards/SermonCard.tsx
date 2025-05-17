@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import {
   Dialog,
@@ -14,16 +15,35 @@ import {
 import { BorderBeam } from '@/app/components/magicui/border-beam';
 
 import { cn } from '@/app/lib/utils';
+import { SOUL_TYPE } from '@/app/variables/enums';
 
 interface SermonCardProps {
   name: string;
   desc?: string;
+  sermonType?: number | null;
   autoOpen?: boolean;
   onDialogClose?: () => void;
 }
 
-export function SermonCard({ name, desc, autoOpen = false, onDialogClose }: SermonCardProps) {
+export function SermonCard({
+  name,
+  desc,
+  sermonType = SOUL_TYPE.INTRODUCE,
+  autoOpen = false,
+  onDialogClose,
+}: SermonCardProps) {
   const [isOpen, setIsOpen] = useState(autoOpen);
+
+  // 다국어 라벨
+  const t = useTranslations('Menu.Sermon');
+  const typeLabel =
+    sermonType === SOUL_TYPE.INTRODUCE
+      ? t('introduce')
+      : sermonType === SOUL_TYPE.MISSION
+        ? t('mission')
+        : sermonType === SOUL_TYPE.SPIRIT
+          ? t('spirit')
+          : '';
 
   useEffect(() => {
     setIsOpen(autoOpen);
@@ -62,10 +82,13 @@ export function SermonCard({ name, desc, autoOpen = false, onDialogClose }: Serm
             >
               <DialogTitle asChild>
                 <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-neutral-900 to-neutral-600 dark:from-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent">
+                  {typeLabel && (
+                    <div className="text-xs text-muted-foreground mb-2 ">{typeLabel}</div>
+                  )}
                   {name}
                 </h2>
               </DialogTitle>
-              {desc && ( 
+              {desc && (
                 <DialogDescription asChild>
                   <motion.div
                     className="prose prose-neutral dark:prose-invert max-w-none"

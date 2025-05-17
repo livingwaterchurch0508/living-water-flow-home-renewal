@@ -14,12 +14,12 @@ import { MasonryGrid, MasonryItem } from '@/app/components/magicui/masonry-grid'
 import { Youtube } from '@/app/components/icon/Youtube';
 import { HeroSection } from '@/app/components/layout/hero-section';
 import HomeSection from '@/app/components/layout/home-section';
+import { ContentListSkeleton } from '@/app/components/ui';
 
 import { cn } from '@/app/lib/utils';
 import { YOUTUBE_URL, ROUTER_PATHS } from '@/app/variables/constants';
-import { MENU_TAB, INTRODUCE_TAB } from '@/app/variables/enums';
+import { MENU_TAB, INTRODUCE_TAB, SOUL_TYPE } from '@/app/variables/enums';
 import type { IHymn, ISermon, ICommunity } from '@/app/variables/interfaces';
-import { ContentListSkeleton } from '@/app/components/ui';
 
 interface ApiResponse<T> {
   status: string;
@@ -34,7 +34,20 @@ interface HomeClientProps {
 export default function HomeLayout({ locale, hymns }: HomeClientProps) {
   const t = useTranslations('Main');
   const menuT = useTranslations('Menu');
-  const [selectedSermon, setSelectedSermon] = useState<{ name: string; desc: string } | null>(null);
+  const [selectedSermon, setSelectedSermon] = useState<ISermon | null>(null);
+
+  const typeLabel = (sermonType?: SOUL_TYPE | null) => {
+    switch (sermonType) {
+      case SOUL_TYPE.INTRODUCE:
+        return menuT('Sermon.introduce');
+      case SOUL_TYPE.MISSION:
+        return menuT('Sermon.mission');
+      case SOUL_TYPE.SPIRIT:
+        return menuT('Sermon.spirit');
+      default:
+        return '';
+    }
+  };
 
   // Sermons lazy fetch
   const { ref: sermonRef, inView: sermonInView } = useInView({ triggerOnce: true });
@@ -264,7 +277,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
                     <MasonryItem key={sermon.id} span={span}>
                       <button
                         data-testid="sermon-card-button"
-                        onClick={() => setSelectedSermon({ name, desc })}
+                        onClick={() => setSelectedSermon(sermon)}
                         className={cn(
                           'group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300',
                           gradientClass,
@@ -272,6 +285,9 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
                         )}
                       >
                         <div className="space-y-1 sm:space-y-2 text-left">
+                          <div className="text-xs text-muted-foreground ">
+                            {typeLabel(sermon.viewCount)}
+                          </div>
                           <h3
                             data-testid="sermon-card-title"
                             className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight"
@@ -292,8 +308,9 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
               </MasonryGrid>
               {selectedSermon && (
                 <SermonCard
-                  name={selectedSermon.name}
-                  desc={selectedSermon.desc}
+                  name={selectedSermon.name || ''}
+                  desc={selectedSermon.desc || ''}
+                  sermonType={selectedSermon.viewCount}
                   autoOpen={true}
                   onDialogClose={() => setSelectedSermon(null)}
                 />
