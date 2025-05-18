@@ -91,7 +91,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
   });
 
   return (
-    <div className="space-y-20 py-10 px-2">
+    <div className="space-y-20 py-10 px-6">
       <HeroSection
         title={t('Info.title')}
         content={t('Info.description')}
@@ -294,14 +294,11 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
                           </div>
                           <h3
                             data-testid="sermon-card-title"
-                            className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight"
+                            className="text-lg sm:text-xl md:text-2xl tracking-tight font-bold"
                           >
                             {name}
                           </h3>
-                          <p
-                            data-testid="sermon-card-desc"
-                            className="text-base sm:text-base text-muted-foreground"
-                          >
+                          <p data-testid="sermon-card-desc" className="text-base sm:text-base">
                             {desc}
                           </p>
                         </div>

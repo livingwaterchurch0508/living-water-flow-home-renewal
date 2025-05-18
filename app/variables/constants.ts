@@ -129,8 +129,8 @@ export const Menus = () => [
 ];
 
 export const SECTION_WIDTH = {
-  EXPANDED: 'w-full md:w-[calc(100vw-291px)]',
-  COLLAPSED: 'w-full md:w-[calc(100vw-83px)]',
+  EXPANDED: 'w-full md:w-[calc(100vw-302px)]',
+  COLLAPSED: 'w-full md:w-[calc(100vw-94px)]',
 } as const;
 
 export function getBaseUrl() {

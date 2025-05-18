@@ -82,7 +82,7 @@ export function SermonCard({
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </DialogClose>
-          <div className={cn("relative overflow-hidden", gradientMap[sermonType ?? 0])}>
+          <div className={cn('relative overflow-hidden', gradientMap[sermonType ?? 0])}>
             <BorderBeam className="opacity-20" />
             <motion.div
               className="relative z-10 p-8"
@@ -93,7 +93,9 @@ export function SermonCard({
               <DialogTitle asChild>
                 <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-neutral-900 to-neutral-600 dark:from-neutral-100 dark:to-neutral-400 bg-clip-text text-transparent">
                   {typeLabel && (
-                    <div className={cn('text-xs mb-2', typeColorMap[sermonType ?? 0])}>{typeLabel}</div>
+                    <div className={cn('text-xs mb-2', typeColorMap[sermonType ?? 0])}>
+                      {typeLabel}
+                    </div>
                   )}
                   {name}
                 </h2>
@@ -106,7 +108,7 @@ export function SermonCard({
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3, duration: 0.5 }}
                   >
-                    <div className="text-base leading-relaxed whitespace-pre-wrap">{desc}</div>
+                    <div className="text-base leading-relaxed whitespace-pre-wrap ">{desc}</div>
                   </motion.div>
                 </DialogDescription>
               )}

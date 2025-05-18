@@ -201,10 +201,10 @@ export default function SermonsPage() {
                       <div className={cn('text-xs mb-2', typeColorMap[sermon.viewCount ?? 0])}>
                         {typeLabel(sermon.viewCount)}
                       </div>
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-medium tracking-tight">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
                         {sermon.name}
                       </h3>
-                      <p className="text-base sm:text-base text-muted-foreground">{sermon.desc}</p>
+                      <p className="text-base sm:text-base">{sermon.desc}</p>
                     </div>
                   </button>
                 </MasonryItem>
@@ -255,7 +255,7 @@ export default function SermonsPage() {
   };
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-2 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-6 space-y-16">
       <HeroSection
         title={menuT('Sermon.name')}
         content={menuT('Sermon.content')}

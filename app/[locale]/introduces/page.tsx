@@ -72,7 +72,7 @@ export default function IntroducesPage() {
   };
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-2  space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-6  space-y-16">
       <HeroSection
         title={menuT('Introduce.name')}
         content={menuT('Introduce.content')}

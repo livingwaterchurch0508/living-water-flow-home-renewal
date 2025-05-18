@@ -19,7 +19,7 @@ export default function InfosPage() {
   const { state } = useSidebar();
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-2 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-6 space-y-16">
       <HeroSection
         title={t('Location.title')}
         content={t('Location.description')}

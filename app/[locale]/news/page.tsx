@@ -99,7 +99,7 @@ export default function NewsPage() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-2 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-6 space-y-16">
       <HeroSection
         title={menuT('News.name')}
         content={menuT('News.content')}
