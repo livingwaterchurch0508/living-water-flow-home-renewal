@@ -19,21 +19,18 @@ import { SERMON_TAB, SOUL_TYPE } from '@/app/variables/enums';
 import { SECTION_WIDTH } from '@/app/variables/constants';
 import { DetailSkeleton } from '@/app/components/ui/detail-skeleton';
 import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import type { ISermon } from '@/app/variables/interfaces';
 
 // URL 파라미터에서 특정 param을 제거하고 /sermons로 push하는 함수
 function removeParamAndPush(
   param: string,
   searchParams: URLSearchParams,
-  router: unknown,
-  basePath: string
+  router: AppRouterInstance,
 ) {
   const params = new URLSearchParams(searchParams);
   params.delete(param);
-  const paramString = params.toString();
-  (router as { push: (url: string) => void }).push(
-    paramString ? `${basePath}?${paramString}` : basePath
-  );
+  router.push(`/sermons?${params.toString()}`, { scroll: false });
 }
 
 export default function SermonsPage() {
@@ -76,17 +73,17 @@ export default function SermonsPage() {
       try {
         const response = await fetch(`/api/sermons/${selectedId}`);
         if (!response.ok) {
-          removeParamAndPush('id', searchParams, router, '/sermons');
+          removeParamAndPush('id', searchParams, router);
           return null;
         }
         const data = await response.json();
         if (data.status === 'error' || !data.payload) {
-          removeParamAndPush('id', searchParams, router, '/sermons');
+          removeParamAndPush('id', searchParams, router);
           return null;
         }
         return data.payload;
       } catch {
-        removeParamAndPush('id', searchParams, router, '/sermons');
+        removeParamAndPush('id', searchParams, router);
         return null;
       }
     },
@@ -102,7 +99,7 @@ export default function SermonsPage() {
 
   // Dialog 닫을 때 id 파라미터 제거
   const handleCloseDialog = () => {
-    removeParamAndPush('id', searchParams, router, '/sermons');
+    removeParamAndPush('id', searchParams, router);
   };
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =

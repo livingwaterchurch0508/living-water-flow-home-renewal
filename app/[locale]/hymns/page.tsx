@@ -25,7 +25,7 @@ function removeParamAndPush(
 ) {
   const params = new URLSearchParams(searchParams);
   params.delete(param);
-  router.push(`/hymns?${params.toString()}`);
+  router.push(`/hymns?${params.toString()}`, { scroll: false });
 }
 
 export default function HymnsPage() {
@@ -110,7 +110,11 @@ export default function HymnsPage() {
     <div className="min-h-screen py-10 pb-20 px-6 space-y-16">
       <HeroSection
         title={menuT('Hymn.name')}
-        content={menuT('Hymn.content')}
+        content={
+          currentType === HYMN_TAB.HYMN
+            ? menuT('Hymn.contentHymn')
+            : menuT('Hymn.content')
+        }
         bg1="from-rose-500/20"
         bg2="to-orange-500/20"
         bgDark1="dark:from-rose-500/10"
