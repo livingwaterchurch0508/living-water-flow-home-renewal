@@ -13,7 +13,7 @@ type Props = {
 async function fetchSermonById(id: string) {
   if (!id) return null;
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/sermons/${id}`, {
+    const res = await fetch(`https://${process.env.NEXT_PUBLIC_BASE_URL}/api/sermons/${id}`, {
       cache: 'no-store',
     });
     if (!res.ok) return null;
