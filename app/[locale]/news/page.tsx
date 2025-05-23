@@ -40,7 +40,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       title: locale === 'en' ? community.nameEn : community.name,
       description: locale === 'en' ? community.descEn : community.desc,
       images: [
-        `/api/image?imageName=${community.files?.[0]?.url}1.jpg&size=small` ||
+        `/api/image?imageName=${community.files?.[0]?.url}1.jpg&size=thumbnail` ||
           'https://livingwater-church.co.kr/home_banner.png',
       ],
       type: 'website',
