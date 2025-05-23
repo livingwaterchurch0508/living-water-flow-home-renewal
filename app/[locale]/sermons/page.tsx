@@ -6,7 +6,7 @@ import { metadata } from '@/app/[locale]/layout';
 import { YOUTUBE_URL } from '@/app/variables/constants';
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
 };
 
@@ -25,7 +25,8 @@ async function fetchSermonById(id: string) {
   }
 }
 
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+  const { locale } = await params;
   const { id } = await searchParams;
   if (!id) {
     return metadata;
@@ -40,11 +41,11 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     : 'https://livingwater-church.co.kr/home_banner.png';
 
   return {
-    title: sermon.name,
-    description: sermon.desc,
+    title: locale === 'en' ? sermon.nameEn : sermon.name,
+    description: locale === 'en' ? sermon.descEn : sermon.desc,
     openGraph: {
-      title: sermon.name,
-      description: sermon.desc,
+      title: locale === 'en' ? sermon.nameEn : sermon.name,
+      description: locale === 'en' ? sermon.descEn : sermon.desc,
       images: [thumbnail],
       type: 'website',
     },
