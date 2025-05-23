@@ -7,8 +7,9 @@ import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } f
 import { useTranslations } from 'next-intl';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
-import { ChevronLeft, ChevronRight, XIcon, ImageIcon, Maximize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, XIcon, ImageIcon, Maximize2, Share2 } from 'lucide-react';
 
+import { useShare } from '@/app/hooks/use-share';
 import { cn } from '@/app/lib/utils';
 
 interface ImageGalleryProps {
@@ -21,8 +22,10 @@ interface ImageGalleryProps {
   className?: string;
   children?: React.ReactNode;
   title?: string;
+  desc?: string;
   onClose?: () => void;
   autoOpen?: boolean;
+  id?: string;
 }
 
 const animationVariants = {
@@ -60,12 +63,15 @@ export default function ImageGalleryDialog({
   className,
   children,
   title,
+  desc,
   onClose,
   autoOpen = false,
+  id,
 }: ImageGalleryProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(thumbnailIndex);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const { handleShare } = useShare();
   const t = useTranslations('Common');
 
   const controls = useAnimation();
@@ -171,6 +177,12 @@ export default function ImageGalleryDialog({
                 className="relative mx-4 w-full max-w-3xl md:mx-0"
               >
                 <div className="absolute -top-12 right-0 flex items-center gap-2">
+                  <motion.button
+                    onClick={() => handleShare(id, title ?? '', desc ?? '')}
+                    className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
+                  >
+                    <Share2 className="size-5" />
+                  </motion.button>
                   <PhotoProvider
                     loop
                     speed={() => 300}

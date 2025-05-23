@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { X } from 'lucide-react';
+import { X, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import {
@@ -16,6 +16,7 @@ import { BorderBeam } from '@/app/components/magicui/border-beam';
 
 import { cn } from '@/app/lib/utils';
 import { SOUL_TYPE } from '@/app/variables/enums';
+import { useShare } from '@/app/hooks/use-share';
 
 interface SermonCardProps {
   name: string;
@@ -23,6 +24,7 @@ interface SermonCardProps {
   sermonType?: number | null;
   autoOpen?: boolean;
   onDialogClose?: () => void;
+  id?: string;
 }
 
 export function SermonCard({
@@ -31,8 +33,10 @@ export function SermonCard({
   sermonType = SOUL_TYPE.INTRODUCE,
   autoOpen = false,
   onDialogClose,
+  id,
 }: SermonCardProps) {
   const [isOpen, setIsOpen] = useState(autoOpen);
+  const { handleShare } = useShare();
 
   // 다국어 라벨
   const t = useTranslations('Menu.Sermon');
@@ -78,8 +82,11 @@ export function SermonCard({
         )}
       >
         <div className="relative overflow-hidden rounded-lg">
+          <div className="absolute right-10 top-4 z-20">
+            <Share2 className="size-4 cursor-pointer" onClick={() => handleShare(id, name, desc ?? '')} />
+          </div>
           <DialogClose className="absolute right-4 top-4 z-20 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4 cursor-pointer" />
             <span className="sr-only">Close</span>
           </DialogClose>
           <div className={cn('relative overflow-hidden', gradientMap[sermonType ?? 0])}>

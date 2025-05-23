@@ -178,6 +178,7 @@ const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn })
                   type="hymn"
                   autoOpen={false}
                   onDialogClose={handleCloseDialog}
+                  id={hymn.id.toString()}
                 />
               ))}
             </div>
@@ -212,6 +213,7 @@ const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn })
               autoOpen={true}
               onDialogClose={handleCloseDialog}
               type="hymn"
+              id={selectedHymnData.id.toString()}
             />
           )}
         </>

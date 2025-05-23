@@ -221,6 +221,7 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
               sermonType={selectedSermonState.viewCount}
               autoOpen={true}
               onDialogClose={() => setSelectedSermonState(null)}
+              id={selectedSermonState.id.toString()}
             />
           )}
 
@@ -243,6 +244,7 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
                 url={sermon.url || ''}
                 createdAt={sermon.createdAt || ''}
                 type="sermon"
+                id={sermon.id.toString()}
               />
             </div>
           ))}
@@ -316,6 +318,7 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
               sermonType={selectedSermonData.viewCount}
               autoOpen={true}
               onDialogClose={handleCloseDialog}
+              id={selectedSermonData.id.toString()}
             />
           ) : (
             <ContentCard
@@ -334,6 +337,7 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
               autoOpen={true}
               onDialogClose={handleCloseDialog}
               type="sermon"
+              id={selectedSermonData.id.toString()}
             />
           )}
         </>

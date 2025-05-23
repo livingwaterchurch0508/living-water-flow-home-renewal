@@ -172,6 +172,7 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
                     onDialogClose={() => {
                       setSelectedCommunityState(null);
                     }}
+                    id={community.id.toString()}
                   />
                 </div>
               ))}
@@ -207,6 +208,7 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
               caption={Number(selectedCommunityData.files[0]?.caption) || 1}
               autoOpen={true}
               onDialogClose={handleCloseDialog}
+              id={selectedCommunityData.id}
             />
           )}
         </>

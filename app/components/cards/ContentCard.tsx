@@ -5,8 +5,9 @@ import { AnimatePresence, motion } from 'motion/react';
 import Image from 'next/image';
 import { createPortal } from 'react-dom';
 import { useParams } from 'next/navigation';
-import { Play, XIcon } from 'lucide-react';
+import { Play, XIcon, Share2 } from 'lucide-react';
 
+import { useShare } from '@/app/hooks/use-share';
 import { cn } from '@/app/lib/utils';
 import { getRelativeTime } from '@/app/lib/date';
 import { YOUTUBE_URL } from '@/app/variables/constants';
@@ -21,6 +22,7 @@ interface ContentCardProps {
   variant?: 'home' | 'page';
   autoOpen?: boolean;
   onDialogClose?: () => void;
+  id?: string;
 }
 
 export function ContentCard({
@@ -33,12 +35,14 @@ export function ContentCard({
   variant = 'page',
   autoOpen = false,
   onDialogClose,
+  id,
 }: ContentCardProps) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const { locale } = useParams();
   const videoSrc = `${YOUTUBE_URL.EMBED}${url}`;
   const thumbnailSrc = `${YOUTUBE_URL.THUMB_NAIL}${url}/mqdefault.jpg`;
   const relativeTime = getRelativeTime(createdAt, locale as string);
+  const { handleShare } = useShare();
 
   useEffect(() => {
     if (autoOpen) {
@@ -50,6 +54,7 @@ export function ContentCard({
     setIsVideoOpen(false);
     onDialogClose?.();
   };
+
 
   return (
     <>
@@ -139,13 +144,22 @@ export function ContentCard({
                 className="relative w-full aspect-video max-w-5xl"
                 onClick={(e) => e.stopPropagation()}
               >
-                <motion.button
-                  data-testid="content-card-close-button"
-                  className="absolute -top-12 right-0 rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
-                  onClick={handleClose}
-                >
-                  <XIcon className="size-5" />
-                </motion.button>
+                <div className="absolute -top-12 right-0 flex items-center gap-2">
+                  <motion.button
+                    data-testid="content-card-share-button"
+                    className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
+                    onClick={() => handleShare(id, name, desc)}
+                  >
+                    <Share2 className="size-5" />
+                  </motion.button>
+                  <motion.button
+                    data-testid="content-card-close-button"
+                    className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
+                    onClick={handleClose}
+                  >
+                    <XIcon className="size-5" />
+                  </motion.button>
+                </div>
                 <div className="relative isolate z-[1] size-full overflow-hidden rounded-2xl border-2 border-white">
                   <iframe
                     src={videoSrc}

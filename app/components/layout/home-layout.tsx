@@ -151,6 +151,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
                       url={hymn.url || ''}
                       createdAt={hymn.createdAt || ''}
                       variant="home"
+                      id={hymn.id.toString()}
                     />
                   </CarouselItem>
                 ))
@@ -190,6 +191,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
                       url={sermon.url || ''}
                       createdAt={sermon.createdAt || ''}
                       variant="home"
+                      id={sermon.id.toString()}
                     />
                   </CarouselItem>
                 ))
@@ -233,6 +235,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
                       createdAt={community.createdAt || ''}
                       caption={Number(community.files[0]?.caption) || 1}
                       variant="home"
+                      id={community.id.toString()}
                     />
                   </CarouselItem>
                 ))
@@ -314,6 +317,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
                   sermonType={selectedSermon.viewCount}
                   autoOpen={true}
                   onDialogClose={() => setSelectedSermon(null)}
+                  id={selectedSermon.id.toString()}
                 />
               )}
             </div>

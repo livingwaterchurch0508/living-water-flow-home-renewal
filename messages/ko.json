@@ -97,7 +97,9 @@
     "theme": "테마 변경",
     "light": "라이트",
     "dark": "다크",
-    "system": "시스템"
+    "system": "시스템",
+    "copy": "URL이 복사되었습니다.",
+    "shareText": "공유하기"
   },
   "Introduce": {
     "pastor": {

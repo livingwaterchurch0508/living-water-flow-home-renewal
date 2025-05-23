@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { Analytics } from '@vercel/analytics/react';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { Toaster } from '@/app/components/ui/sonner';
 
 import { AppSidebar } from '@/app/components/layout/app-sidebar';
 import { Nav } from '@/app/components/layout/nav';
@@ -61,6 +62,7 @@ export default async function RootLayout({
                 <BottomDock />
               </div>
             </div>
+            <Toaster />
             <Analytics />
           </ClientProviders>
         </NextIntlClientProvider>
