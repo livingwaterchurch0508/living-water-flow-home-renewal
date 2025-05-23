@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { desc, ilike, or, eq } from 'drizzle-orm';
 import { db } from '@/app/lib/db/postgres/dbConnection';
 import { sermons, hymns, communities, files } from '@/app/lib/db/postgres/schema';
+import { YOUTUBE_URL } from '@/app/variables/constants';
 
 export async function GET(request: Request) {
   try {
@@ -97,14 +98,14 @@ export async function GET(request: Request) {
     const processedSermonsResults = sermonsResults.map((sermon) => ({
       ...sermon,
       thumbnailUrl: sermon.url
-        ? `https://img.youtube.com/vi/${sermon.url.split('v=')[1]}/mqdefault.jpg`
+        ? `${YOUTUBE_URL.THUMB_NAIL}${sermon.url.split('v=')[1]}/mqdefault.jpg`
         : null,
     }));
 
     const processedHymnsResults = hymnsResults.map((hymn) => ({
       ...hymn,
       thumbnailUrl: hymn.url
-        ? `https://img.youtube.com/vi/${hymn.url.split('v=')[1]}/mqdefault.jpg`
+        ? `${YOUTUBE_URL.THUMB_NAIL}${hymn.url.split('v=')[1]}/mqdefault.jpg`
         : null,
     }));
 
