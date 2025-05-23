@@ -415,6 +415,7 @@ export function Nav() {
               variant="page"
               onDialogClose={() => setSelectedContent(null)}
               autoOpen
+              id={selectedContent.item.id}
             />
           </div>
         ) : selectedContent.type === 'sermon' && !selectedContent.item.url ? (
