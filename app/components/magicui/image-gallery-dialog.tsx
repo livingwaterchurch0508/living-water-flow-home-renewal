@@ -26,6 +26,7 @@ interface ImageGalleryProps {
   onClose?: () => void;
   autoOpen?: boolean;
   id?: string;
+  customUrl?: string;
 }
 
 const animationVariants = {
@@ -67,6 +68,7 @@ export default function ImageGalleryDialog({
   onClose,
   autoOpen = false,
   id,
+  customUrl,
 }: ImageGalleryProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(thumbnailIndex);
@@ -178,7 +180,7 @@ export default function ImageGalleryDialog({
               >
                 <div className="absolute -top-12 right-0 flex items-center gap-2">
                   <motion.button
-                    onClick={() => handleShare(id, title ?? '', desc ?? '')}
+                    onClick={() => handleShare(id, title ?? '', desc ?? '', customUrl)}
                     className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
                   >
                     <Share2 className="size-5" />

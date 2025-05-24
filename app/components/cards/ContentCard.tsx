@@ -23,6 +23,7 @@ interface ContentCardProps {
   autoOpen?: boolean;
   onDialogClose?: () => void;
   id?: string;
+  customUrl?: string;
 }
 
 export function ContentCard({
@@ -36,6 +37,7 @@ export function ContentCard({
   autoOpen = false,
   onDialogClose,
   id,
+  customUrl,
 }: ContentCardProps) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const { locale } = useParams();
@@ -148,7 +150,7 @@ export function ContentCard({
                   <motion.button
                     data-testid="content-card-share-button"
                     className="rounded-full bg-neutral-900/50 p-2 text-xl text-white ring-1 backdrop-blur-md dark:bg-neutral-100/50 dark:text-black"
-                    onClick={() => handleShare(id, name, desc)}
+                    onClick={() => handleShare(id, name, desc, customUrl)}
                   >
                     <Share2 className="size-5" />
                   </motion.button>

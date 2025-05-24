@@ -25,6 +25,7 @@ interface SermonCardProps {
   autoOpen?: boolean;
   onDialogClose?: () => void;
   id?: string;
+  customUrl?: string;
 }
 
 export function SermonCard({
@@ -34,6 +35,7 @@ export function SermonCard({
   autoOpen = false,
   onDialogClose,
   id,
+  customUrl,
 }: SermonCardProps) {
   const [isOpen, setIsOpen] = useState(autoOpen);
   const { handleShare } = useShare();
@@ -83,7 +85,7 @@ export function SermonCard({
       >
         <div className="relative overflow-hidden rounded-lg">
           <div className="absolute right-10 top-4 z-20">
-            <Share2 className="size-4 cursor-pointer" onClick={() => handleShare(id, name, desc ?? '')} />
+            <Share2 className="size-4 cursor-pointer" onClick={() => handleShare(id, name, desc ?? '', customUrl)} />
           </div>
           <DialogClose className="absolute right-4 top-4 z-20 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
             <X className="h-4 w-4 cursor-pointer" />

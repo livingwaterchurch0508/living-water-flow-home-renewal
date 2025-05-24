@@ -19,6 +19,7 @@ interface CommunityCardProps {
   onDialogClose?: () => void;
   autoOpen?: boolean;
   id: string;
+  customUrl?: string;
 }
 
 export function CommunityCard({
@@ -32,6 +33,7 @@ export function CommunityCard({
   onDialogClose,
   autoOpen = false,
   id,
+  customUrl,
 }: CommunityCardProps) {
   const { locale } = useParams();
   const relativeTime = getRelativeTime(createdAt, locale as string);
@@ -52,6 +54,7 @@ export function CommunityCard({
         onClose={onDialogClose}
         autoOpen={autoOpen}
         id={id}
+        customUrl={customUrl}
       >
         <div className="group relative overflow-hidden rounded-lg">
           <div className={cn('relative aspect-video', variant === 'home' ? 'w-[300px]' : 'w-full')}>
