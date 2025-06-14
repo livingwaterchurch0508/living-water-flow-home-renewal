@@ -24,6 +24,11 @@ export default function BottomDock() {
 
   const pathname = usePathname();
 
+  // admin 경로에서는 dock을 렌더링하지 않음
+  // pathname: /ko/admin, /en/admin/login 등
+  const segments = pathname.split('/');
+  if (segments[2] === 'admin') return null;
+
   const isActive = (path: string) => {
     const currentPath = pathname.split('/').slice(2).join('/');
     const comparePath = path.startsWith('/') ? path.slice(1) : path;

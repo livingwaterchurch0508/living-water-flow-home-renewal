@@ -60,7 +60,7 @@ export function ContentCard({
 
   return (
     <>
-      <div className={cn('relative', variant === 'home' ? 'w-[300px]' : 'w-full', className)}>
+      <div className={cn('relative',  'w-full', className)}>
         <div
           data-testid="content-card"
           className="group/card relative cursor-pointer"
@@ -69,17 +69,17 @@ export function ContentCard({
           <div
             className={cn(
               'group relative overflow-hidden rounded-lg bg-gradient-to-b from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900',
-              'shadow-lg transition-all hover:shadow-xl'
+              'shadow-md hover:shadow-2xl transition-all duration-200',
+              'p-0'
             )}
           >
-            <div
-              className={cn('relative aspect-video', variant === 'home' ? 'w-[300px]' : 'w-full')}
+            <div className={cn('relative w-full aspect-video')}
             >
               <Image
                 src={thumbnailSrc}
                 alt={name}
                 fill
-                className="object-cover"
+                className="object-cover transition-all duration-200 group-hover:scale-105"
                 sizes={
                   variant === 'home'
                     ? '300px'
@@ -88,28 +88,24 @@ export function ContentCard({
                 priority
               />
               <div className="absolute inset-0 bg-black/40" />
-              <div className="absolute inset-0 p-4 sm:p-6">
-                <div className="relative z-10 h-full flex flex-col">
-                  <div className="flex-1 space-y-2">
-                    <h3
-                      className="text-base sm:text-lg font-semibold text-white line-clamp-2 mb-2"
-                      data-testid={`content-card-title-${type}`}
-                    >
-                      {name}
-                    </h3>
-                    <p
-                      className="text-xs sm:text-sm text-neutral-200 line-clamp-2"
-                      data-testid={`content-card-desc-${type}`}
-                    >
-                      {desc}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-end gap-2 text-xs text-neutral-300">
-                    <span>{relativeTime}</span>
-                  </div>
-                </div>
+              <div className="absolute top-4 left-4 right-4 z-10">
+                <h3
+                  className="text-base sm:text-lg font-semibold text-white line-clamp-2 mb-1"
+                  data-testid={`content-card-title-${type}`}
+                >
+                  {name}
+                </h3>
+                <p
+                  className="text-xs sm:text-sm text-neutral-200 line-clamp-3 mb-2"
+                  data-testid={`content-card-desc-${type}`}
+                >
+                  {desc}
+                </p>
               </div>
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2 text-xs text-neutral-300">
+                <span>{relativeTime}</span>
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="flex size-12 sm:size-16 items-center justify-center rounded-full bg-primary/10 backdrop-blur-md transition-transform duration-200 ease-out group-hover:scale-110">
                   <div className="flex size-8 sm:size-12 items-center justify-center rounded-full bg-gradient-to-b from-primary/30 to-primary shadow-md">
                     <Play

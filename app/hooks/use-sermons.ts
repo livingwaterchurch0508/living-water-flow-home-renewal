@@ -3,7 +3,7 @@ import { SermonsGetResponse } from '@/app/api/sermons/route';
 import { QueryParams } from '@/app/lib/api-utils';
 import { ISermon } from '@/app/variables/interfaces';
 
-async function fetchSermons({ page = 1, limit = 10, type = 0 }: Partial<QueryParams>) {
+async function fetchSermons({ page = 1, limit = 1000, type = 0 }: Partial<QueryParams>) {
   try {
     const params = new URLSearchParams();
 
@@ -67,7 +67,7 @@ const fetchSermonsInfinite = async ({
     return response.json();
   } catch (error) {
     console.error('Fetch infinite sermons error:', error);
-    throw error;
+     throw error;
   }
 };
 
@@ -90,3 +90,5 @@ export function useSermons({ page = 1, limit = 10, type = 0 }: Partial<QueryPara
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
+
+export { fetchSermons };

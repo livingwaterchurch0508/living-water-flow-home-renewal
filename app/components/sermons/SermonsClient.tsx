@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -30,7 +30,7 @@ interface SermonsClientProps {
 function removeParamAndPush(
   param: string,
   searchParams: URLSearchParams,
-  router: ReturnType<typeof useRouter>,
+  router: ReturnType<typeof useRouter>
 ) {
   const params = new URLSearchParams(searchParams);
   params.delete(param);
@@ -235,7 +235,7 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
 
     return (
       <>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+        <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {sermonsForRender.map((sermon) => (
             <div key={sermon.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
               <ContentCard
@@ -259,18 +259,10 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
   };
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-6 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-6">
       <HeroSection
         title={menuT('Sermon.name')}
         content={menuT('Sermon.content')}
-        bg1="from-blue-500/20"
-        bg2="to-violet-500/20"
-        bgDark1="dark:from-blue-500/10"
-        bgDark2="dark:to-violet-500/10"
-        color1="from-blue-600"
-        color2="to-violet-600"
-        colorDark1="dark:from-blue-400"
-        colorDark2="dark:to-violet-400"
         icon={<BookOpenIcon className="w-16 h-16 mb-6 text-blue-500/80" />}
       />
 
@@ -346,4 +338,4 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
   );
 };
 
-export default SermonsClient; 
+export default SermonsClient;

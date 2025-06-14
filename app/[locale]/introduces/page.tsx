@@ -72,18 +72,10 @@ export default function IntroducesPage() {
   };
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-6  space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-6">
       <HeroSection
         title={menuT('Introduce.name')}
         content={menuT('Introduce.content')}
-        bg1="from-indigo-500/20"
-        bg2="to-purple-500/20"
-        bgDark1="dark:from-indigo-500/10"
-        bgDark2="dark:to-purple-500/10"
-        color1="from-indigo-600"
-        color2="to-purple-600"
-        colorDark1="dark:from-indigo-400"
-        colorDark2="dark:to-purple-400"
         icon={<UsersIcon className="w-16 h-16 mb-6 text-indigo-500/80" />}
       />
 

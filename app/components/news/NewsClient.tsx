@@ -104,18 +104,10 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-6 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-6">
       <HeroSection
         title={menuT('News.name')}
         content={menuT('News.content')}
-        bg1="from-emerald-500/20"
-        bg2="to-teal-500/20"
-        bgDark1="dark:from-emerald-500/10"
-        bgDark2="dark:to-teal-500/10"
-        color1="from-emerald-600"
-        color2="to-teal-600"
-        colorDark1="dark:from-emerald-400"
-        colorDark2="dark:to-teal-400"
         icon={<NewspaperIcon className="w-16 h-16 mb-6 text-emerald-500/80" />}
       />
 
@@ -153,7 +145,7 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+            <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {communitiesForRender.map((community) => (
                 <div
                   key={community.id}

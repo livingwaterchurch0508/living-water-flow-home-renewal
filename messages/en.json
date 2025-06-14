@@ -47,21 +47,33 @@
       "introduce": "Vision",
       "mission": "Spiritual life",
       "spirit": "Wise life",
-      "content": "You will immediately encounter your true self when you reflect on these words. \nHe always wins spiritual wars because he has a different purpose in life, a different value, a clear sense of mission, and a clear desire for heaven."
+      "content": "You will immediately encounter your true self when you reflect on these words. \nHe always wins spiritual wars because he has a different purpose in life, a different value, a clear sense of mission, and a clear desire for heaven.",
+      "nameEn": "Title (English)",
+      "desc": "Description (Korean)",
+      "descEn": "Description (English)",
+      "type": "Type"
     },
     "Hymn": {
       "name": "Hymns",
       "hymn": "Watch Hymns",
       "song": "Pastor's own song",
       "content": "Shalom! I'm greeting you in the name of the Lord.\nThe Holy Spirit, who makes me praise God's love and grace that has been poured into me for the past 70 years, has given me praise through my heart and lips since one day. I am putting this praise book before the Lord, praying that the Lord's healing and restoration in our lives and that the grace of the hymns in history will be in all souls.",
-      "contentHymn":"I praise you, Lord."
+      "contentHymn":"I praise you, Lord.",
+      "nameEn": "Title (English)",
+      "desc": "Description (Korean)",
+      "descEn": "Description (English)",
+      "type": "Type"
     },
     "News": {
       "name": "News",
       "service": "Ministry",
       "event": "Event",
       "story": "Our Story",
-      "content": "We share what happens in the church."
+      "content": "We share what happens in the church.",
+      "nameEn": "Title (English)",
+      "desc": "Description (Korean)",
+      "descEn": "Description (English)",
+      "type": "Type"
     },
     "Info": {
       "name": "Info",
@@ -138,5 +150,35 @@
     "hours": "hours ago",
     "minutes": "minutes ago",
     "just_now": "just now"
+  },
+  "Admin": {
+    "viewCount": "Views",
+    "dashboardTitle": "Admin Dashboard",
+    "recentUploads": "Recent Uploads",
+    "chartPlaceholder": "Chart area (upload statistics)",
+    "hymnSong": "Pastor's own song",
+    "titleKo": "Title (Korean)",
+    "titleEn": "Title (English)",
+    "descKo": "Description (Korean)",
+    "descEn": "Description (English)",
+    "date": "Date",
+    "submit": "Submit",
+    "required": "This field is required.",
+    "soulTypeRequired": "Please select a Soul type.",
+    "urlRequired": "Please enter a YouTube URL after the video.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "type": "Type",
+    "fetchError": "Failed to load data. Please try again.",
+    "submitError": "Failed to submit. Please try again.",
+    "submitSuccess": "Successfully submitted.",
+    "deleteConfirmTitle": "Delete Confirmation",
+    "deleteConfirm": "Are you sure you want to delete?",
+    "deleteSuccess": "Successfully deleted.",
+    "deleteError": "An error occurred while deleting.",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "deleting": "Deleting..."
   }
 }

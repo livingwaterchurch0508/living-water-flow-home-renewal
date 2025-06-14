@@ -3,7 +3,7 @@ import { CommunitiesGetResponse } from '@/app/api/communities/route';
 import { QueryParams } from '@/app/lib/api-utils';
 import { ICommunity } from '@/app/variables/interfaces';
 
-async function fetchCommunities({ page = 1, limit = 10, type = 0 }: Partial<QueryParams>) {
+async function fetchCommunities({ page = 1, limit = 1000, type = 0 }: Partial<QueryParams>) {
   try {
     const params = new URLSearchParams();
 
@@ -90,3 +90,5 @@ export function useCommunities({ page = 1, limit = 10, type = 0 }: Partial<Query
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
+
+export { fetchCommunities };

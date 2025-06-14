@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useRef, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
@@ -111,22 +111,10 @@ const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn })
   };
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-6 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-6">
       <HeroSection
         title={menuT('Hymn.name')}
-        content={
-          currentType === HYMN_TAB.HYMN
-            ? menuT('Hymn.contentHymn')
-            : menuT('Hymn.content')
-        }
-        bg1="from-rose-500/20"
-        bg2="to-orange-500/20"
-        bgDark1="dark:from-rose-500/10"
-        bgDark2="dark:to-orange-500/10"
-        color1="from-rose-600"
-        color2="to-orange-600"
-        colorDark1="dark:from-rose-400"
-        colorDark2="dark:to-orange-400"
+        content={currentType === HYMN_TAB.HYMN ? menuT('Hymn.contentHymn') : menuT('Hymn.content')}
         icon={<MusicIcon className="w-16 h-16 mb-6 text-rose-500/80" />}
       />
 
@@ -167,7 +155,7 @@ const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn })
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+            <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {hymnsForRender.map((hymn) => (
                 <ContentCard
                   key={hymn.id}
@@ -222,4 +210,4 @@ const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn })
   );
 };
 
-export default HymnsClient; 
+export default HymnsClient;

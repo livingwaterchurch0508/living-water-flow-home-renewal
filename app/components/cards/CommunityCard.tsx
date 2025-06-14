@@ -45,7 +45,7 @@ export function CommunityCard({
   }));
 
   return (
-    <div className={cn('relative', variant === 'home' ? 'w-[300px]' : 'w-full', className)}>
+    <div className={cn('relative',  'w-full', className)}>
       <ImageGalleryDialog
         images={images}
         thumbnailIndex={0}
@@ -56,8 +56,9 @@ export function CommunityCard({
         id={id}
         customUrl={customUrl}
       >
-        <div className="group relative overflow-hidden rounded-lg">
-          <div className={cn('relative aspect-video', variant === 'home' ? 'w-[300px]' : 'w-full')}>
+        <div className="group relative overflow-hidden rounded-lg shadow-md hover:shadow-2xl transition-all duration-200 p-0">
+          <div className={cn('relative w-full aspect-video')}
+          >
             <Image
               src={`${images[0].src}&size=small`}
               alt={name}
@@ -71,18 +72,14 @@ export function CommunityCard({
               priority
             />
             <div className="absolute inset-0 bg-black/40 transition-opacity duration-200 group-hover:bg-black/50" />
-            <div className="absolute inset-0 p-4 sm:p-6">
-              <div className="relative z-10 h-full flex flex-col">
-                <div className="flex-1 space-y-2">
-                  <h3 data-testid="community-card-title" className="text-base sm:text-lg font-semibold text-white line-clamp-2">
-                    {name}
-                  </h3>
-                  <p data-testid="community-card-desc" className="text-xs sm:text-sm text-neutral-200 line-clamp-3">{desc}</p>
-                </div>
-                <div className="flex items-center justify-end gap-2 text-xs text-neutral-300">
-                  <span>{relativeTime}</span>
-                </div>
-              </div>
+            <div className="absolute top-4 left-4 right-4 z-10">
+              <h3 data-testid="community-card-title" className="text-base sm:text-lg font-semibold text-white line-clamp-2 mb-1">
+                {name}
+              </h3>
+              <p data-testid="community-card-desc" className="text-xs sm:text-sm text-neutral-200 line-clamp-3 mb-2">{desc}</p>
+            </div>
+            <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2 text-xs text-neutral-300">
+              <span>{relativeTime}</span>
             </div>
           </div>
         </div>

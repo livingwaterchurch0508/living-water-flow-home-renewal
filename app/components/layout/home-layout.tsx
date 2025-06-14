@@ -9,7 +9,7 @@ import { useInView } from 'react-intersection-observer';
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
 import { SermonCard } from '@/app/components/cards/SermonCard';
-import { Carousel, CarouselContent, CarouselItem, buttonVariants } from '@/app/components/ui';
+import { buttonVariants } from '@/app/components/ui';
 import { MasonryGrid, MasonryItem } from '@/app/components/magicui/masonry-grid';
 import { Youtube } from '@/app/components/icon/Youtube';
 import { HeroSection } from '@/app/components/layout/hero-section';
@@ -95,14 +95,6 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
       <HeroSection
         title={t('Info.title')}
         content={t('Info.description')}
-        bg1="from-blue-500/20"
-        bg2="to-violet-500/20"
-        bgDark1="dark:from-blue-500/10"
-        bgDark2="dark:to-violet-500/10"
-        color1="from-gray-900"
-        color2="to-gray-600"
-        colorDark1="dark:from-white"
-        colorDark2="dark:to-gray-200"
       >
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
@@ -134,31 +126,26 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
         title={t('Hymn.title')}
         viewAll={t('Common.viewAll')}
       >
-        <div className="relative">
-          <Carousel className="w-full">
-            <CarouselContent className="-ml-4">
-              {hymns.length === 0 ? (
-                <div className="w-full text-center py-8 text-muted-foreground">
-                  {t('Common.noData')}
-                </div>
-              ) : (
-                hymns.map((hymn) => (
-                  <CarouselItem key={hymn.id} className="pl-4 basis-auto">
-                    <ContentCard
-                      type="hymn"
-                      name={locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || ''}
-                      desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
-                      url={hymn.url || ''}
-                      createdAt={hymn.createdAt || ''}
-                      variant="home"
-                      id={hymn.id.toString()}
-                      customUrl={`/${locale}/hymns?id=${hymn.id}&type=0`}
-                    />
-                  </CarouselItem>
-                ))
-              )}
-            </CarouselContent>
-          </Carousel>
+        <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {hymns.length === 0 ? (
+            <div className="w-full text-center py-8 text-muted-foreground">
+              {t('Common.noData')}
+            </div>
+          ) : (
+            hymns.map((hymn) => (
+              <ContentCard
+                key={hymn.id}
+                type="hymn"
+                name={locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || ''}
+                desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
+                url={hymn.url || ''}
+                createdAt={hymn.createdAt || ''}
+                variant="home"
+                id={hymn.id.toString()}
+                customUrl={`/${locale}/hymns?id=${hymn.id}&type=0`}
+              />
+            ))
+          )}
         </div>
       </HomeSection>
 
@@ -167,39 +154,30 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
         title={t('Sermon.title')}
         viewAll={t('Common.viewAll')}
       >
-        <div className="relative" ref={sermonRef}>
-          <Carousel className="w-full">
-            <CarouselContent className="-ml-4">
-              {sermonsLoading ? (
-                <div className="w-full text-center py-8 text-muted-foreground">
-                  <ContentListSkeleton count={12} />
-                </div>
-              ) : sermons.length === 0 ? (
-                <div className="w-full text-center py-8 text-muted-foreground">
-                  {t('Common.noData')}
-                </div>
-              ) : (
-                sermons.map((sermon: ISermon) => (
-                  <CarouselItem key={sermon.id} className="pl-4 basis-auto">
-                    <ContentCard
-                      type="sermon"
-                      name={
-                        locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''
-                      }
-                      desc={
-                        locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''
-                      }
-                      url={sermon.url || ''}
-                      createdAt={sermon.createdAt || ''}
-                      variant="home"
-                      id={sermon.id.toString()}
-                      customUrl={`/${locale}/sermons?id=${sermon.id}&type=0`}
-                    />
-                  </CarouselItem>
-                ))
-              )}
-            </CarouselContent>
-          </Carousel>
+        <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" ref={sermonRef}>
+          {sermonsLoading ? (
+            <div className="w-full text-center py-8 text-muted-foreground">
+              <ContentListSkeleton count={12} />
+            </div>
+          ) : sermons.length === 0 ? (
+            <div className="w-full text-center py-8 text-muted-foreground">
+              {t('Common.noData')}
+            </div>
+          ) : (
+            sermons.map((sermon: ISermon) => (
+              <ContentCard
+                key={sermon.id}
+                type="sermon"
+                name={locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''}
+                desc={locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''}
+                url={sermon.url || ''}
+                createdAt={sermon.createdAt || ''}
+                variant="home"
+                id={sermon.id.toString()}
+                customUrl={`/${locale}/sermons?id=${sermon.id}&type=0`}
+              />
+            ))
+          )}
         </div>
       </HomeSection>
 
@@ -208,43 +186,30 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
         title={t('News.title')}
         viewAll={t('Common.viewAll')}
       >
-        <div className="relative" ref={commRef}>
-          <Carousel className="w-full">
-            <CarouselContent className="-ml-4">
-              {commLoading ? (
-                <div className="w-full text-center py-8 text-muted-foreground">
-                  <ContentListSkeleton count={12} />
-                </div>
-              ) : communities.length === 0 ? (
-                <div className="w-full text-center py-8 text-muted-foreground">
-                  {t('Common.noData')}
-                </div>
-              ) : (
-                communities.map((community: ICommunity) => (
-                  <CarouselItem key={community.id} className="pl-4 basis-auto">
-                    <CommunityCard
-                      name={
-                        locale === 'en'
-                          ? community.nameEn || community.name || ''
-                          : community.name || ''
-                      }
-                      desc={
-                        locale === 'en'
-                          ? community.descEn || community.desc || ''
-                          : community.desc || ''
-                      }
-                      url={community.files[0]?.url || ''}
-                      createdAt={community.createdAt || ''}
-                      caption={Number(community.files[0]?.caption) || 1}
-                      variant="home"
-                      id={community.id.toString()}
-                      customUrl={`/${locale}/news?id=${community.id}&type=0`}
-                    />
-                  </CarouselItem>
-                ))
-              )}
-            </CarouselContent>
-          </Carousel>
+        <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" ref={commRef}>
+          {commLoading ? (
+            <div className="w-full text-center py-8 text-muted-foreground">
+              <ContentListSkeleton count={12} />
+            </div>
+          ) : communities.length === 0 ? (
+            <div className="w-full text-center py-8 text-muted-foreground">
+              {t('Common.noData')}
+            </div>
+          ) : (
+            communities.map((community: ICommunity) => (
+              <CommunityCard
+                key={community.id}
+                name={locale === 'en' ? community.nameEn || community.name || '' : community.name || ''}
+                desc={locale === 'en' ? community.descEn || community.desc || '' : community.desc || ''}
+                url={community.files[0]?.url || ''}
+                createdAt={community.createdAt || ''}
+                caption={Number(community.files[0]?.caption) || 1}
+                variant="home"
+                id={community.id.toString()}
+                customUrl={`/${locale}/news?id=${community.id}&type=0`}
+              />
+            ))
+          )}
         </div>
       </HomeSection>
 

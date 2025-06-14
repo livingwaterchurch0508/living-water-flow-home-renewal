@@ -168,3 +168,117 @@ export async function getHymnById(id: string): Promise<IHymn | null> {
     return null;
   }
 }
+
+/**
+ * Create a new hymn
+ */
+export async function createHymn(data: {
+  name: string;
+  nameEn?: string;
+  desc?: string;
+  descEn?: string;
+  url: string;
+  type: number;
+  createdAt?: string;
+}): DbResult<IHymn> {
+  try {
+    const db = await handleDbConnection(getDb, 'CREATE_HYMN');
+    if (!db) {
+      return createErrorResponse(
+        new Error('Database connection failed'),
+        'Failed to connect to database'
+      );
+    }
+    const [inserted] = await db
+      .insert(hymns)
+      .values({
+        name: data.name,
+        nameEn: data.nameEn,
+        desc: data.desc,
+        descEn: data.descEn,
+        url: data.url,
+        type: data.type,
+        createdAt: data.createdAt ? new Date(data.createdAt) : undefined,
+      })
+      .returning();
+    if (!inserted) {
+      return createErrorResponse(new Error('Insert failed'), 'Failed to create hymn');
+    }
+    return {
+      ...inserted,
+      createdAt: formatDate(inserted.createdAt),
+    };
+  } catch (error) {
+    return createErrorResponse(error, 'Failed to create hymn');
+  }
+}
+
+/**
+ * Utility to sanitize update data for hymns
+ * - Non-nullable fields (name, url, type, viewCount) must not be set to null
+ * - Nullable fields (desc, nameEn, descEn) can be set to null
+ */
+function sanitizeHymnUpdateData(
+  data: Partial<Omit<IHymn, 'id' | 'createdAt'>>
+): Record<string, string | number | null | undefined> {
+  const sanitized: Record<string, string | number | null | undefined> = {};
+  if (data.name !== undefined && data.name !== null) sanitized.name = data.name;
+  if (data.url !== undefined && data.url !== null) sanitized.url = data.url;
+  if (data.type !== undefined && data.type !== null) sanitized.type = data.type;
+  if (data.viewCount !== undefined && data.viewCount !== null) sanitized.viewCount = data.viewCount;
+  if (data.desc !== undefined) sanitized.desc = data.desc;
+  if (data.nameEn !== undefined) sanitized.nameEn = data.nameEn;
+  if (data.descEn !== undefined) sanitized.descEn = data.descEn;
+  return sanitized;
+}
+
+/**
+ * Update an existing hymn
+ */
+export async function updateHymn(
+  id: number,
+  data: Partial<Omit<IHymn, 'id'>> & { createdAt?: string }
+): DbResult<IHymn> {
+  try {
+    const db = await handleDbConnection(getDb, 'UPDATE_HYMN');
+    if (!db) {
+      return createErrorResponse(
+        new Error('Database connection failed'),
+        'Failed to connect to database'
+      );
+    }
+    const sanitizedData = sanitizeHymnUpdateData(data);
+    const [updated] = await db.update(hymns).set(sanitizedData).where(eq(hymns.id, id)).returning();
+    if (!updated) {
+      return createErrorResponse(new Error('Update failed'), 'Failed to update hymn');
+    }
+    return {
+      ...updated,
+      createdAt: formatDate(updated.createdAt),
+    };
+  } catch (error) {
+    return createErrorResponse(error, 'Failed to update hymn');
+  }
+}
+
+/**
+ * Delete a hymn by id
+ */
+export async function deleteHymn(id: number): DbResult<{ id: number }> {
+  try {
+    const db = await handleDbConnection(getDb, 'DELETE_HYMN');
+    if (!db) {
+      return createErrorResponse(
+        new Error('Database connection failed'),
+        'Failed to connect to database'
+      );
+    }
+    const [deleted] = await db.delete(hymns).where(eq(hymns.id, id)).returning({ id: hymns.id });
+    if (!deleted) {
+      return createErrorResponse(new Error('Delete failed'), 'Failed to delete hymn');
+    }
+    return { id: deleted.id };
+  } catch (error) {
+    return createErrorResponse(error, 'Failed to delete hymn');
+  }
+}

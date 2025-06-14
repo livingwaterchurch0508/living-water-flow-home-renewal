@@ -3,7 +3,7 @@ import { HymnsGetResponse } from '@/app/api/hymns/route';
 import { QueryParams } from '@/app/lib/api-utils';
 import { IHymn } from '@/app/variables/interfaces';
 
-async function fetchHymns({ page = 1, limit = 10, type = 0 }: Partial<QueryParams>) {
+async function fetchHymns({ page = 1, limit = 1000, type = 0 }: Partial<QueryParams>) {
   try {
     const params = new URLSearchParams();
 
@@ -69,7 +69,7 @@ const fetchHymnsInfinite = async ({
     return response.json();
   } catch (error) {
     console.error('Fetch infinite hymns error:', error);
-    throw error;
+    return { status: 'error', payload: { items: [], total: 0, totalPages: 0 } };
   }
 };
 
@@ -92,3 +92,5 @@ export function useHymns({ page = 1, limit = 10, type = 0 }: Partial<QueryParams
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
+
+export { fetchHymns };

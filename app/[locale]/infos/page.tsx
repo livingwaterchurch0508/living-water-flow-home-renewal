@@ -19,18 +19,10 @@ export default function InfosPage() {
   const { state } = useSidebar();
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-6 space-y-16">
+    <div className="min-h-screen py-10 pb-20 px-6">
       <HeroSection
         title={t('Location.title')}
         content={t('Location.description')}
-        bg1="from-cyan-500/20"
-        bg2="to-blue-500/20"
-        bgDark1="dark:from-cyan-500/10"
-        bgDark2="dark:to-blue-500/10"
-        color1="from-cyan-600"
-        color2="to-blue-600"
-        colorDark1="dark:from-cyan-400"
-        colorDark2="dark:to-blue-400"
         icon={<MapIcon className="w-16 h-16 mb-6 text-cyan-500/80" />}
       />
 
