@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import NodeCache from 'node-cache';
 import sharp from 'sharp';
-import { storageClient } from '@/app/lib/fetch/storage';
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+
+import { storageClient } from '@/lib/fetch/storage';
 
 // Create a new cache instance (TTL: 3600 seconds, 1 hour)
 const cache = new NodeCache({ stdTTL: 3600 });

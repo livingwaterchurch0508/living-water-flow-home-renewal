@@ -4,10 +4,10 @@ import {
   INFO_TAB,
   INTRODUCE_TAB,
   MENU_TAB,
-  NEWS_TAB,
+  NEWS_TYPES,
   SERMON_TAB,
   SOUL_TYPE,
-} from '@/app/variables/enums';
+} from '@/variables/enums';
 
 export const ROUTER_PATHS = {
   [MENU_TAB.INTRODUCE]: 'introduces',
@@ -99,17 +99,17 @@ export const Menus = () => [
       {
         name: 'News.service',
         menuTab: MENU_TAB.NEWS,
-        detailTab: NEWS_TAB.NEWS,
+        detailTab: NEWS_TYPES.SERVICE,
       },
       {
         name: 'News.event',
         menuTab: MENU_TAB.NEWS,
-        detailTab: NEWS_TAB.EVENT,
+        detailTab: NEWS_TYPES.EVENT,
       },
       {
         name: 'News.story',
         menuTab: MENU_TAB.NEWS,
-        detailTab: NEWS_TAB.STORY,
+        detailTab: NEWS_TYPES.STORY,
       },
     ],
   },

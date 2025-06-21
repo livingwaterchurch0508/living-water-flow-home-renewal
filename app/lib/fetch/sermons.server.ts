@@ -1,9 +1,17 @@
-import { ISermon } from '@/app/variables/interfaces';
-import { getBaseUrl } from '@/app/variables/constants';
+import { ISermon } from '@/variables/types/sermon.types';
+import { getBaseUrl } from '@/variables/constants';
 
 const baseUrl = getBaseUrl();
 
-export async function fetchSermonsServer({ page = 1, limit = 10, type = 0 }: { page?: number; limit?: number; type?: number }) {
+export async function fetchSermonsServer({
+  page = 1,
+  limit = 10,
+  type = 0,
+}: {
+  page?: number;
+  limit?: number;
+  type?: number;
+}) {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
@@ -15,4 +23,4 @@ export async function fetchSermonsServer({ page = 1, limit = 10, type = 0 }: { p
     status: 'success' | 'error';
     payload: { items: ISermon[]; total: number; totalPages: number };
   }>;
-} 
+}

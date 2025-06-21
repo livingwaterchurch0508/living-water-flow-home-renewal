@@ -21,17 +21,17 @@ import {
   SidebarMenuSubButton,
   SidebarFooter,
   useSidebar,
-} from '@/app/components/ui/sidebar';
+} from '@/components/ui/sidebar';
 import {
   Collapsible,
   CollapsibleTrigger,
   CollapsibleContent,
-} from '@/app/components/ui/collapsible';
-import { Youtube } from '@/app/components/icon/Youtube';
+} from '@/components/ui/collapsible';
+import { Youtube } from '@/components/icon/Youtube';
 
-import { cn } from '@/app/lib/utils';
-import { Menus, ROUTER_PATHS, YOUTUBE_URL } from '@/app/variables/constants';
-import { MENU_TAB } from '@/app/variables/enums';
+import { cn } from '@/lib/utils';
+import { Menus, ROUTER_PATHS, YOUTUBE_URL } from '@/variables/constants';
+import { MENU_TAB } from '@/variables/enums';
 
 export function AppSidebar() {
   const t = useTranslations('Menu');

@@ -1,7 +1,8 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { SermonsGetResponse } from '@/app/api/sermons/route';
-import { QueryParams } from '@/app/lib/api-utils';
-import { ISermon } from '@/app/variables/interfaces';
+
+import { SermonsGetResponse } from '@/api/sermons/route';
+import { QueryParams } from '@/lib/api-utils';
+import { ISermon } from '@/variables/types/sermon.types';
 
 async function fetchSermons({ page = 1, limit = 1000, type = 0 }: Partial<QueryParams>) {
   try {
@@ -67,7 +68,7 @@ const fetchSermonsInfinite = async ({
     return response.json();
   } catch (error) {
     console.error('Fetch infinite sermons error:', error);
-     throw error;
+    throw error;
   }
 };
 
@@ -91,4 +92,3 @@ export function useSermons({ page = 1, limit = 10, type = 0 }: Partial<QueryPara
 }
 
 export { fetchSermons };
-

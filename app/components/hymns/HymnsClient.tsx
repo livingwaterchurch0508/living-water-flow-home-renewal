@@ -5,18 +5,20 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { MusicIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useSidebar } from '@/app/components/ui/sidebar';
-import { HeroSection } from '@/app/components/layout/hero-section';
-import { TabSection } from '@/app/components/layout/tab-section';
-import { useInfiniteHymns } from '@/app/hooks/use-hymns';
-import { cn } from '@/app/lib/utils';
-import { HYMN_TAB } from '@/app/variables/enums';
-import { SECTION_WIDTH } from '@/app/variables/constants';
-import { ContentCard } from '@/app/components/cards/ContentCard';
-import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
-import { DetailSkeleton } from '@/app/components/ui/detail-skeleton';
-import { MotionEffect } from '@/app/components/animate-ui/effects/motion-effect';
-import type { IHymn } from '@/app/variables/interfaces.d';
+
+import { useSidebar } from '@/components/ui/sidebar';
+import { HeroSection } from '@/components/layout/hero-section';
+import { TabSection } from '@/components/layout/tab-section';
+import { ContentCard } from '@/components/cards/ContentCard';
+import { ContentListSkeleton } from '@/components/ui/content-list-skeleton';
+import { DetailSkeleton } from '@/components/ui/detail-skeleton';
+import { MotionEffect } from '@/components/animate-ui/effects/motion-effect';
+
+import { useInfiniteHymns } from '@/hooks/use-hymns';
+import { cn } from '@/lib/utils';
+import { HYMN_TAB } from '@/variables/enums';
+import { SECTION_WIDTH } from '@/variables/constants';
+import type { IHymn } from '@/variables/types/hymn.types';
 
 interface HymnsClientProps {
   searchParams: { [key: string]: string | undefined };

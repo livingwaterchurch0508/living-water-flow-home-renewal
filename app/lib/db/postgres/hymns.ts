@@ -1,8 +1,8 @@
 import { desc, eq, ilike, or, and, sql } from 'drizzle-orm';
 import { getDb } from './dbConnection';
 import { hymns } from './schema';
-import { IHymn } from '@/app/variables/interfaces';
-import { HYMN_TAB } from '@/app/variables/enums';
+import { IHymn } from '@/variables/types/hymn.types';
+import { HYMN_TAB } from '@/variables/enums';
 import {
   IPage,
   IPaginatedResponse,

@@ -70,17 +70,6 @@ export enum HYMN_TAB {
 }
 
 /**
- * 0: 교회 사역
- * 1: 교회 행사
- * 2: 성도 이야기
- */
-export enum NEWS_TAB {
-  NEWS,
-  EVENT,
-  STORY,
-}
-
-/**
  * 0: 교회 위치/주차
  * 1: 오시는 길
  */

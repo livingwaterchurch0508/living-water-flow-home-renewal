@@ -9,8 +9,8 @@ import { DateTime } from 'luxon';
 import { motion, useScroll } from 'motion/react';
 import { Languages } from 'lucide-react';
 
-import { buttonVariants } from '@/app/components/ui/button';
-import { Button } from '@/app/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandDialog,
@@ -20,25 +20,25 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@/app/components/ui/command';
+} from '@/components/ui/command';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/app/components/ui/dropdown-menu';
-import { SidebarTrigger } from '@/app/components/ui/sidebar';
-import { ModeToggle } from '@/app/components/icon/mode-toggle';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/app/components/ui/tooltip';
-import { Youtube } from '@/app/components/icon/Youtube';
-import { ContentCard } from '@/app/components/cards/ContentCard';
-import { CommunityCard } from '@/app/components/cards/CommunityCard';
-import { SermonCard } from '@/app/components/cards/SermonCard';
+} from '@/components/ui/dropdown-menu';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ModeToggle } from '@/components/icon/mode-toggle';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Youtube } from '@/components/icon/Youtube';
+import { ContentCard } from '@/components/cards/ContentCard';
+import { CommunityCard } from '@/components/cards/CommunityCard';
+import { SermonCard } from '@/components/cards/SermonCard';
 
-import { useDebounce } from '@/app/hooks/use-debounce';
-import { cn } from '@/app/lib/utils';
-import { YOUTUBE_URL } from '@/app/variables/constants';
-import { LOCALE_TYPE } from '@/app/variables/enums';
+import { useDebounce } from '@/hooks/use-debounce';
+import { cn } from '@/lib/utils';
+import { YOUTUBE_URL } from '@/variables/constants';
+import { LOCALE_TYPE } from '@/variables/enums';
 
 interface SearchResult {
   id: string;

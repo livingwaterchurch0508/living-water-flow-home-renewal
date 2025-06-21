@@ -6,16 +6,16 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { UsersIcon } from 'lucide-react';
 
-import { useSidebar } from '@/app/components/ui/sidebar';
-import { PastorContent } from '@/app/components/introduces/PastorContent';
-import { ChurchContent } from '@/app/components/introduces/ChurchContent';
-import { WorshipContent } from '@/app/components/introduces/WorshipContent';
-import { HeroSection } from '@/app/components/layout/hero-section';
-import { TabSection } from '@/app/components/layout/tab-section';
+import { useSidebar } from '@/components/ui/sidebar';
+import { PastorContent } from '@/components/introduces/PastorContent';
+import { ChurchContent } from '@/components/introduces/ChurchContent';
+import { WorshipContent } from '@/components/introduces/WorshipContent';
+import { HeroSection } from '@/components/layout/hero-section';
+import { TabSection } from '@/components/layout/tab-section';
 
-import { cn } from '@/app/lib/utils';
-import { INTRODUCE_TAB } from '@/app/variables/enums';
-import { SECTION_WIDTH } from '@/app/variables/constants';
+import { cn } from '@/lib/utils';
+import { INTRODUCE_TAB } from '@/variables/enums';
+import { SECTION_WIDTH } from '@/variables/constants';
 
 const CONTENT_ANIMATION = {
   initial: { opacity: 0, y: 20 },

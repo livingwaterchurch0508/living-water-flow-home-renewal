@@ -6,7 +6,7 @@ import Script from 'next/script';
 import { motion } from 'framer-motion';
 import { BusIcon, CarIcon, MapPinIcon, PhoneIcon, MailIcon } from 'lucide-react';
 
-import { YOUTUBE_URL } from '@/app/variables/constants';
+import { YOUTUBE_URL } from '@/variables/constants';
 
 interface LatLng {
   lat: number;

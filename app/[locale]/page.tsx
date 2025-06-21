@@ -1,6 +1,7 @@
-import HomeLayout from '../components/layout/home-layout';
-import { getHymns } from '@/app/lib/db/postgres/hymns';
-import { HYMN_TAB } from '@/app/variables/enums';
+import HomeLayout from '@/components/layout/home-layout';
+
+import { getHymns } from '@/lib/db/postgres/hymns';
+import { HYMN_TAB } from '@/variables/enums';
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

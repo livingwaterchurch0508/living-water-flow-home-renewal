@@ -11,12 +11,12 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose,
-} from '@/app/components/ui/dialog';
-import { BorderBeam } from '@/app/components/magicui/border-beam';
+} from '@/components/ui/dialog';
+import { BorderBeam } from '@/components/magicui/border-beam';
 
-import { cn } from '@/app/lib/utils';
-import { SOUL_TYPE } from '@/app/variables/enums';
-import { useShare } from '@/app/hooks/use-share';
+import { cn } from '@/lib/utils';
+import { SOUL_TYPE } from '@/variables/enums';
+import { useShare } from '@/hooks/use-share';
 
 interface SermonCardProps {
   name: string;

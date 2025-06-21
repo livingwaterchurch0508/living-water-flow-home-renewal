@@ -8,9 +8,9 @@ import { useParams } from 'next/navigation';
 import { Play, XIcon, Share2 } from 'lucide-react';
 
 import { useShare } from '@/app/hooks/use-share';
-import { cn } from '@/app/lib/utils';
-import { getRelativeTime } from '@/app/lib/date';
-import { YOUTUBE_URL } from '@/app/variables/constants';
+import { cn } from '@/lib/utils';
+import { getRelativeTime } from '@/lib/date';
+import { YOUTUBE_URL } from '@/variables/constants';
 
 interface ContentCardProps {
   type: 'hymn' | 'sermon';

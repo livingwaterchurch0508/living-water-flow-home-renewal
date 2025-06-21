@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getSermons } from '@/app/lib/db/postgres/sermons';
-import { getHymns } from '@/app/lib/db/postgres/hymns';
-import { getCommunities } from '@/app/lib/db/postgres/communities';
-import { SERMON_TAB, HYMN_TAB, NEWS_TYPES } from '@/app/variables/enums';
+import { getSermons } from '@/lib/db/postgres/sermons';
+import { getHymns } from '@/lib/db/postgres/hymns';
+import { getCommunities } from '@/lib/db/postgres/communities';
+import { SERMON_TAB, HYMN_TAB, NEWS_TYPES } from '@/variables/enums';
 
 function getTotal(result: unknown): number {
   return result &&

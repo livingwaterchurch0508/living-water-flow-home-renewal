@@ -1,20 +1,19 @@
 'use client';
-import { useTranslations } from 'next-intl';
-import { TextReveal } from '@/app/components/magicui/text-reveal';
-import { BorderBeam } from '@/app/components/magicui/border-beam';
-import UploadDialog from './UploadDialog';
 import { useState, useEffect, useCallback } from 'react';
-import { DataTable } from '@/app/components/ui/data-table';
+import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
-import { Button } from '@/app/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/app/components/ui/tooltip';
-import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
-import type { ISermon, IHymn, ICommunity } from '@/app/variables/interfaces';
-import { cn } from '@/app/lib/utils';
-import { SECTION_WIDTH } from '@/app/variables/constants';
-import { useSidebar } from '@/app/components/ui';
 import { toast } from 'sonner';
+
+import { TextReveal } from '@/components/magicui/text-reveal';
+import { BorderBeam } from '@/components/magicui/border-beam';
+import UploadDialog from '@/components/admin/UploadDialog';
+import { DataTable } from '@/components/ui/data-table';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { ContentListSkeleton } from '@/components/ui/content-list-skeleton';
+import { useSidebar } from '@/components/ui/sidebar';
 import {
   Dialog,
   DialogContent,
@@ -22,9 +21,14 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from '@/app/components/ui/dialog';
-import { useQuery } from '@tanstack/react-query';
-import type { FileItem } from './UploadDialog';
+} from '@/components/ui/dialog';
+import type { FileItem } from '@/components/admin/UploadDialog';
+
+import type { ISermon } from '@/variables/types/sermon.types';
+import type { IHymn } from '@/variables/types/hymn.types';
+import type { ICommunity } from '@/variables/types/community.types';
+import { cn } from '@/lib/utils';
+import { SECTION_WIDTH } from '@/variables/constants';
 
 // Sermon, Hymn, News row types
 interface SermonRow {
@@ -327,7 +331,12 @@ export default function DashboardUI() {
             });
           } else if (key === 'deletedFiles' && Array.isArray(value) && value.length > 0) {
             formData.append('deletedFiles', JSON.stringify(value));
-          } else if (key !== 'files' && key !== 'deletedFiles' && value !== null && value !== undefined) {
+          } else if (
+            key !== 'files' &&
+            key !== 'deletedFiles' &&
+            value !== null &&
+            value !== undefined
+          ) {
             formData.append(key, String(value));
           }
         });
@@ -540,7 +549,7 @@ export default function DashboardUI() {
           initialData={(() => {
             if (dialogMode !== 'edit' || selectedRowIds.length !== 1) return undefined;
             const selectedId = (tableData[Number(selectedRowIds[0])] as { id: number }).id;
-            const data = allData[selectedTab].find(d => d.id === selectedId);
+            const data = allData[selectedTab].find((d) => d.id === selectedId);
             if (!data) return undefined;
 
             // Explicitly map fields to ensure type compatibility
@@ -553,8 +562,11 @@ export default function DashboardUI() {
               date: data.createdAt?.split('T')[0] ?? undefined,
               type: data.type ?? undefined,
               url: data.url ?? undefined,
-              soulType: 'viewCount' in data ? data.viewCount ?? undefined : undefined,
-              files: 'files' in data ? (data.files as { url: string | null; caption: string | null }[]) : undefined,
+              soulType: 'viewCount' in data ? (data.viewCount ?? undefined) : undefined,
+              files:
+                'files' in data
+                  ? (data.files as { url: string | null; caption: string | null }[])
+                  : undefined,
             };
           })()}
         />

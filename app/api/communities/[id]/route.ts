@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getCommunityById } from '@/app/lib/db/postgres/communities';
-import { BaseItemSchema, handleApiError, ApiResponse } from '@/app/lib/api-utils';
-import { db } from '@/app/lib/db/postgres/dbConnection';
-import { communities, files as filesTable } from '@/app/lib/db/postgres/schema';
-import { storageClient } from '@/app/lib/fetch/storage';
 import { eq } from 'drizzle-orm';
 import path from 'path';
+
+import { getCommunityById } from '@/lib/db/postgres/communities';
+import { BaseItemSchema, handleApiError, ApiResponse } from '@/lib/api-utils';
+import { db } from '@/lib/db/postgres/dbConnection';
+import { communities, files as filesTable } from '@/lib/db/postgres/schema';
+import { storageClient } from '@/lib/fetch/storage';
 
 export const dynamic = 'force-dynamic';
 

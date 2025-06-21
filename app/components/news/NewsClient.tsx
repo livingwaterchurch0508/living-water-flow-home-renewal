@@ -6,19 +6,19 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { NewspaperIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
-import { MotionEffect } from '@/app/components/animate-ui/effects/motion-effect';
-import { CommunityCard } from '@/app/components/cards/CommunityCard';
-import { useSidebar } from '@/app/components/ui/sidebar';
-import { HeroSection } from '@/app/components/layout/hero-section';
-import { TabSection } from '@/app/components/layout/tab-section';
-import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
-import { DetailSkeleton } from '@/app/components/ui/detail-skeleton';
+import { MotionEffect } from '@/components/animate-ui/effects/motion-effect';
+import { CommunityCard } from '@/components/cards/CommunityCard';
+import { useSidebar } from '@/components/ui/sidebar';
+import { HeroSection } from '@/components/layout/hero-section';
+import { TabSection } from '@/components/layout/tab-section';
+import { ContentListSkeleton } from '@/components/ui/content-list-skeleton';
+import { DetailSkeleton } from '@/components/ui/detail-skeleton';
 
-import { useInfiniteCommunities } from '@/app/hooks/use-communities';
+import { useInfiniteCommunities } from '@/hooks/use-communities';
 import { cn } from '@/app/lib/utils';
-import { NEWS_TAB } from '@/app/variables/enums';
-import { SECTION_WIDTH } from '@/app/variables/constants';
-import { ICommunity } from '@/app/variables/interfaces';
+import { NEWS_TYPES } from '@/variables/enums';
+import { SECTION_WIDTH } from '@/variables/constants';
+import { ICommunity } from '@/variables/types/community.types';
 
 interface NewsClientProps {
   searchParams: { [key: string]: string | undefined };
@@ -33,7 +33,7 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
   const { state } = useSidebar();
   const router = useRouter();
   const nextSearchParams = useSearchParams();
-  const currentType = Number(searchParams.type) || NEWS_TAB.NEWS;
+  const currentType = Number(searchParams.type) || NEWS_TYPES.SERVICE;
   const selectedId = searchParams.id;
   const observerTarget = useRef<HTMLDivElement>(null);
   const [selectedCommunityState, setSelectedCommunityState] = useState<number | null>(null);
@@ -114,9 +114,9 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
 
       <TabSection
         tabs={[
-          { id: NEWS_TAB.NEWS, label: menuT('News.service') },
-          { id: NEWS_TAB.EVENT, label: menuT('News.event') },
-          { id: NEWS_TAB.STORY, label: menuT('News.story') },
+          { id: NEWS_TYPES.SERVICE, label: menuT('News.service') },
+          { id: NEWS_TYPES.EVENT, label: menuT('News.event') },
+          { id: NEWS_TYPES.STORY, label: menuT('News.story') },
         ]}
         activeTab={currentType}
         onTabChange={(tabId) => {

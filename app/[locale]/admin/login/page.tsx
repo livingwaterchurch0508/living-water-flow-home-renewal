@@ -1,9 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Input } from '@/app/components/ui/input';
-import { ShimmerButton } from '@/app/components/magicui/shimmer-button';
-import { Toaster } from '@/app/components/ui/sonner';
+import { Input } from '@/components/ui/input';
+import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 
 export default function AdminLoginPage() {

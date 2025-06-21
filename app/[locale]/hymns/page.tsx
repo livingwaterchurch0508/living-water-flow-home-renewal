@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
-import HymnsClient from '@/app/components/hymns/HymnsClient';
-import { metadata } from '@/app/[locale]/layout';
-import { YOUTUBE_URL } from '@/app/variables/constants';
+import HymnsClient from '@/components/hymns/HymnsClient';
+import { metadata } from '@/pages/layout';
+import { YOUTUBE_URL } from '@/variables/constants';
 
 type Props = {
   params: Promise<{ locale: string }>;

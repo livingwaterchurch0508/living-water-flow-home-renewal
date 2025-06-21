@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { useSidebar } from '../ui/sidebar';
+import { useSidebar } from '@/components/ui/sidebar';
 
-import { cn } from '@/app/lib/utils';
-import { SECTION_WIDTH } from '@/app/variables/constants';
+import { cn } from '@/lib/utils';
+import { SECTION_WIDTH } from '@/variables/constants';
 
 interface Tab<T> {
   id: T;

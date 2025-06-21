@@ -5,19 +5,19 @@ import Link from 'next/link';
 import { Church, HomeIcon, Music, Newspaper, MapPin, BookOpen } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
-import { Dock, DockIcon } from '@/app/components/magicui/dock';
+import { Dock, DockIcon } from '@/components/magicui/dock';
 import {
   Separator,
   buttonVariants,
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-} from '@/app/components/ui';
-import { Youtube } from '@/app/components/icon/Youtube';
+} from '@/components/ui';
+import { Youtube } from '@/components/icon/Youtube';
 
-import { cn } from '@/app/lib/utils';
-import { ROUTER_PATHS, YOUTUBE_URL } from '@/app/variables/constants';
-import { MENU_TAB } from '@/app/variables/enums';
+import { cn } from '@/lib/utils';
+import { ROUTER_PATHS, YOUTUBE_URL } from '@/variables/constants';
+import { MENU_TAB } from '@/variables/enums';
 
 export default function BottomDock() {
   const t = useTranslations('Menu');

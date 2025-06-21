@@ -1,7 +1,8 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { HymnsGetResponse } from '@/app/api/hymns/route';
-import { QueryParams } from '@/app/lib/api-utils';
-import { IHymn } from '@/app/variables/interfaces';
+
+import { HymnsGetResponse } from '@/api/hymns/route';
+import { QueryParams } from '@/lib/api-utils';
+import { IHymn } from '@/variables/types/hymn.types';
 
 async function fetchHymns({ page = 1, limit = 1000, type = 0 }: Partial<QueryParams>) {
   try {
@@ -93,4 +94,3 @@ export function useHymns({ page = 1, limit = 10, type = 0 }: Partial<QueryParams
 }
 
 export { fetchHymns };
-

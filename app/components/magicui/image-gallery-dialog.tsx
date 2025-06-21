@@ -9,8 +9,8 @@ import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
 import { ChevronLeft, ChevronRight, XIcon, ImageIcon, Maximize2, Share2 } from 'lucide-react';
 
-import { useShare } from '@/app/hooks/use-share';
-import { cn } from '@/app/lib/utils';
+import { useShare } from '@/hooks/use-share';
+import { cn } from '@/lib/utils';
 
 interface ImageGalleryProps {
   images: Array<{

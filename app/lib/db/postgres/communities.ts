@@ -3,8 +3,8 @@ import { DateTime } from 'luxon';
 
 import { getDb } from './dbConnection';
 import { communities, files } from './schema';
-import { NEWS_TAB, NEWS_TYPES } from '@/app/variables/enums';
-import { IError, IPage } from '@/app/variables/interfaces';
+import { NEWS_TYPES } from '@/variables/enums';
+import { IError, IPage } from '@/variables/types/common.types';
 
 type Community = typeof communities.$inferSelect & {
   nameEn: string | null;
@@ -140,7 +140,7 @@ export interface ICommunitiesById {
 
 export type ICommunityType = Awaited<IError> | Awaited<ICommunitiesById> | null;
 
-export async function getCommunitiesById(id: number, type: NEWS_TAB): Promise<ICommunityType> {
+export async function getCommunitiesById(id: number, type: NEWS_TYPES): Promise<ICommunityType> {
   try {
     const db = await getDb();
     if (!db) {

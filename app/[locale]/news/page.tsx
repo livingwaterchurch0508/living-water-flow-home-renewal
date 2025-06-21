@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import NewsClient from '@/app/components/news/NewsClient';
-import { metadata } from '@/app/[locale]/layout';
+import NewsClient from '@/components/news/NewsClient';
+import { metadata } from '@/pages/layout';
 
 async function fetchCommunityById(id: string) {
   if (!id) return null;

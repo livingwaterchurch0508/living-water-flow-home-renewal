@@ -2,30 +2,7 @@
 import { useState, useEffect, type ChangeEvent, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { z } from 'zod';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from '@/app/components/ui/dialog';
-import { Input } from '@/app/components/ui/input';
-import { ShimmerButton } from '@/app/components/magicui/shimmer-button';
-import { SERMON_TAB, HYMN_TAB, NEWS_TAB, SOUL_TYPE } from '@/app/variables/enums';
 import Image from 'next/image';
-import { useIsMobile } from '@/app/hooks/use-mobile';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerFooter,
-  DrawerDescription,
-  DrawerClose,
-} from '@/app/components/ui/drawer';
-import { ScrollArea } from '@/app/components/ui/scroll-area';
-import { Button } from '@/app/components/ui/button';
 import {
   DndContext,
   closestCenter,
@@ -37,6 +14,31 @@ import {
 import { arrayMove, SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { X } from 'lucide-react';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+  DrawerDescription,
+  DrawerClose,
+} from '@/components/ui/drawer';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+
+import { useIsMobile } from '@/hooks/use-mobile';
+import { SERMON_TAB, HYMN_TAB, NEWS_TYPES, SOUL_TYPE } from '@/variables/enums';
 
 const baseSchema = z.object({
   type: z.number(),
@@ -85,7 +87,7 @@ export interface UploadDialogProps {
 }
 
 type UploadFormState = {
-  type: SERMON_TAB | HYMN_TAB | NEWS_TAB;
+  type: SERMON_TAB | HYMN_TAB | NEWS_TYPES;
   soulType?: SOUL_TYPE;
   name: string;
   nameEn: string;
@@ -218,7 +220,7 @@ const UploadForm = ({
             ? enumToOptions(SERMON_TAB, SERMON_TYPE_LABELS)
             : tabType === 'hymn'
               ? enumToOptions(HYMN_TAB, HYMN_TYPE_LABELS)
-              : enumToOptions(NEWS_TAB, NEWS_TYPE_LABELS)
+              : enumToOptions(NEWS_TYPES, NEWS_TYPE_LABELS)
           ).map((opt) => (
             <button
               key={opt.value}
@@ -374,7 +376,7 @@ export default function UploadDialog({
               ? SERMON_TAB.RHEMA
               : tabType === 'hymn'
                 ? HYMN_TAB.HYMN
-                : NEWS_TAB.NEWS),
+                : NEWS_TYPES.SERVICE),
           soulType: initialData.soulType ?? 0,
           name: initialData.name ?? '',
           nameEn: initialData.nameEn ?? '',
@@ -408,7 +410,7 @@ export default function UploadDialog({
               ? SERMON_TAB.RHEMA
               : tabType === 'hymn'
                 ? HYMN_TAB.HYMN
-                : NEWS_TAB.NEWS,
+                : NEWS_TYPES.ALL,
           soulType: 0,
           name: '',
           nameEn: '',

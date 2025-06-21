@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getHymnById, updateHymn, deleteHymn } from '@/app/lib/db/postgres/hymns';
 import { z } from 'zod';
-import { BaseItemSchema, handleApiError, ApiResponse } from '@/app/lib/api-utils';
+
+import { getHymnById, updateHymn, deleteHymn } from '@/lib/db/postgres/hymns';
+import { BaseItemSchema, handleApiError, ApiResponse } from '@/lib/api-utils';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getSermonById, updateSermon, deleteSermon } from '@/app/lib/db/postgres/sermons';
-import { BaseItemSchema, handleApiError, ApiResponse } from '@/app/lib/api-utils';
+
+import { getSermonById, updateSermon, deleteSermon } from '@/lib/db/postgres/sermons';
+import { BaseItemSchema, handleApiError, ApiResponse } from '@/lib/api-utils';
 
 export const dynamic = 'force-dynamic';
 

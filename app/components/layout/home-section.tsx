@@ -2,10 +2,10 @@ import React, { ReactNode } from 'react';
 import Link from 'next/link';
 import { ArrowRightIcon } from 'lucide-react';
 
-import { useSidebar } from '@/app/components/ui/sidebar';
+import { useSidebar } from '@/components/ui/sidebar';
 
-import { cn } from '@/app/lib/utils';
-import { SECTION_WIDTH } from '@/app/variables/constants';
+import { cn } from '@/lib/utils';
+import { SECTION_WIDTH } from '@/variables/constants';
 
 interface IHomeSection {
   path: string;

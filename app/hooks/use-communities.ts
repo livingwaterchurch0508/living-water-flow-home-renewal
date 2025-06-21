@@ -1,7 +1,8 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { CommunitiesGetResponse } from '@/app/api/communities/route';
-import { QueryParams } from '@/app/lib/api-utils';
-import { ICommunity } from '@/app/variables/interfaces';
+
+import { CommunitiesGetResponse } from '@/api/communities/route';
+import { QueryParams } from '@/lib/api-utils';
+import { ICommunity } from '@/variables/types/community.types';
 
 async function fetchCommunities({ page = 1, limit = 1000, type = 0 }: Partial<QueryParams>) {
   try {
@@ -91,4 +92,3 @@ export function useCommunities({ page = 1, limit = 10, type = 0 }: Partial<Query
 }
 
 export { fetchCommunities };
-

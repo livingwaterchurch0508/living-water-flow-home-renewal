@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 
-import SermonsClient from '@/app/components/sermons/SermonsClient';
+import SermonsClient from '@/components/sermons/SermonsClient';
 
-import { metadata } from '@/app/[locale]/layout';
-import { YOUTUBE_URL } from '@/app/variables/constants';
+import { metadata } from '@/pages/layout';
+import { YOUTUBE_URL } from '@/variables/constants';
 
 type Props = {
   params: Promise<{ locale: string }>;

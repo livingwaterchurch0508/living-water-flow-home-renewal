@@ -6,21 +6,23 @@ import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
 
-import { ContentCard } from '@/app/components/cards/ContentCard';
-import { CommunityCard } from '@/app/components/cards/CommunityCard';
-import { SermonCard } from '@/app/components/cards/SermonCard';
-import { buttonVariants } from '@/app/components/ui';
-import { MasonryGrid, MasonryItem } from '@/app/components/magicui/masonry-grid';
-import { Youtube } from '@/app/components/icon/Youtube';
-import { HeroSection } from '@/app/components/layout/hero-section';
-import HomeSection from '@/app/components/layout/home-section';
-import { ContentListSkeleton } from '@/app/components/ui';
-import { MotionEffect } from '@/app/components/animate-ui/effects/motion-effect';
+import { ContentCard } from '@/components/cards/ContentCard';
+import { CommunityCard } from '@/components/cards/CommunityCard';
+import { SermonCard } from '@/components/cards/SermonCard';
+import { buttonVariants } from '@/components/ui';
+import { MasonryGrid, MasonryItem } from '@/components/magicui/masonry-grid';
+import { Youtube } from '@/components/icon/Youtube';
+import { HeroSection } from '@/components/layout/hero-section';
+import HomeSection from '@/components/layout/home-section';
+import { ContentListSkeleton } from '@/components/ui';
+import { MotionEffect } from '@/components/animate-ui/effects/motion-effect';
 
-import { cn } from '@/app/lib/utils';
-import { YOUTUBE_URL, ROUTER_PATHS } from '@/app/variables/constants';
-import { MENU_TAB, INTRODUCE_TAB, SOUL_TYPE } from '@/app/variables/enums';
-import type { IHymn, ISermon, ICommunity } from '@/app/variables/interfaces';
+import { cn } from '@/lib/utils';
+import { YOUTUBE_URL, ROUTER_PATHS } from '@/variables/constants';
+import { MENU_TAB, INTRODUCE_TAB, SOUL_TYPE } from '@/variables/enums';
+import type { ISermon } from '@/variables/types/sermon.types';
+import type { IHymn } from '@/variables/types/hymn.types';
+import type { ICommunity } from '@/variables/types/community.types';
 
 interface ApiResponse<T> {
   status: string;

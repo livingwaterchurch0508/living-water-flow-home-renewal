@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-import { cn } from '@/app/lib/utils';
+import { cn } from '@/lib/utils';
 
 interface MasonryGridProps {
   children: React.ReactNode;

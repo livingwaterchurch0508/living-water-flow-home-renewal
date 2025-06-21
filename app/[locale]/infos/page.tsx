@@ -4,14 +4,14 @@ import React from 'react';
 import { useTranslations } from 'next-intl';
 import { MapIcon } from 'lucide-react';
 
-import { useSidebar } from '@/app/components/ui/sidebar';
-import { TextReveal } from '@/app/components/magicui/text-reveal';
-import { BorderBeam } from '@/app/components/magicui/border-beam';
-import Location from '@/app/components/cards/Location';
-import { HeroSection } from '@/app/components/layout/hero-section';
+import { useSidebar } from '@/components/ui/sidebar';
+import { TextReveal } from '@/components/magicui/text-reveal';
+import { BorderBeam } from '@/components/magicui/border-beam';
+import Location from '@/components/cards/Location';
+import { HeroSection } from '@/components/layout/hero-section';
 
-import { cn } from '@/app/lib/utils';
-import { SECTION_WIDTH } from '@/app/variables/constants';
+import { cn } from '@/lib/utils';
+import { SECTION_WIDTH } from '@/variables/constants';
 
 export default function InfosPage() {
   const t = useTranslations('Main');

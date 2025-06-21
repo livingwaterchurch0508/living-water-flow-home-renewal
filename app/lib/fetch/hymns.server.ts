@@ -1,9 +1,17 @@
-import { IHymn } from '@/app/variables/interfaces';
-import { getBaseUrl } from '@/app/variables/constants';
+import { IHymn } from '@/variables/types/hymn.types';
+import { getBaseUrl } from '@/variables/constants';
 
 const baseUrl = getBaseUrl();
 
-export async function fetchHymnsServer({ page = 1, limit = 10, type = 0 }: { page?: number; limit?: number; type?: number }) {
+export async function fetchHymnsServer({
+  page = 1,
+  limit = 10,
+  type = 0,
+}: {
+  page?: number;
+  limit?: number;
+  type?: number;
+}) {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
@@ -15,4 +23,4 @@ export async function fetchHymnsServer({ page = 1, limit = 10, type = 0 }: { pag
     status: 'success' | 'error';
     payload: { items: IHymn[]; total: number; totalPages: number };
   }>;
-} 
+}

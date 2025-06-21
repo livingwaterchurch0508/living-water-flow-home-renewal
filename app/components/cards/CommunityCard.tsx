@@ -3,10 +3,10 @@
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 
-import ImageGalleryDialog from '@/app/components/magicui/image-gallery-dialog';
+import ImageGalleryDialog from '@/components/magicui/image-gallery-dialog';
 
-import { cn } from '@/app/lib/utils';
-import { getRelativeTime } from '@/app/lib/date';
+import { cn } from '@/lib/utils';
+import { getRelativeTime } from '@/lib/date';
 
 interface CommunityCardProps {
   name: string;

@@ -3,12 +3,12 @@ import { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { Analytics } from '@vercel/analytics/react';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { Toaster } from '@/app/components/ui/sonner';
 
-import { AppSidebar } from '@/app/components/layout/app-sidebar';
-import { Nav } from '@/app/components/layout/nav';
-import BottomDock from '@/app/components/layout/bottom-dock';
-import { ClientProviders } from '@/app/components/providers/client-providers';
+import { Toaster } from '@/components/ui/sonner';
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { Nav } from '@/components/layout/nav';
+import BottomDock from '@/components/layout/bottom-dock';
+import { ClientProviders } from '@/components/providers/client-providers';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',

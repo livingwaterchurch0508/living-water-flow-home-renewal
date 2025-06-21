@@ -1,7 +1,7 @@
 import { desc, eq, ilike, or, and, sql } from 'drizzle-orm';
 import { getDb } from './dbConnection';
 import { sermons } from './schema';
-import { ISermon } from '@/app/variables/interfaces';
+import { ISermon } from '@/variables/types/sermon.types';
 import {
   IPage,
   IPaginatedResponse,

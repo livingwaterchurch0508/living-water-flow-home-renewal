@@ -1,5 +1,6 @@
-import { TextReveal } from '@/app/components/magicui/text-reveal';
-import { cn } from '@/app/lib/utils';
+import { TextReveal } from '@/components/magicui/text-reveal';
+
+import { cn } from '@/lib/utils';
 
 interface StyledTextProps {
   text: string;

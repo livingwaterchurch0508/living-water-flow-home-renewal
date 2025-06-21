@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getHymns, createHymn, deleteHymn } from '@/app/lib/db/postgres/hymns';
 import { z } from 'zod';
+
+import { getHymns, createHymn, deleteHymn } from '@/lib/db/postgres/hymns';
 import {
   QuerySchema as BaseQuerySchema,
   BaseItemSchema,
@@ -8,8 +9,8 @@ import {
   handleApiError,
   ApiResponse,
   createEmptyResponse,
-} from '@/app/lib/api-utils';
-import { IHymnsResponse } from '@/app/variables/interfaces';
+} from '@/lib/api-utils';
+import { IHymnsResponse } from '@/variables/types/hymn.types';
 
 export const dynamic = 'force-dynamic';
 
@@ -125,7 +126,10 @@ export async function POST(req: NextRequest) {
     });
     const parsed = HymnCreateSchema.safeParse(data);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid data', details: parsed.error.errors, status: 'error' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid data', details: parsed.error.errors, status: 'error' },
+        { status: 400 }
+      );
     }
     const cleanData = { ...parsed.data };
     if (typeof cleanData.soulType === 'number') cleanData.viewCount = cleanData.soulType;
@@ -151,7 +155,10 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ payload: result, status: 'success' }, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message || 'Internal server error', status: 'error' }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as Error).message || 'Internal server error', status: 'error' },
+      { status: 500 }
+    );
   }
 }
 
@@ -162,11 +169,14 @@ export async function DELETE(req: NextRequest) {
     const IdsSchema = z.object({ ids: z.array(z.number()) });
     const parsed = IdsSchema.safeParse(data);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid ids', details: parsed.error.errors, status: 'error' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Invalid ids', details: parsed.error.errors, status: 'error' },
+        { status: 400 }
+      );
     }
-    const results = await Promise.all(parsed.data.ids.map(id => deleteHymn(id)));
+    const results = await Promise.all(parsed.data.ids.map((id) => deleteHymn(id)));
     // null -> undefined 변환 (응답 타입 일치)
-    const cleanResults = results.map(result => {
+    const cleanResults = results.map((result) => {
       if (result && typeof result === 'object') {
         const r = { ...result };
         if ('nameEn' in r && r.nameEn === null) r.nameEn = undefined;
@@ -176,12 +186,18 @@ export async function DELETE(req: NextRequest) {
       }
       return result;
     });
-    const errors = cleanResults.filter(r => 'message' in r);
+    const errors = cleanResults.filter((r) => 'message' in r);
     if (errors.length > 0) {
-      return NextResponse.json({ error: 'Some deletes failed', details: errors, status: 'error' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Some deletes failed', details: errors, status: 'error' },
+        { status: 500 }
+      );
     }
     return NextResponse.json({ payload: cleanResults, status: 'success' }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message || 'Internal server error', status: 'error' }, { status: 500 });
+    return NextResponse.json(
+      { error: (error as Error).message || 'Internal server error', status: 'error' },
+      { status: 500 }
+    );
   }
 }

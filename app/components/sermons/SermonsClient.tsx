@@ -6,21 +6,21 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { BookOpenIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
-import { ContentCard } from '@/app/components/cards/ContentCard';
-import { SermonCard } from '@/app/components/cards/SermonCard';
-import { useSidebar } from '@/app/components/ui/sidebar';
-import { MasonryGrid, MasonryItem } from '@/app/components/magicui/masonry-grid';
-import { HeroSection } from '@/app/components/layout/hero-section';
-import { TabSection } from '@/app/components/layout/tab-section';
+import { ContentCard } from '@/components/cards/ContentCard';
+import { SermonCard } from '@/components/cards/SermonCard';
+import { useSidebar } from '@/components/ui/sidebar';
+import { MasonryGrid, MasonryItem } from '@/components/magicui/masonry-grid';
+import { HeroSection } from '@/components/layout/hero-section';
+import { TabSection } from '@/components/layout/tab-section';
+import { ContentListSkeleton } from '@/components/ui/content-list-skeleton';
+import { DetailSkeleton } from '@/components/ui/detail-skeleton';
+import { MotionEffect } from '@/components/animate-ui/effects/motion-effect';
 
-import { useInfiniteSermons } from '@/app/hooks/use-sermons';
-import { cn } from '@/app/lib/utils';
-import { SERMON_TAB, SOUL_TYPE } from '@/app/variables/enums';
-import { SECTION_WIDTH } from '@/app/variables/constants';
-import { DetailSkeleton } from '@/app/components/ui/detail-skeleton';
-import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
-import type { ISermon } from '@/app/variables/interfaces';
-import { MotionEffect } from '@/app/components/animate-ui/effects/motion-effect';
+import { useInfiniteSermons } from '@/hooks/use-sermons';
+import { cn } from '@/lib/utils';
+import { SERMON_TAB, SOUL_TYPE } from '@/variables/enums';
+import { SECTION_WIDTH } from '@/variables/constants';
+import type { ISermon } from '@/variables/types/sermon.types';
 
 interface SermonsClientProps {
   searchParams: { id?: string; type?: string };

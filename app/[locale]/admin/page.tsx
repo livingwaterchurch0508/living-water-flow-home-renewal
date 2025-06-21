@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import DashboardUI from '@/app/components/admin/DashboardUI';
-import { isAdminAuthenticated } from '@/app/lib/auth';
+import DashboardUI from '@/components/admin/DashboardUI';
+import { isAdminAuthenticated } from '@/lib/auth';
 
 export default async function AdminDashboard({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -8,7 +8,5 @@ export default async function AdminDashboard({ params }: { params: Promise<{ loc
   if (!(await isAdminAuthenticated())) {
     redirect(`/${locale}/admin/login`);
   }
-  return (
-    <DashboardUI />
-  );
+  return <DashboardUI />;
 }

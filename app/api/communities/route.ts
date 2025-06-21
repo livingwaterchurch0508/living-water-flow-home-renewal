@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCommunities } from '@/app/lib/db/postgres/communities';
 import { z } from 'zod';
+import path from 'path';
+
+import { getCommunities } from '@/lib/db/postgres/communities';
 import {
   QuerySchema,
   BaseItemSchema,
@@ -8,11 +10,10 @@ import {
   handleApiError,
   createEmptyResponse,
   ApiResponse,
-} from '@/app/lib/api-utils';
-import { db } from '@/app/lib/db/postgres/dbConnection';
-import { communities, files as filesTable } from '@/app/lib/db/postgres/schema';
-import { storageClient } from '@/app/lib/fetch/storage';
-import path from 'path';
+} from '@/lib/api-utils';
+import { db } from '@/lib/db/postgres/dbConnection';
+import { communities, files as filesTable } from '@/lib/db/postgres/schema';
+import { storageClient } from '@/lib/fetch/storage';
 
 export const dynamic = 'force-dynamic';
 

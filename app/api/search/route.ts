@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { desc, ilike, or, eq } from 'drizzle-orm';
-import { db } from '@/app/lib/db/postgres/dbConnection';
-import { sermons, hymns, communities, files } from '@/app/lib/db/postgres/schema';
-import { YOUTUBE_URL } from '@/app/variables/constants';
+
+import { db } from '@/lib/db/postgres/dbConnection';
+import { sermons, hymns, communities, files } from '@/lib/db/postgres/schema';
+import { YOUTUBE_URL } from '@/variables/constants';
 
 export async function GET(request: Request) {
   try {

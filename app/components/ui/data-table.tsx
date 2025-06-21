@@ -10,8 +10,10 @@ import {
   ColumnSizingState,
   getFilteredRowModel,
 } from '@tanstack/react-table';
-import { Input } from './input';
-import { cn } from '@/app/lib/utils';
+
+import { Input } from '@/components/ui/input';
+
+import { cn } from '@/lib/utils';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

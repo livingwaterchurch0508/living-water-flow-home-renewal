@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+
 import { ContentCard } from './ContentCard';
 import { TitleText, BodyText } from './StyledText';
 
