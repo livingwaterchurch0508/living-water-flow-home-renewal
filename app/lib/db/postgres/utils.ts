@@ -31,10 +31,12 @@ export const formatDate = (date: Date | string | null): string | null => {
   }
 };
 
-export const handleDbConnection = async (
-  getDb: () => Promise<NeonHttpDatabase | null>,
+export const handleDbConnection = async <
+  TDatabase extends NeonHttpDatabase<Record<string, unknown>>
+>(
+  getDb: () => Promise<TDatabase | null>,
   errorPrefix: string
-): Promise<NeonHttpDatabase | null> => {
+): Promise<TDatabase | null> => {
   try {
     const db = await getDb();
     if (!db) {

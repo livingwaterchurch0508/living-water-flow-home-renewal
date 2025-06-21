@@ -1,4 +1,3 @@
-import { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { DateTime } from 'luxon';
 
@@ -45,7 +44,7 @@ export async function getCommunities({
   limit = 10,
 }: IGetCommunities): Promise<ICommunitiesType> {
   try {
-    const db = (await getDb()) as NeonHttpDatabase;
+    const db = await getDb();
     if (!db) {
       console.error('[GET_COMMUNITIES_ERROR] Database connection failed');
       return { message: 'Database connection failed' };
@@ -143,7 +142,7 @@ export type ICommunityType = Awaited<IError> | Awaited<ICommunitiesById> | null;
 
 export async function getCommunitiesById(id: number, type: NEWS_TAB): Promise<ICommunityType> {
   try {
-    const db = (await getDb()) as NeonHttpDatabase;
+    const db = await getDb();
     if (!db) {
       console.error('[GET_COMMUNITIES_BY_ID_ERROR] Database connection failed');
       return { message: 'Database connection failed' };
@@ -220,7 +219,7 @@ export async function getCommunitiesById(id: number, type: NEWS_TAB): Promise<IC
 
 export async function getCommunityById(id: number) {
   try {
-    const db = (await getDb()) as NeonHttpDatabase;
+    const db = await getDb();
     if (!db) {
       console.error('[GET_COMMUNITY_BY_ID_ERROR] Database connection failed');
       return null;
