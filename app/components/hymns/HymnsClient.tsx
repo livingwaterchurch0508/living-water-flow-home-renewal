@@ -15,6 +15,7 @@ import { SECTION_WIDTH } from '@/app/variables/constants';
 import { ContentCard } from '@/app/components/cards/ContentCard';
 import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
 import { DetailSkeleton } from '@/app/components/ui/detail-skeleton';
+import { MotionEffect } from '@/app/components/animate-ui/effects/motion-effect';
 import type { IHymn } from '@/app/variables/interfaces.d';
 
 interface HymnsClientProps {
@@ -155,25 +156,36 @@ const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn })
           </div>
         ) : (
           <>
-            <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {hymnsForRender.map((hymn) => (
-                <ContentCard
-                  key={hymn.id}
-                  name={hymn.name}
-                  desc={hymn.desc}
-                  url={hymn.url || ''}
-                  createdAt={hymn.createdAt || ''}
-                  type="hymn"
-                  autoOpen={false}
-                  onDialogClose={handleCloseDialog}
-                  id={hymn.id.toString()}
-                />
-              ))}
-            </div>
+            <div className="mt-8">
+              {hymnsForRender.length > 0 && (
+                <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {hymnsForRender.map((hymn, index) => (
+                    <MotionEffect
+                      key={hymn.id}
+                      slide={{ direction: 'up', offset: 20 }}
+                      className="cursor-pointer"
+                      delay={index * 0.05}
+                      inView
+                    >
+                      <ContentCard
+                        name={hymn.name}
+                        desc={hymn.desc}
+                        url={hymn.url || ''}
+                        createdAt={hymn.createdAt || ''}
+                        type="hymn"
+                        autoOpen={false}
+                        onDialogClose={handleCloseDialog}
+                        id={hymn.id.toString()}
+                      />
+                    </MotionEffect>
+                  ))}
+                </div>
+              )}
 
-            {/* 무한 스크롤 로딩 인디케이터 */}
-            <div ref={observerTarget} className="mt-8">
-              {isFetchingNextPage && <ContentListSkeleton count={12} />}
+              {/* 무한 스크롤 로딩 인디케이터 */}
+              <div ref={observerTarget} className="mt-8">
+                {isFetchingNextPage && <ContentListSkeleton count={12} />}
+              </div>
             </div>
           </>
         )}

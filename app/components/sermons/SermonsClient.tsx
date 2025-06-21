@@ -20,6 +20,7 @@ import { SECTION_WIDTH } from '@/app/variables/constants';
 import { DetailSkeleton } from '@/app/components/ui/detail-skeleton';
 import { ContentListSkeleton } from '@/app/components/ui/content-list-skeleton';
 import type { ISermon } from '@/app/variables/interfaces';
+import { MotionEffect } from '@/app/components/animate-ui/effects/motion-effect';
 
 interface SermonsClientProps {
   searchParams: { id?: string; type?: string };
@@ -236,17 +237,25 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
     return (
       <>
         <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {sermonsForRender.map((sermon) => (
-            <div key={sermon.id} className="flex flex-col bg-card rounded-xl overflow-hidden">
-              <ContentCard
-                name={sermon.name}
-                desc={sermon.desc}
-                url={sermon.url || ''}
-                createdAt={sermon.createdAt || ''}
-                type="sermon"
-                id={sermon.id.toString()}
-              />
-            </div>
+          {sermonsForRender.map((sermon, index) => (
+            <MotionEffect
+              key={sermon.id}
+              className="cursor-pointer"
+              delay={index * 0.05}
+              inView
+              slide={{ direction: 'up', offset: 20 }}
+            >
+              <div className="flex flex-col bg-card rounded-xl overflow-hidden h-full">
+                <ContentCard
+                  name={sermon.name}
+                  desc={sermon.desc}
+                  url={sermon.url || ''}
+                  createdAt={sermon.createdAt || ''}
+                  type="sermon"
+                  id={sermon.id.toString()}
+                />
+              </div>
+            </MotionEffect>
           ))}
         </div>
 

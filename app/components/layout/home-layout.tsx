@@ -15,6 +15,7 @@ import { Youtube } from '@/app/components/icon/Youtube';
 import { HeroSection } from '@/app/components/layout/hero-section';
 import HomeSection from '@/app/components/layout/home-section';
 import { ContentListSkeleton } from '@/app/components/ui';
+import { MotionEffect } from '@/app/components/animate-ui/effects/motion-effect';
 
 import { cn } from '@/app/lib/utils';
 import { YOUTUBE_URL, ROUTER_PATHS } from '@/app/variables/constants';
@@ -92,10 +93,7 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
 
   return (
     <div className="space-y-20 py-10 px-6">
-      <HeroSection
-        title={t('Info.title')}
-        content={t('Info.description')}
-      >
+      <HeroSection title={t('Info.title')} content={t('Info.description')}>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href={`/introduces?type=${INTRODUCE_TAB.WORSHIP}`}
@@ -128,22 +126,27 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
       >
         <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {hymns.length === 0 ? (
-            <div className="w-full text-center py-8 text-muted-foreground">
+            <div className="col-span-full w-full text-center py-8 text-muted-foreground">
               {t('Common.noData')}
             </div>
           ) : (
-            hymns.map((hymn) => (
-              <ContentCard
+            hymns.map((hymn, index) => (
+              <MotionEffect
                 key={hymn.id}
-                type="hymn"
-                name={locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || ''}
-                desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
-                url={hymn.url || ''}
-                createdAt={hymn.createdAt || ''}
-                variant="home"
-                id={hymn.id.toString()}
-                customUrl={`/${locale}/hymns?id=${hymn.id}&type=0`}
-              />
+                slide={{ direction: 'up', offset: 20 }}
+                delay={index * 0.1}
+              >
+                <ContentCard
+                  type="hymn"
+                  name={locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || ''}
+                  desc={locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || ''}
+                  url={hymn.url || ''}
+                  createdAt={hymn.createdAt || ''}
+                  variant="home"
+                  id={hymn.id.toString()}
+                  customUrl={`/${locale}/hymns?id=${hymn.id}&type=0`}
+                />
+              </MotionEffect>
             ))
           )}
         </div>
@@ -154,28 +157,36 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
         title={t('Sermon.title')}
         viewAll={t('Common.viewAll')}
       >
-        <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" ref={sermonRef}>
+        <div
+          className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          ref={sermonRef}
+        >
           {sermonsLoading ? (
-            <div className="w-full text-center py-8 text-muted-foreground">
+            <div className="col-span-full w-full text-center py-8 text-muted-foreground">
               <ContentListSkeleton count={12} />
             </div>
           ) : sermons.length === 0 ? (
-            <div className="w-full text-center py-8 text-muted-foreground">
+            <div className="col-span-full w-full text-center py-8 text-muted-foreground">
               {t('Common.noData')}
             </div>
           ) : (
-            sermons.map((sermon: ISermon) => (
-              <ContentCard
+            sermons.map((sermon: ISermon, index: number) => (
+              <MotionEffect
                 key={sermon.id}
-                type="sermon"
-                name={locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''}
-                desc={locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''}
-                url={sermon.url || ''}
-                createdAt={sermon.createdAt || ''}
-                variant="home"
-                id={sermon.id.toString()}
-                customUrl={`/${locale}/sermons?id=${sermon.id}&type=0`}
-              />
+                slide={{ direction: 'up', offset: 20 }}
+                delay={index * 0.1}
+              >
+                <ContentCard
+                  type="sermon"
+                  name={locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || ''}
+                  desc={locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || ''}
+                  url={sermon.url || ''}
+                  createdAt={sermon.createdAt || ''}
+                  variant="home"
+                  id={sermon.id.toString()}
+                  customUrl={`/${locale}/sermons?id=${sermon.id}&type=0`}
+                />
+              </MotionEffect>
             ))
           )}
         </div>
@@ -186,28 +197,44 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
         title={t('News.title')}
         viewAll={t('Common.viewAll')}
       >
-        <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" ref={commRef}>
+        <div
+          className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          ref={commRef}
+        >
           {commLoading ? (
-            <div className="w-full text-center py-8 text-muted-foreground">
+            <div className="col-span-full w-full text-center py-8 text-muted-foreground">
               <ContentListSkeleton count={12} />
             </div>
           ) : communities.length === 0 ? (
-            <div className="w-full text-center py-8 text-muted-foreground">
+            <div className="col-span-full w-full text-center py-8 text-muted-foreground">
               {t('Common.noData')}
             </div>
           ) : (
-            communities.map((community: ICommunity) => (
-              <CommunityCard
+            communities.map((community: ICommunity, index: number) => (
+              <MotionEffect
                 key={community.id}
-                name={locale === 'en' ? community.nameEn || community.name || '' : community.name || ''}
-                desc={locale === 'en' ? community.descEn || community.desc || '' : community.desc || ''}
-                url={community.files[0]?.url || ''}
-                createdAt={community.createdAt || ''}
-                caption={Number(community.files[0]?.caption) || 1}
-                variant="home"
-                id={community.id.toString()}
-                customUrl={`/${locale}/news?id=${community.id}&type=0`}
-              />
+                slide={{ direction: 'up', offset: 20 }}
+                delay={index * 0.1}
+              >
+                <CommunityCard
+                  name={
+                    locale === 'en'
+                      ? community.nameEn || community.name || ''
+                      : community.name || ''
+                  }
+                  desc={
+                    locale === 'en'
+                      ? community.descEn || community.desc || ''
+                      : community.desc || ''
+                  }
+                  url={community.files[0]?.url || ''}
+                  createdAt={community.createdAt || ''}
+                  caption={Number(community.files[0]?.caption) || 1}
+                  variant="home"
+                  id={community.id.toString()}
+                  customUrl={`/${locale}/news?id=${community.id}&type=0`}
+                />
+              </MotionEffect>
             ))
           )}
         </div>

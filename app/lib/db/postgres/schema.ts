@@ -29,7 +29,7 @@ export const communities = pgTable('communities', {
   name: varchar('name', { length: 256 }).notNull(),
   desc: varchar('desc', { length: 256 }),
   type: integer('type').default(1).notNull(),
-  url: varchar('url', { length: 256 }).notNull(),
+  url: varchar('url', { length: 256 }),
   viewCount: integer('viewCount').default(0).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),
   nameEn: varchar('nameEn', { length: 512 }),
@@ -41,7 +41,7 @@ export const files = pgTable('files', {
   communityId: integer('community_id')
     .references(() => communities.id)
     .notNull(),
-  url: varchar('url', { length: 256 }).notNull(),
+  url: varchar('url', { length: 256 }),
   caption: varchar('caption', { length: 256 }),
   downloadCount: integer('downloadCount').default(0).notNull(),
   createdAt: timestamp('createdAt').defaultNow().notNull(),

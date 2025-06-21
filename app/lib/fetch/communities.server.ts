@@ -11,8 +11,8 @@ export async function fetchCommunitiesServer({ page = 1, limit = 10, type = 0 }:
   });
   const res = await fetch(`${baseUrl}/api/communities?${params}`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error('Failed to fetch communities');
-  return res.json() as Promise<{
-    status: 'success' | 'error';
-    payload: { items: ICommunity[]; total: number; totalPages: number };
-  }>;
+
+  const data: { payload: { items: ICommunity[]; total: number; totalPages: number } } = await res.json();
+
+  return data.payload;
 } 

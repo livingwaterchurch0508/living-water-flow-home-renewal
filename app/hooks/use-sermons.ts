@@ -82,7 +82,6 @@ export const useInfiniteSermons = ({ limit, search, type }: InfiniteSermonParams
     initialPageParam: 1,
   });
 };
-
 export function useSermons({ page = 1, limit = 10, type = 0 }: Partial<QueryParams> = {}) {
   return useQuery({
     queryKey: ['sermons', { page, limit, type }],
@@ -92,3 +91,4 @@ export function useSermons({ page = 1, limit = 10, type = 0 }: Partial<QueryPara
 }
 
 export { fetchSermons };
+

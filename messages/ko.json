@@ -185,6 +185,7 @@
     "deleteError": "삭제 중 오류가 발생했습니다.",
     "cancel": "취소",
     "confirm": "확인",
-    "deleting": "삭제 중..."
+    "deleting": "삭제 중...",
+    "previewAltText": "미리보기 {current}/{total}"
   }
 }

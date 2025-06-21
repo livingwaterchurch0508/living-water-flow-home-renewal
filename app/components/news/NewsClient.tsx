@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { NewspaperIcon } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
+import { MotionEffect } from '@/app/components/animate-ui/effects/motion-effect';
 import { CommunityCard } from '@/app/components/cards/CommunityCard';
 import { useSidebar } from '@/app/components/ui/sidebar';
 import { HeroSection } from '@/app/components/layout/hero-section';
@@ -146,13 +147,16 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
         ) : (
           <>
             <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {communitiesForRender.map((community) => (
-                <div
+              {communitiesForRender.map((community, index) => (
+                <MotionEffect
                   key={community.id}
+                  className="cursor-pointer"
+                  delay={index * 0.05}
+                  inView
                   onClick={() => {
                     setSelectedCommunityState(community.id);
                   }}
-                  className="cursor-pointer"
+                  slide={{ direction: 'up', offset: 20 }}
                 >
                   <CommunityCard
                     name={community.name}
@@ -166,7 +170,7 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
                     }}
                     id={community.id.toString()}
                   />
-                </div>
+                </MotionEffect>
               ))}
             </div>
 

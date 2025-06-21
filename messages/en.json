@@ -167,9 +167,14 @@
     "soulTypeRequired": "Please select a Soul type.",
     "urlRequired": "Please enter a YouTube URL after the video.",
     "edit": "Edit",
+    "editSuccess": "Successfully edited.",
     "delete": "Delete",
     "add": "Add",
     "type": "Type",
+    "youtubeUrl": "YouTube URL",
+    "photoUpload": "Photo Upload",
+    "soulTypeDetail": "Sermon Note Type",
+    "url": "URL",
     "fetchError": "Failed to load data. Please try again.",
     "submitError": "Failed to submit. Please try again.",
     "submitSuccess": "Successfully submitted.",
@@ -179,6 +184,7 @@
     "deleteError": "An error occurred while deleting.",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "deleting": "Deleting..."
+    "deleting": "Deleting...",
+    "previewAltText": "Preview {current} of {total}"
   }
 }

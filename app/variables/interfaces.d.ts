@@ -71,3 +71,5 @@ export interface IPaginatedResponse<T> {
 export type IHymnsResponse = IPaginatedResponse<IHymn>;
 export type ISermonsResponse = IPaginatedResponse<ISermon>;
 export type ICommunitiesResponse = IPaginatedResponse<ICommunity>;
+
+declare module 'uuid';

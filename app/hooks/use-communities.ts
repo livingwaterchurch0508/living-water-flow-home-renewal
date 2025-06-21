@@ -82,7 +82,6 @@ export const useInfiniteCommunities = ({ limit, search, type }: InfiniteCommunit
     initialPageParam: 1,
   });
 };
-
 export function useCommunities({ page = 1, limit = 10, type = 0 }: Partial<QueryParams> = {}) {
   return useQuery({
     queryKey: ['communities', { page, limit, type }],
@@ -92,3 +91,4 @@ export function useCommunities({ page = 1, limit = 10, type = 0 }: Partial<Query
 }
 
 export { fetchCommunities };
+

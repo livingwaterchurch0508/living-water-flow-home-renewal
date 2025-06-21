@@ -15,22 +15,16 @@ import { cn } from '@/app/lib/utils';
 import { SECTION_WIDTH } from '@/app/variables/constants';
 import { useSidebar } from '@/app/components/ui';
 import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/app/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from '@/app/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
-
-interface DashboardProps {
-  locale: string;
-  sermonCount: number;
-  hymnCount: number;
-  newsCount: number;
-  sermonRhema: number;
-  sermonSoul: number;
-  hymnHymn: number;
-  hymnSong: number;
-  newsService: number;
-  newsEvent: number;
-  newsStory: number;
-}
+import type { FileItem } from './UploadDialog';
 
 // Sermon, Hymn, News row types
 interface SermonRow {
@@ -94,18 +88,7 @@ async function fetchAllTypePages<T>(
     );
 }
 
-export default function DashboardUI({
-  // sermonCount,
-  // hymnCount,
-  // newsCount,
-  // sermonRhema,
-  // sermonSoul,
-  // hymnHymn,
-  // hymnSong,
-  // newsService,
-  // newsEvent,
-  // newsStory,
-}: DashboardProps) {
+export default function DashboardUI() {
   const t = useTranslations('Admin');
   const menuT = useTranslations('Menu');
   const { state } = useSidebar();
@@ -123,7 +106,11 @@ export default function DashboardUI({
   const [errorMsgAll, setErrorMsgAll] = useState('');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { data: stats, isLoading: isStatsLoading, refetch: refetchStats } = useQuery({
+  const {
+    data: stats,
+    isLoading: isStatsLoading,
+    refetch: refetchStats,
+  } = useQuery({
     queryKey: ['admin-dashboard-stats'],
     queryFn: async () => {
       const res = await fetch('/api/admin/stats');
@@ -300,6 +287,8 @@ export default function DashboardUI({
 
   type UploadData = {
     id?: number;
+    files?: FileItem[];
+    deletedFiles?: string[];
     [key: string]: unknown;
   };
 
@@ -307,7 +296,8 @@ export default function DashboardUI({
     try {
       let url = '';
       let method: 'POST' | 'PUT' = 'POST';
-      let body: Record<string, unknown> = { ...data };
+      let reqBody: BodyInit;
+      const reqHeaders: HeadersInit = {};
 
       if (selectedTab === 'sermon') {
         url = '/api/sermons';
@@ -317,27 +307,52 @@ export default function DashboardUI({
         url = '/api/communities';
       }
 
-      if (dialogMode === 'add') {
-        if ('id' in body) delete body.id;
-      } else if (dialogMode === 'edit') {
+      if (dialogMode === 'edit') {
         if (!data.id) {
           toast.error('수정할 데이터의 id가 없습니다.');
           return;
         }
         url += `/${data.id}`;
         method = 'PUT';
-        body = { ...data };
+      }
+
+      if (selectedTab === 'news' && (dialogMode === 'add' || dialogMode === 'edit')) {
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === 'files' && Array.isArray(value)) {
+            value.forEach((fileItem: FileItem) => {
+              if (fileItem.file) {
+                formData.append('files', fileItem.file);
+              }
+            });
+          } else if (key === 'deletedFiles' && Array.isArray(value) && value.length > 0) {
+            formData.append('deletedFiles', JSON.stringify(value));
+          } else if (key !== 'files' && key !== 'deletedFiles' && value !== null && value !== undefined) {
+            formData.append(key, String(value));
+          }
+        });
+        reqBody = formData;
+        // Do not set Content-Type header for FormData, browser will do it
+      } else {
+        const body: Record<string, unknown> = { ...data };
+        if (dialogMode === 'add' && 'id' in body) {
+          delete body.id;
+        }
+        reqBody = JSON.stringify(body);
+        reqHeaders['Content-Type'] = 'application/json';
       }
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        headers: reqHeaders,
+        body: reqBody,
       });
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || t('submitError'));
       }
+
       setDialogOpen(false);
       toast.success(t(dialogMode === 'add' ? 'submitSuccess' : 'editSuccess'));
       await fetchAll();
@@ -353,7 +368,9 @@ export default function DashboardUI({
 
   // 카드 클릭 핸들러
   const handleCardClick = (tab: TabType) => {
+    if (selectedTab === tab) return;
     setSelectedTab(tab);
+    setSelectedRowIds([]);
   };
 
   // 삭제 API 호출 함수
@@ -392,15 +409,16 @@ export default function DashboardUI({
           <Button
             size="icon"
             variant="outline"
-            onClick={() => { setDialogMode('add'); setDialogOpen(true); }}
+            onClick={() => {
+              setDialogMode('add');
+              setDialogOpen(true);
+            }}
             aria-label={t('add')}
           >
             <Plus className="w-4 h-4" />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>
-          {t('add')}
-        </TooltipContent>
+        <TooltipContent>{t('add')}</TooltipContent>
       </Tooltip>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -409,7 +427,10 @@ export default function DashboardUI({
             variant="outline"
             disabled={selectedRowIds.length !== 1}
             aria-label={t('edit')}
-            onClick={() => { setDialogMode('edit'); setDialogOpen(true); }}
+            onClick={() => {
+              setDialogMode('edit');
+              setDialogOpen(true);
+            }}
           >
             <Pencil className="w-4 h-4" />
           </Button>
@@ -452,10 +473,11 @@ export default function DashboardUI({
             <BorderBeam className="opacity-30" colorFrom="#60a5fa" colorTo="#818cf8" />
             <span className="text-lg font-semibold">{menuT('Sermon.name')}</span>
             <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {isStatsLoading ? '...' : stats?.sermonCount ?? '-'}
+              {isStatsLoading ? '...' : (stats?.sermonCount ?? '-')}
             </span>
             <span className="text-sm mt-2 text-muted-foreground">
-              {menuT('Sermon.sermon')}: {isStatsLoading ? '...' : stats?.sermonRhema ?? '-'} / {menuT('Sermon.soul')}: {isStatsLoading ? '...' : stats?.sermonSoul ?? '-'}
+              {menuT('Sermon.sermon')}: {isStatsLoading ? '...' : (stats?.sermonRhema ?? '-')} /{' '}
+              {menuT('Sermon.soul')}: {isStatsLoading ? '...' : (stats?.sermonSoul ?? '-')}
             </span>
           </div>
           {/* 찬양 카드 */}
@@ -466,10 +488,11 @@ export default function DashboardUI({
             <BorderBeam className="opacity-30" colorFrom="#34d399" colorTo="#60a5fa" />
             <span className="text-lg font-semibold">{menuT('Hymn.name')}</span>
             <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {isStatsLoading ? '...' : stats?.hymnCount ?? '-'}
+              {isStatsLoading ? '...' : (stats?.hymnCount ?? '-')}
             </span>
             <span className="text-sm mt-2 text-muted-foreground">
-              {menuT('Hymn.hymn')}: {isStatsLoading ? '...' : stats?.hymnHymn ?? '-'} / {t('hymnSong')}: {isStatsLoading ? '...' : stats?.hymnSong ?? '-'}
+              {menuT('Hymn.hymn')}: {isStatsLoading ? '...' : (stats?.hymnHymn ?? '-')} /{' '}
+              {t('hymnSong')}: {isStatsLoading ? '...' : (stats?.hymnSong ?? '-')}
             </span>
           </div>
           {/* 소식 카드 */}
@@ -480,18 +503,18 @@ export default function DashboardUI({
             <BorderBeam className="opacity-30" colorFrom="#a78bfa" colorTo="#f472b6" />
             <span className="text-lg font-semibold">{menuT('News.name')}</span>
             <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {isStatsLoading ? '...' : stats?.newsCount ?? '-'}
+              {isStatsLoading ? '...' : (stats?.newsCount ?? '-')}
             </span>
             <span className="text-sm mt-2 text-muted-foreground">
-              {menuT('News.service')}: {isStatsLoading ? '...' : stats?.newsService ?? '-'} / {menuT('News.event')}: {isStatsLoading ? '...' : stats?.newsEvent ?? '-'} / {menuT('News.story')}: {isStatsLoading ? '...' : stats?.newsStory ?? '-'}
+              {menuT('News.service')}: {isStatsLoading ? '...' : (stats?.newsService ?? '-')} /{' '}
+              {menuT('News.event')}: {isStatsLoading ? '...' : (stats?.newsEvent ?? '-')} /{' '}
+              {menuT('News.story')}: {isStatsLoading ? '...' : (stats?.newsStory ?? '-')}
             </span>
           </div>
         </div>
         {/* 툴바 + 데이터 테이블 */}
         <div className="flex flex-col gap-2 relative ">
-          <div className="flex items-center justify-between mb-2">
-            {selectedTab !== 'news' && toolbar}
-          </div>
+          <div className="flex items-center justify-between mb-2">{toolbar}</div>
           {isLoading ? (
             <ContentListSkeleton count={8} />
           ) : isError ? (
@@ -514,11 +537,26 @@ export default function DashboardUI({
           onSubmit={handleSubmit}
           mode={dialogMode}
           tabType={selectedTab}
-          initialData={
-            dialogMode === 'edit' && selectedRowIds.length === 1
-              ? tableData[Number(selectedRowIds[0])]
-              : undefined
-          }
+          initialData={(() => {
+            if (dialogMode !== 'edit' || selectedRowIds.length !== 1) return undefined;
+            const selectedId = (tableData[Number(selectedRowIds[0])] as { id: number }).id;
+            const data = allData[selectedTab].find(d => d.id === selectedId);
+            if (!data) return undefined;
+
+            // Explicitly map fields to ensure type compatibility
+            return {
+              id: data.id,
+              name: data.name ?? undefined,
+              nameEn: data.nameEn ?? undefined,
+              desc: data.desc ?? undefined,
+              descEn: data.descEn ?? undefined,
+              date: data.createdAt?.split('T')[0] ?? undefined,
+              type: data.type ?? undefined,
+              url: data.url ?? undefined,
+              soulType: 'viewCount' in data ? data.viewCount ?? undefined : undefined,
+              files: 'files' in data ? (data.files as { url: string | null; caption: string | null }[]) : undefined,
+            };
+          })()}
         />
         {/* 삭제 확인 다이얼로그 */}
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
@@ -527,13 +565,21 @@ export default function DashboardUI({
               <DialogTitle>{t('deleteConfirmTitle', { defaultValue: '삭제 확인' })}</DialogTitle>
               <DialogDescription />
             </DialogHeader>
-            <div className="py-4">{t('deleteConfirm', { defaultValue: '정말로 삭제하시겠습니까?' })}</div>
+            <div className="py-4">
+              {t('deleteConfirm', { defaultValue: '정말로 삭제하시겠습니까?' })}
+            </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isDeleting}>
+              <Button
+                variant="outline"
+                onClick={() => setIsDeleteDialogOpen(false)}
+                disabled={isDeleting}
+              >
                 {t('cancel', { defaultValue: '취소' })}
               </Button>
               <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-                {isDeleting ? t('deleting', { defaultValue: '삭제 중...' }) : t('confirm', { defaultValue: '확인' })}
+                {isDeleting
+                  ? t('deleting', { defaultValue: '삭제 중...' })
+                  : t('confirm', { defaultValue: '확인' })}
               </Button>
             </DialogFooter>
           </DialogContent>

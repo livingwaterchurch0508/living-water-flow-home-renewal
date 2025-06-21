@@ -84,7 +84,6 @@ export const useInfiniteHymns = ({ limit, search, type }: InfiniteHymnParams) =>
     initialPageParam: 1,
   });
 };
-
 export function useHymns({ page = 1, limit = 10, type = 0 }: Partial<QueryParams> = {}) {
   return useQuery({
     queryKey: ['hymns', { page, limit, type }],
@@ -94,3 +93,4 @@ export function useHymns({ page = 1, limit = 10, type = 0 }: Partial<QueryParams
 }
 
 export { fetchHymns };
+

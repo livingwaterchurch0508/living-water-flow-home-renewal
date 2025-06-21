@@ -4,6 +4,7 @@ import sharp from 'sharp';
 import { storageClient } from '@/app/lib/fetch/storage';
 import path from 'path';
 import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
 // Create a new cache instance (TTL: 3600 seconds, 1 hour)
 const cache = new NodeCache({ stdTTL: 3600 });
@@ -178,5 +179,45 @@ export async function GET(req: NextRequest) {
       console.error('[GET_IMAGE_ERROR]', error);
       return NextResponse.json({ error: 'Failed to process image' }, { status: 500 });
     }
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    if (!storageClient.isInitialized()) {
+      return NextResponse.json({ error: 'Storage client not initialized' }, { status: 500 });
+    }
+
+    const { fileName, contentType } = await req.json();
+    if (!fileName || !contentType) {
+      return NextResponse.json({ error: 'File name and content type are required' }, { status: 400 });
+    }
+
+    // Sanitize file name and create a unique path
+    const cleanFileName = path.basename(fileName);
+    const extension = path.extname(cleanFileName);
+    const uniqueFileName = `${uuidv4()}${extension}`;
+    const filePath = `news/${uniqueFileName}`;
+
+    const bucket = storageClient.getBucket();
+    const file = bucket.file(filePath);
+
+    const options = {
+      version: 'v4' as const,
+      action: 'write' as const,
+      expires: Date.now() + 10 * 60 * 1000, // 10 minutes
+      contentType,
+    };
+
+    const [signedUrl] = await file.getSignedUrl(options);
+
+    return NextResponse.json({
+      signedUrl,
+      filePath, // The path to be stored in the database
+    });
+  } catch (error) {
+    console.error('[GET_SIGNED_URL_ERROR]', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ error: 'Failed to get signed URL', details: errorMessage }, { status: 500 });
   }
 }

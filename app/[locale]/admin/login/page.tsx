@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="flex min-h-[80vh] flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 px-4">
+    <div className="flex h-[calc(100vh-58px)] flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-zinc-900 dark:to-zinc-800 px-4">
       <div className="w-full max-w-md rounded-xl bg-white/80 dark:bg-zinc-900/80 shadow-xl p-8 flex flex-col gap-8">
         <h1 className="text-3xl font-bold text-center mb-2">Admin Login</h1>
         <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
