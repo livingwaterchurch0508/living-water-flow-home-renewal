@@ -32,6 +32,7 @@ export async function GET(request: Request) {
           type: sermons.type,
           url: sermons.url,
           createdAt: sermons.createdAt,
+          viewCount: sermons.viewCount,
         })
         .from(sermons)
         .where(

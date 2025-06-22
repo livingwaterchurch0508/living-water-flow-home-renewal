@@ -46,6 +46,7 @@ export function ContentDialog({ selectedContent, onDialogClose }: ContentDialogP
       <SermonCard
         name={locale === 'ko' ? item.name : item.nameEn || ''}
         desc={locale === 'ko' ? item.desc : item.descEn || ''}
+        sermonType={item.viewCount}
         autoOpen
         onDialogClose={onDialogClose}
       />

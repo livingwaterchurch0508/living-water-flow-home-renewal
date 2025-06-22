@@ -29,6 +29,42 @@ function getYouTubeThumbnail(url: string) {
   }
 }
 
+const SoulTypeBadge = ({ type }: { type?: number }) => {
+  const t = useTranslations('Menu.Sermon');
+
+  const soulType = type;
+  if (type === undefined || soulType === undefined) {
+    return null;
+  }
+
+  const soulTypes = [
+    {
+      text: t('introduce'),
+      color: 'bg-blue-100 text-blue-800',
+    },
+    {
+      text: t('mission'),
+      color: 'bg-green-100 text-green-800',
+    },
+    {
+      text: t('spirit'),
+      color: 'bg-purple-100 text-purple-800',
+    },
+  ];
+
+  const props = soulTypes[soulType];
+
+  if (!props) {
+    return null;
+  }
+
+  return (
+    <div className={`flex items-center justify-center p-1 h-12 w-16 rounded-sm ${props.color}`}>
+      <span className="text-xs font-semibold text-center">{props.text}</span>
+    </div>
+  );
+};
+
 export function SearchResultList({ results, onSelect }: SearchResultListProps) {
   const t = useTranslations('Menu');
   const locale = useLocale();
@@ -56,7 +92,7 @@ export function SearchResultList({ results, onSelect }: SearchResultListProps) {
                       </div>
                     )}
                   </div>
-                  {sermon.url && (
+                  {sermon.url ? (
                     <div className="relative h-12 w-16 rounded-sm overflow-hidden">
                       <Image
                         src={getYouTubeThumbnail(sermon.url) || ''}
@@ -65,6 +101,8 @@ export function SearchResultList({ results, onSelect }: SearchResultListProps) {
                         className="object-cover"
                       />
                     </div>
+                  ) : (
+                    <SoulTypeBadge type={sermon.viewCount} />
                   )}
                 </div>
               </CommandItem>
