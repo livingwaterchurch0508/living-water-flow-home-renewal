@@ -5,22 +5,11 @@ import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
-import { DateTime } from 'luxon';
-import { motion, useScroll } from 'motion/react';
+import { motion, useScroll } from 'framer-motion';
 import { Languages } from 'lucide-react';
 
 import { buttonVariants } from '@/components/ui/button';
 import { Button } from '@/components/ui/button';
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from '@/components/ui/command';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,74 +20,27 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { ModeToggle } from '@/components/icon/mode-toggle';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Youtube } from '@/components/icon/Youtube';
-import { ContentCard } from '@/components/cards/ContentCard';
-import { CommunityCard } from '@/components/cards/CommunityCard';
-import { SermonCard } from '@/components/cards/SermonCard';
+import { SearchDialog } from '@/components/layout/nav/SearchDialog';
 
-import { useDebounce } from '@/hooks/use-debounce';
 import { cn } from '@/lib/utils';
 import { YOUTUBE_URL } from '@/variables/constants';
 import { LOCALE_TYPE } from '@/variables/enums';
 
-interface SearchResult {
-  id: string;
-  name: string;
-  url?: string;
-  type?: string;
-  desc?: string;
-  nameEn?: string;
-  descEn?: string;
-  createdAt?: string;
-  thumbnailUrl?: string;
-  files?: { url: string; caption: string }[];
-  fileUrl?: string;
-  fileCaption?: string;
-}
-
-interface SearchResponse {
-  status: string;
-  payload: {
-    sermons: SearchResult[];
-    hymns: SearchResult[];
-    communities: SearchResult[];
-  };
-}
-
-function getRelativeTime(dateStr: string) {
-  return DateTime.fromISO(dateStr).toRelative({ locale: 'ko' });
-}
-
-function getYouTubeThumbnail(url: string) {
-  try {
-    return `${YOUTUBE_URL.THUMB_NAIL}${url}/mqdefault.jpg`;
-  } catch {
-    return null;
-  }
-}
-
 export function Nav() {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
-  const [selectedContent, setSelectedContent] = useState<{
-    item: SearchResult;
-    type: 'sermon' | 'hymn' | 'community';
-  } | null>(null);
-  const debouncedQuery = useDebounce(query, 300);
-  const router = useRouter();
-  const pathname = usePathname();
-  const t = useTranslations('Menu');
-  const tSearch = useTranslations('Search');
+  const [openSearch, setOpenSearch] = useState(false);
   const { scrollY, scrollYProgress } = useScroll();
   const [scrolled, setScrolled] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
   const locale = useLocale();
+  const t = useTranslations('Menu');
+  const tSearch = useTranslations('Search');
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpenSearch((open) => !open);
       }
     };
 
@@ -112,39 +54,10 @@ export function Nav() {
     });
   }, [scrollY]);
 
-  const handleLanguageChange = (locale: LOCALE_TYPE) => {
+  const handleLanguageChange = (newLocale: LOCALE_TYPE) => {
     const segments = pathname.split('/');
-    segments[1] = locale;
+    segments[1] = newLocale;
     router.push(segments.join('/'));
-  };
-
-  const performSearch = async (searchQuery: string) => {
-    if (!searchQuery) {
-      setSearchResults(null);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-      const data = await response.json();
-      if (data.status === 'success') {
-        setSearchResults(data);
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    performSearch(debouncedQuery);
-  }, [debouncedQuery]);
-
-  const handleSelect = (item: SearchResult, type: 'sermon' | 'hymn' | 'community') => {
-    setOpen(type === 'sermon' && !item.url);
-    setSelectedContent({ item, type });
   };
 
   return (
@@ -152,14 +65,14 @@ export function Nav() {
       <motion.div
         className={cn(
           'sticky top-0 z-50 w-full bg-background/80 backdrop-blur-[6px] backdrop-saturate-150',
-          scrolled && 'bg-background/90 backdrop-blur-[8px]'
+          scrolled && 'bg-background/90 backdrop-blur-[8px]',
         )}
         initial={{ backdropFilter: 'blur(6px)' }}
         animate={{
           backdropFilter: scrolled ? 'blur(8px)' : 'blur(6px)',
           backgroundColor: scrolled
-            ? 'rgba(var(--background), 0.9)'
-            : 'rgba(var(--background), 0.8)',
+            ? 'rgba(var(--background-rgb), 0.9)'
+            : 'rgba(var(--background-rgb), 0.8)',
         }}
         transition={{ duration: 0.2 }}
       >
@@ -176,7 +89,7 @@ export function Nav() {
             <Button
               variant="outline"
               className="relative h-8 w-full max-w-[600px] justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
-              onClick={() => setOpen(true)}
+              onClick={() => setOpenSearch(true)}
             >
               <span className="hidden lg:inline-flex">{tSearch('placeholder')}</span>
               <span className="inline-flex lg:hidden">{tSearch('shortPlaceholder')}</span>
@@ -198,7 +111,7 @@ export function Nav() {
                         buttonVariants({
                           variant: 'outline',
                           size: 'icon',
-                        })
+                        }),
                       )}
                     >
                       <Languages className="h-[1.2rem] w-[1.2rem]" />
@@ -236,7 +149,7 @@ export function Nav() {
                     buttonVariants({
                       variant: 'outline',
                       size: 'icon',
-                    })
+                    }),
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -270,181 +183,7 @@ export function Nav() {
         </motion.div>
       </motion.div>
 
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <Command shouldFilter={false}>
-          <CommandInput
-            placeholder={tSearch('placeholder')}
-            value={query}
-            onValueChange={setQuery}
-          />
-          <CommandList>
-            {isLoading ? (
-              <CommandEmpty>{tSearch('searching')}</CommandEmpty>
-            ) : !query ? (
-              <CommandEmpty>{tSearch('initial')}</CommandEmpty>
-            ) : !searchResults?.payload ? (
-              <CommandEmpty>{tSearch('noResults')}</CommandEmpty>
-            ) : (
-              <>
-                {searchResults.payload.sermons?.length > 0 && (
-                  <>
-                    <CommandGroup heading={t('Sermon.name')}>
-                      {searchResults.payload.sermons.map((sermon) => (
-                        <CommandItem
-                          key={sermon.id}
-                          value={`sermon-${sermon.id}`}
-                          onSelect={() => handleSelect(sermon, 'sermon')}
-                          className="cursor-pointer hover:bg-accent"
-                        >
-                          <div className="flex items-center w-full gap-3">
-                            <div className="flex-1">
-                              <div className="font-medium">
-                                {locale === 'ko' ? sermon.name : sermon.nameEn}
-                              </div>
-                              {sermon.createdAt && (
-                                <div className="text-xs text-muted-foreground">
-                                  {getRelativeTime(sermon.createdAt)}
-                                </div>
-                              )}
-                            </div>
-                            {sermon.url && (
-                              <div className="relative h-12 w-16 rounded-sm overflow-hidden">
-                                <Image
-                                  src={getYouTubeThumbnail(sermon.url) || ''}
-                                  alt={sermon.name}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                            )}
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                    <CommandSeparator />
-                  </>
-                )}
-                {searchResults.payload.hymns?.length > 0 && (
-                  <>
-                    <CommandGroup heading={t('Hymn.name')}>
-                      {searchResults.payload.hymns.map((hymn) => (
-                        <CommandItem
-                          key={hymn.id}
-                          value={`hymn-${hymn.id}`}
-                          onSelect={() => handleSelect(hymn, 'hymn')}
-                          className="cursor-pointer hover:bg-accent"
-                        >
-                          <div className="flex items-center w-full gap-3">
-                            <div className="flex-1">
-                              <div className="font-medium">
-                                {locale === 'ko' ? hymn.name : hymn.nameEn}
-                              </div>
-                              {hymn.createdAt && (
-                                <div className="text-xs text-muted-foreground">
-                                  {getRelativeTime(hymn.createdAt)}
-                                </div>
-                              )}
-                            </div>
-                            {hymn.url && (
-                              <div className="relative h-12 w-16 rounded-sm overflow-hidden">
-                                <Image
-                                  src={getYouTubeThumbnail(hymn.url) || ''}
-                                  alt={hymn.name}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                            )}
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                    <CommandSeparator />
-                  </>
-                )}
-                {searchResults.payload.communities?.length > 0 && (
-                  <CommandGroup heading={t('News.name')}>
-                    {searchResults.payload.communities.map((community) => (
-                      <CommandItem
-                        key={community.id}
-                        value={`community-${community.id}`}
-                        onSelect={() => handleSelect(community, 'community')}
-                        className="cursor-pointer hover:bg-accent"
-                      >
-                        <div className="flex items-center w-full gap-3">
-                          <div className="flex-1">
-                            <div className="font-medium">
-                              {locale === 'ko' ? community.name : community.nameEn}
-                            </div>
-                            {community.createdAt && (
-                              <div className="text-xs text-muted-foreground">
-                                {getRelativeTime(community.createdAt)}
-                              </div>
-                            )}
-                          </div>
-                          {community.files?.[0]?.url && (
-                            <div className="relative h-12 w-16 rounded-sm overflow-hidden">
-                              <Image
-                                src={`/api/image?imageName=${community.files[0].url}1.jpg`}
-                                alt={community.name}
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                )}
-              </>
-            )}
-          </CommandList>
-        </Command>
-      </CommandDialog>
-
-      {selectedContent &&
-        (selectedContent.type === 'community' ? (
-          <div className="hidden">
-            <CommunityCard
-              name={locale === 'ko' ? selectedContent.item.name : selectedContent.item.nameEn || ''}
-              desc={selectedContent.item.fileCaption || ''}
-              url={selectedContent.item.fileUrl || ''}
-              createdAt={selectedContent.item.createdAt || ''}
-              caption={Number(selectedContent.item.fileCaption) || 0}
-              variant="page"
-              onDialogClose={() => setSelectedContent(null)}
-              autoOpen
-              id={selectedContent.item.id}
-            />
-          </div>
-        ) : selectedContent.type === 'sermon' && !selectedContent.item.url ? (
-          <div className="hidden">
-            <SermonCard
-              name={locale === 'ko' ? selectedContent.item.name : selectedContent.item.nameEn || ''}
-              desc={locale === 'ko' ? selectedContent.item.desc : selectedContent.item.descEn || ''}
-              autoOpen
-              onDialogClose={() => setSelectedContent(null)}
-            />
-          </div>
-        ) : (
-          <div className="hidden">
-            <ContentCard
-              name={locale === 'ko' ? selectedContent.item.name : selectedContent.item.nameEn || ''}
-              desc={
-                locale === 'ko'
-                  ? selectedContent.item.desc || ''
-                  : selectedContent.item.descEn || ''
-              }
-              url={selectedContent.item.url || ''}
-              createdAt={selectedContent.item.createdAt || ''}
-              variant="page"
-              autoOpen
-              onDialogClose={() => setSelectedContent(null)}
-              type={selectedContent.type}
-            />
-          </div>
-        ))}
+      <SearchDialog open={openSearch} onOpenChange={setOpenSearch} />
     </>
   );
 }
