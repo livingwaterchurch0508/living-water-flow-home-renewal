@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     const cachedBuffer = cache.get<Buffer>(cacheKey);
     if (cachedBuffer) {
       console.log('[GET_IMAGE] Serving cached image:', imageName);
-      return new NextResponse(cachedBuffer, {
+      return new Response(cachedBuffer, {
         headers: {
           'Content-Type': 'image/webp',
           'Cache-Control': 'public, max-age=3600',
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
     if (!storageClient.isInitialized()) {
       console.warn('[GET_IMAGE] Storage client not initialized, using fallback image');
       const fallbackBuffer = await getLocalFallbackImage();
-      return new NextResponse(fallbackBuffer, {
+      return new Response(fallbackBuffer, {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=3600',
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     if (!exists) {
       console.warn('[GET_IMAGE] Image not found:', imageName);
       const fallbackBuffer = await getLocalFallbackImage();
-      return new NextResponse(fallbackBuffer, {
+      return new Response(fallbackBuffer, {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=3600',
@@ -159,7 +159,7 @@ export async function GET(req: NextRequest) {
     // Cache the processed image
     cache.set(cacheKey, processedBuffer);
 
-    return new NextResponse(processedBuffer, {
+    return new Response(processedBuffer, {
       headers: {
         'Content-Type':
           size !== 'original' && contentType.startsWith('image/') ? 'image/webp' : contentType,
@@ -170,7 +170,7 @@ export async function GET(req: NextRequest) {
     console.error('[GET_IMAGE_ERROR]', error);
     try {
       const fallbackBuffer = await getLocalFallbackImage();
-      return new NextResponse(fallbackBuffer, {
+      return new Response(fallbackBuffer, {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=3600',

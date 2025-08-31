@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo } from 'react';
+import React, { memo, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 
@@ -31,25 +31,41 @@ export const HeroSection = memo(function HeroSection({
 }: HeroSectionProps) {
   const { state } = useSidebar();
 
-  const handleScrollToContent = () => {
-    // Hero Section 다음 요소로 스크롤
-    const heroSection = document.querySelector('[data-hero-section]');
-    if (heroSection) {
-      const nextSection = heroSection.nextElementSibling;
-      if (nextSection) {
-        nextSection.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
+  const handleScrollToContent = useCallback(() => {
+    // 더욱 안정적인 스크롤 방법 사용
+    setTimeout(() => {
+      const heroSection = document.querySelector('[data-hero-section]');
+      if (heroSection) {
+        // hero section의 위치와 크기를 정확히 계산
+        const heroRect = heroSection.getBoundingClientRect();
+        const heroBottom = heroRect.bottom + window.scrollY;
+        
+        // hero section 바로 아래로 스크롤 (약간의 여백 포함)
+        const scrollTarget = heroBottom + 20; // 20px 여백 추가
+        
+        window.scrollTo({
+          top: scrollTarget,
+          behavior: 'smooth'
         });
       } else {
-        // 다음 섹션이 없으면 페이지 하단으로 스크롤
+        // hero section을 찾을 수 없는 경우 viewport 높이만큼 스크롤
         window.scrollTo({
           top: window.innerHeight,
           behavior: 'smooth'
         });
       }
-    }
-  };
+    }, 100); // 약간의 지연을 두어 DOM 업데이트 완료 후 실행
+  }, []);
+
+  // 터치 이벤트 핸들러 추가
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    handleScrollToContent();
+  }, [handleScrollToContent]);
 
   return (
     <section
@@ -151,15 +167,17 @@ export const HeroSection = memo(function HeroSection({
         )}
       </div>
       
-      {/* Scroll indicator */}
+      {/* Scroll indicator - 항상 클릭 가능한 위치에 배치 */}
       <motion.button
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 p-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-colors cursor-pointer"
-        animate={{ y: [0, -10, 0] }}
+        className="absolute bottom-4 left-1/2 transform -translate-x-1/2 p-4 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 active:bg-white/40 transition-colors cursor-pointer touch-manipulation z-50 shadow-lg"
+        animate={{ y: [0, -8, 0] }}
         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
         onClick={handleScrollToContent}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
         aria-label="Scroll to content"
       >
-        <ChevronDown className="w-6 h-6 text-slate-600 dark:text-slate-300" />
+        <ChevronDown className="w-6 h-6 text-slate-700 dark:text-slate-200" />
       </motion.button>
       
       {/* Bottom glow effect */}
