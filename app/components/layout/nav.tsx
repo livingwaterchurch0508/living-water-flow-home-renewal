@@ -64,15 +64,15 @@ export function Nav() {
     <>
       <motion.div
         className={cn(
-          'sticky top-0 z-50 w-full bg-background/80 backdrop-blur-[6px] backdrop-saturate-150',
-          scrolled && 'bg-background/90 backdrop-blur-[8px]',
+          'sticky top-0 z-50 w-full bg-background/95 backdrop-blur-[8px] backdrop-saturate-150 border-b border-slate-200/50 dark:border-slate-700/50',
+          scrolled && 'bg-background/98 backdrop-blur-[12px]',
         )}
-        initial={{ backdropFilter: 'blur(6px)' }}
+        initial={{ backdropFilter: 'blur(8px)' }}
         animate={{
-          backdropFilter: scrolled ? 'blur(8px)' : 'blur(6px)',
+          backdropFilter: scrolled ? 'blur(12px)' : 'blur(8px)',
           backgroundColor: scrolled
-            ? 'rgba(var(--background-rgb), 0.9)'
-            : 'rgba(var(--background-rgb), 0.8)',
+            ? 'rgba(var(--background-rgb), 0.98)'
+            : 'rgba(var(--background-rgb), 0.95)',
         }}
         transition={{ duration: 0.2 }}
       >
@@ -88,12 +88,12 @@ export function Nav() {
           <div className="flex-1 flex items-center justify-center px-2 md:px-4">
             <Button
               variant="outline"
-              className="relative h-8 w-full max-w-[600px] justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
+              className="relative h-8 w-full max-w-[600px] justify-start text-sm text-muted-foreground hover:text-foreground hover:bg-accent/80 sm:pr-12 md:w-40 lg:w-64 border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500 bg-background/80"
               onClick={() => setOpenSearch(true)}
             >
               <span className="hidden lg:inline-flex">{tSearch('placeholder')}</span>
               <span className="inline-flex lg:hidden">{tSearch('shortPlaceholder')}</span>
-              <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+              <kbd className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 hidden h-5 select-none items-center gap-1 rounded border bg-muted/80 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
                 <span className="text-xs">⌘</span>K
               </kbd>
             </Button>
@@ -107,12 +107,7 @@ export function Nav() {
                     <Button
                       variant="outline"
                       size="icon"
-                      className={cn(
-                        buttonVariants({
-                          variant: 'outline',
-                          size: 'icon',
-                        }),
-                      )}
+                      className="hover:bg-accent/80 hover:text-accent-foreground border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500 bg-background/80"
                     >
                       <Languages className="h-[1.2rem] w-[1.2rem]" />
                       <span className="sr-only">Change Language</span>
@@ -150,6 +145,7 @@ export function Nav() {
                       variant: 'outline',
                       size: 'icon',
                     }),
+                    "hover:bg-accent/80 hover:text-accent-foreground border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500 bg-background/80"
                   )}
                   target="_blank"
                   rel="noopener noreferrer"

@@ -60,7 +60,13 @@ export function ContentCard({
 
   return (
     <>
-      <div className={cn('relative',  'w-full', className)}>
+      <motion.div 
+        className={cn('relative w-full', className)}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        whileHover={{ y: -8, scale: 1.02 }}
+      >
         <div
           data-testid="content-card"
           className="group/card relative cursor-pointer"
@@ -121,7 +127,7 @@ export function ContentCard({
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {isVideoOpen &&
         createPortal(

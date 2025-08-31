@@ -23,7 +23,11 @@ export function ModeToggle() {
       <Tooltip>
         <TooltipTrigger asChild>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon">
+            <Button 
+              variant="outline" 
+              size="icon"
+              className="hover:bg-accent/80 hover:text-accent-foreground border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500 bg-background/80"
+            >
               <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               <span className="sr-only">{t('theme')}</span>

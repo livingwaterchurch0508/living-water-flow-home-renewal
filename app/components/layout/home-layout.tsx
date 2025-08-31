@@ -111,8 +111,8 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
-              buttonVariants({ size: 'lg', variant: 'outline' }),
-              'min-w-[200px] bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm'
+              buttonVariants({ size: 'lg' }),
+              'min-w-[200px] bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white border-0 shadow-lg hover:shadow-xl'
             )}
           >
             <Youtube className="mr-2 h-5 w-5" />

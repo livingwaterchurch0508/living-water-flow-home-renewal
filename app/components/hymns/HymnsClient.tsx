@@ -114,7 +114,7 @@ const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn })
   };
 
   return (
-    <div className="min-h-screen py-10 pb-20 px-6">
+    <div className="min-h-screen py-10 pb-20 px-6 space-y-10">
       <HeroSection
         title={menuT('Hymn.name')}
         content={currentType === HYMN_TAB.HYMN ? menuT('Hymn.contentHymn') : menuT('Hymn.content')}
