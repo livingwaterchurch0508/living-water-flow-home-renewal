@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     const cachedBuffer = cache.get<Buffer>(cacheKey);
     if (cachedBuffer) {
       console.log('[GET_IMAGE] Serving cached image:', imageName);
-      return new Response(cachedBuffer, {
+      return new Response(new Uint8Array(cachedBuffer), {
         headers: {
           'Content-Type': 'image/webp',
           'Cache-Control': 'public, max-age=3600',
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
     if (!storageClient.isInitialized()) {
       console.warn('[GET_IMAGE] Storage client not initialized, using fallback image');
       const fallbackBuffer = await getLocalFallbackImage();
-      return new Response(fallbackBuffer, {
+      return new Response(new Uint8Array(fallbackBuffer), {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=3600',
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     if (!exists) {
       console.warn('[GET_IMAGE] Image not found:', imageName);
       const fallbackBuffer = await getLocalFallbackImage();
-      return new Response(fallbackBuffer, {
+      return new Response(new Uint8Array(fallbackBuffer), {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=3600',
@@ -159,7 +159,7 @@ export async function GET(req: NextRequest) {
     // Cache the processed image
     cache.set(cacheKey, processedBuffer);
 
-    return new Response(processedBuffer, {
+    return new Response(new Uint8Array(processedBuffer), {
       headers: {
         'Content-Type':
           size !== 'original' && contentType.startsWith('image/') ? 'image/webp' : contentType,
@@ -170,7 +170,7 @@ export async function GET(req: NextRequest) {
     console.error('[GET_IMAGE_ERROR]', error);
     try {
       const fallbackBuffer = await getLocalFallbackImage();
-      return new Response(fallbackBuffer, {
+      return new Response(new Uint8Array(fallbackBuffer), {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=3600',
