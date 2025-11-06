@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     const cachedBuffer = cache.get<Buffer>(cacheKey);
     if (cachedBuffer) {
       console.log('[GET_IMAGE] Serving cached image:', imageName);
-      return new NextResponse(cachedBuffer, {
+      return new Response(new Uint8Array(cachedBuffer), {
         headers: {
           'Content-Type': 'image/webp',
           'Cache-Control': 'public, max-age=3600',
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
     if (!storageClient.isInitialized()) {
       console.warn('[GET_IMAGE] Storage client not initialized, using fallback image');
       const fallbackBuffer = await getLocalFallbackImage();
-      return new NextResponse(fallbackBuffer, {
+      return new Response(new Uint8Array(fallbackBuffer), {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=3600',
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
     if (!exists) {
       console.warn('[GET_IMAGE] Image not found:', imageName);
       const fallbackBuffer = await getLocalFallbackImage();
-      return new NextResponse(fallbackBuffer, {
+      return new Response(new Uint8Array(fallbackBuffer), {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=3600',
@@ -159,7 +159,7 @@ export async function GET(req: NextRequest) {
     // Cache the processed image
     cache.set(cacheKey, processedBuffer);
 
-    return new NextResponse(processedBuffer, {
+    return new Response(new Uint8Array(processedBuffer), {
       headers: {
         'Content-Type':
           size !== 'original' && contentType.startsWith('image/') ? 'image/webp' : contentType,
@@ -170,7 +170,7 @@ export async function GET(req: NextRequest) {
     console.error('[GET_IMAGE_ERROR]', error);
     try {
       const fallbackBuffer = await getLocalFallbackImage();
-      return new NextResponse(fallbackBuffer, {
+      return new Response(new Uint8Array(fallbackBuffer), {
         headers: {
           'Content-Type': 'image/jpeg',
           'Cache-Control': 'public, max-age=3600',
@@ -191,7 +191,10 @@ export async function POST(req: NextRequest) {
 
     const { fileName, contentType } = await req.json();
     if (!fileName || !contentType) {
-      return NextResponse.json({ error: 'File name and content type are required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'File name and content type are required' },
+        { status: 400 }
+      );
     }
 
     // Sanitize file name and create a unique path
@@ -219,6 +222,9 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[GET_SIGNED_URL_ERROR]', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return NextResponse.json({ error: 'Failed to get signed URL', details: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to get signed URL', details: errorMessage },
+      { status: 500 }
+    );
   }
 }
