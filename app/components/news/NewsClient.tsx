@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { NewspaperIcon } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 
 import { MotionEffect } from '@/components/animate-ui/effects/motion-effect';
 import { CommunityCard } from '@/components/cards/CommunityCard';
@@ -15,7 +13,11 @@ import { ContentListSkeleton } from '@/components/ui/content-list-skeleton';
 import { DetailSkeleton } from '@/components/ui/detail-skeleton';
 
 import { useInfiniteCommunities } from '@/hooks/use-communities';
-import { cn } from '@/app/lib/utils';
+import { useUrlParams } from '@/hooks/use-url-params';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useSelectedItem } from '@/hooks/use-selected-item';
+import { cn } from '@/lib/utils';
+import { localizeContentList, localizeContent } from '@/lib/locale-utils';
 import { NEWS_TYPES } from '@/variables/enums';
 import { SECTION_WIDTH } from '@/variables/constants';
 import { ICommunity } from '@/variables/types/community.types';
@@ -31,44 +33,22 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
   const errorT = useTranslations('Error');
   const locale = useLocale();
   const { state } = useSidebar();
-  const router = useRouter();
-  const nextSearchParams = useSearchParams();
+  const { removeParam, closeDialog, setParam } = useUrlParams('/news');
   const currentType = Number(searchParams.type) || NEWS_TYPES.SERVICE;
   const selectedId = searchParams.id;
-  const observerTarget = useRef<HTMLDivElement>(null);
   const [selectedCommunityState, setSelectedCommunityState] = useState<number | null>(null);
 
   // 선택된 커뮤니티 데이터를 가져오는 쿼리 (id가 있을 때만)
-  const { data: selectedCommunityData, isLoading: isLoadingCommunity } = useQuery({
-    queryKey: ['community', selectedId],
-    queryFn: async () => {
-      if (!selectedId) return null;
-      const response = await fetch(`/api/communities/${selectedId}`);
-      if (!response.ok) {
-        const params = new URLSearchParams(nextSearchParams);
-        params.delete('id');
-        router.push(`/news?${params.toString()}`);
-        return null;
-      }
-      const data = await response.json();
-      if (data.status === 'error' || !data.payload) {
-        const params = new URLSearchParams(nextSearchParams);
-        params.delete('id');
-        router.push(`/news?${params.toString()}`);
-        return null;
-      }
-      return data.payload;
-    },
-    enabled: !!selectedId,
-    initialData: selectedCommunity || undefined,
+  const { data: selectedCommunityData, isLoading: isLoadingCommunity } = useSelectedItem<ICommunity>({
+    selectedId,
+    endpoint: '/api/communities',
+    queryKey: 'community',
+    onInvalidId: () => removeParam('id'),
+    initialData: selectedCommunity,
   });
 
   // Dialog 닫을 때 id 파라미터 제거
-  const handleCloseDialog = () => {
-    const params = new URLSearchParams(nextSearchParams);
-    params.delete('id');
-    router.push(`/news?${params.toString()}`);
-  };
+  const handleCloseDialog = closeDialog;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
     useInfiniteCommunities({
@@ -79,30 +59,17 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
   const communities = (data?.pages ?? []).flatMap((page) => page.payload.items);
 
   // communities 다국어 변환 useMemo 적용
-  const communitiesForRender = useMemo(() => {
-    return communities.map((community) => ({
-      ...community,
-      name: locale === 'en' ? community.nameEn || community.name || '' : community.name || '',
-      desc: locale === 'en' ? community.descEn || community.desc || '' : community.desc || '',
-    }));
-  }, [communities, locale]);
+  const communitiesForRender = useMemo(
+    () => localizeContentList(communities, locale),
+    [communities, locale]
+  );
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    const target = observerTarget.current;
-    if (target) observer.observe(target);
-    return () => {
-      if (target) observer.unobserve(target);
-      observer.disconnect();
-    };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  // 무한 스크롤 훅 사용
+  const observerTarget = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   return (
     <div className="min-h-screen py-10 pb-20 px-6">
@@ -119,11 +86,7 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
           { id: NEWS_TYPES.STORY, label: menuT('News.story') },
         ]}
         activeTab={currentType}
-        onTabChange={(tabId) => {
-          const params = new URLSearchParams(nextSearchParams);
-          params.set('type', tabId.toString());
-          router.push(`/news?${params.toString()}`);
-        }}
+        onTabChange={(tabId) => setParam('type', tabId.toString())}
         accentColor="bg-emerald-500"
       />
 
@@ -183,32 +146,23 @@ const NewsClient: React.FC<NewsClientProps> = ({ searchParams, selectedCommunity
       </section>
 
       {/* 선택된 커뮤니티 Dialog */}
-      {selectedId && selectedCommunityData && (
-        <>
-          {isLoadingCommunity ? (
-            <DetailSkeleton />
-          ) : (
-            <CommunityCard
-              name={
-                locale === 'en'
-                  ? selectedCommunityData.nameEn || selectedCommunityData.name
-                  : selectedCommunityData.name
-              }
-              desc={
-                locale === 'en'
-                  ? selectedCommunityData.descEn || selectedCommunityData.desc
-                  : selectedCommunityData.desc
-              }
-              url={selectedCommunityData.files[0]?.url || ''}
-              createdAt={selectedCommunityData.createdAt}
-              caption={Number(selectedCommunityData.files[0]?.caption) || 1}
-              autoOpen={true}
-              onDialogClose={handleCloseDialog}
-              id={selectedCommunityData.id}
-            />
-          )}
-        </>
-      )}
+      {selectedId && selectedCommunityData && (() => {
+        const localized = localizeContent(selectedCommunityData, locale);
+        return isLoadingCommunity ? (
+          <DetailSkeleton />
+        ) : (
+          <CommunityCard
+            name={localized.name}
+            desc={localized.desc}
+            url={selectedCommunityData.files[0]?.url || ''}
+            createdAt={selectedCommunityData.createdAt || ''}
+            caption={Number(selectedCommunityData.files[0]?.caption) || 1}
+            autoOpen={true}
+            onDialogClose={handleCloseDialog}
+            id={selectedCommunityData.id.toString()}
+          />
+        );
+      })()}
     </div>
   );
 };

@@ -4,21 +4,26 @@ import { desc, ilike, or, eq } from 'drizzle-orm';
 import { db } from '@/lib/db/postgres/dbConnection';
 import { sermons, hymns, communities, files } from '@/lib/db/postgres/schema';
 import { YOUTUBE_URL } from '@/variables/constants';
+import { validateAndSanitizeSearchQuery } from '@/lib/security';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q');
+    const rawQuery = searchParams.get('q');
 
-    if (!query) {
+    // 검색어 검증 및 이스케이프
+    const validation = validateAndSanitizeSearchQuery(rawQuery);
+    if (!validation.valid || !validation.sanitized) {
       return NextResponse.json(
         {
           status: 'error',
-          message: 'Query parameter is required',
+          message: validation.error || 'Invalid query parameter',
         },
         { status: 400 }
       );
     }
+
+    const query = validation.sanitized;
 
     const [sermonsResults, hymnsResults, communitiesResults] = await Promise.all([
       // Search in sermons

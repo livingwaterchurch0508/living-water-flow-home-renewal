@@ -3,25 +3,16 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { ColumnDef } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { TextReveal } from '@/components/magicui/text-reveal';
-import { BorderBeam } from '@/components/magicui/border-beam';
 import UploadDialog from '@/components/admin/UploadDialog';
+import { StatCard } from '@/components/admin/StatCard';
+import { DashboardToolbar } from '@/components/admin/DashboardToolbar';
+import { DeleteConfirmDialog } from '@/components/admin/DeleteConfirmDialog';
 import { DataTable } from '@/components/ui/data-table';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { ContentListSkeleton } from '@/components/ui/content-list-skeleton';
 import { useSidebar } from '@/components/ui/sidebar';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from '@/components/ui/dialog';
 import type { FileItem } from '@/components/admin/UploadDialog';
 
 import type { ISermon } from '@/variables/types/sermon.types';
@@ -359,7 +350,8 @@ export default function DashboardUI() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || t('submitError'));
+        toast.error(errorData.error || t('submitError'));
+        return;
       }
 
       setDialogOpen(false);
@@ -368,9 +360,7 @@ export default function DashboardUI() {
       await refetchStats();
     } catch (error) {
       console.error(error);
-      let message = t('submitError');
-      if (error instanceof Error) message = error.message;
-      else if (typeof error === 'string') message = error;
+      const message = error instanceof Error ? error.message : t('submitError');
       toast.error(message);
     }
   };
@@ -410,58 +400,18 @@ export default function DashboardUI() {
     }
   };
 
-  // 툴바
-  const toolbar = (
-    <div className="flex gap-2">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => {
-              setDialogMode('add');
-              setDialogOpen(true);
-            }}
-            aria-label={t('add')}
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>{t('add')}</TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            size="icon"
-            variant="outline"
-            disabled={selectedRowIds.length !== 1}
-            aria-label={t('edit')}
-            onClick={() => {
-              setDialogMode('edit');
-              setDialogOpen(true);
-            }}
-          >
-            <Pencil className="w-4 h-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>{t('edit')}</TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            size="icon"
-            variant="destructive"
-            disabled={selectedRowIds.length < 1}
-            aria-label={t('delete')}
-            onClick={() => setIsDeleteDialogOpen(true)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>{t('delete')}</TooltipContent>
-      </Tooltip>
-    </div>
-  );
+  // 툴바 핸들러
+  const handleAdd = () => {
+    setDialogMode('add');
+    setDialogOpen(true);
+  };
+
+  const handleEdit = () => {
+    setDialogMode('edit');
+    setDialogOpen(true);
+  };
+
+  const handleDeleteClick = () => setIsDeleteDialogOpen(true);
 
   return (
     <div className="h-[calc(100vh-100px)] px-6 py-6">
@@ -474,56 +424,50 @@ export default function DashboardUI() {
         <TextReveal text={t('dashboardTitle')} className="text-3xl font-bold mb-2" />
         {/* 현황 카드 (탭) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
-          {/* 설교 카드 */}
-          <div
-            className={`relative flex flex-col items-center p-6 rounded-xl shadow overflow-hidden cursor-pointer transition-all border-2 ${selectedTab === 'sermon' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/10' : 'border-transparent bg-white dark:bg-zinc-900'}`}
+          <StatCard
+            title={menuT('Sermon.name')}
+            count={stats?.sermonCount ?? '-'}
+            details={`${menuT('Sermon.sermon')}: ${isStatsLoading ? '...' : (stats?.sermonRhema ?? '-')} / ${menuT('Sermon.soul')}: ${isStatsLoading ? '...' : (stats?.sermonSoul ?? '-')}`}
+            isSelected={selectedTab === 'sermon'}
             onClick={() => handleCardClick('sermon')}
-          >
-            <BorderBeam className="opacity-30" colorFrom="#60a5fa" colorTo="#818cf8" />
-            <span className="text-lg font-semibold">{menuT('Sermon.name')}</span>
-            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {isStatsLoading ? '...' : (stats?.sermonCount ?? '-')}
-            </span>
-            <span className="text-sm mt-2 text-muted-foreground">
-              {menuT('Sermon.sermon')}: {isStatsLoading ? '...' : (stats?.sermonRhema ?? '-')} /{' '}
-              {menuT('Sermon.soul')}: {isStatsLoading ? '...' : (stats?.sermonSoul ?? '-')}
-            </span>
-          </div>
-          {/* 찬양 카드 */}
-          <div
-            className={`relative flex flex-col items-center p-6 rounded-xl shadow overflow-hidden cursor-pointer transition-all border-2 ${selectedTab === 'hymn' ? 'border-green-500 bg-green-50 dark:bg-green-900/10' : 'border-transparent bg-white dark:bg-zinc-900'}`}
+            colorScheme="blue"
+            isLoading={isStatsLoading}
+          />
+          <StatCard
+            title={menuT('Hymn.name')}
+            count={stats?.hymnCount ?? '-'}
+            details={`${menuT('Hymn.hymn')}: ${isStatsLoading ? '...' : (stats?.hymnHymn ?? '-')} / ${t('hymnSong')}: ${isStatsLoading ? '...' : (stats?.hymnSong ?? '-')}`}
+            isSelected={selectedTab === 'hymn'}
             onClick={() => handleCardClick('hymn')}
-          >
-            <BorderBeam className="opacity-30" colorFrom="#34d399" colorTo="#60a5fa" />
-            <span className="text-lg font-semibold">{menuT('Hymn.name')}</span>
-            <span className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {isStatsLoading ? '...' : (stats?.hymnCount ?? '-')}
-            </span>
-            <span className="text-sm mt-2 text-muted-foreground">
-              {menuT('Hymn.hymn')}: {isStatsLoading ? '...' : (stats?.hymnHymn ?? '-')} /{' '}
-              {t('hymnSong')}: {isStatsLoading ? '...' : (stats?.hymnSong ?? '-')}
-            </span>
-          </div>
-          {/* 소식 카드 */}
-          <div
-            className={`relative flex flex-col items-center p-6 rounded-xl shadow overflow-hidden cursor-pointer transition-all border-2 ${selectedTab === 'news' ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/10' : 'border-transparent bg-white dark:bg-zinc-900'}`}
+            colorScheme="green"
+            isLoading={isStatsLoading}
+          />
+          <StatCard
+            title={menuT('News.name')}
+            count={stats?.newsCount ?? '-'}
+            details={`${menuT('News.service')}: ${isStatsLoading ? '...' : (stats?.newsService ?? '-')} / ${menuT('News.event')}: ${isStatsLoading ? '...' : (stats?.newsEvent ?? '-')} / ${menuT('News.story')}: ${isStatsLoading ? '...' : (stats?.newsStory ?? '-')}`}
+            isSelected={selectedTab === 'news'}
             onClick={() => handleCardClick('news')}
-          >
-            <BorderBeam className="opacity-30" colorFrom="#a78bfa" colorTo="#f472b6" />
-            <span className="text-lg font-semibold">{menuT('News.name')}</span>
-            <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {isStatsLoading ? '...' : (stats?.newsCount ?? '-')}
-            </span>
-            <span className="text-sm mt-2 text-muted-foreground">
-              {menuT('News.service')}: {isStatsLoading ? '...' : (stats?.newsService ?? '-')} /{' '}
-              {menuT('News.event')}: {isStatsLoading ? '...' : (stats?.newsEvent ?? '-')} /{' '}
-              {menuT('News.story')}: {isStatsLoading ? '...' : (stats?.newsStory ?? '-')}
-            </span>
-          </div>
+            colorScheme="purple"
+            isLoading={isStatsLoading}
+          />
         </div>
         {/* 툴바 + 데이터 테이블 */}
         <div className="flex flex-col gap-2 relative ">
-          <div className="flex items-center justify-between mb-2">{toolbar}</div>
+          <div className="flex items-center justify-between mb-2">
+            <DashboardToolbar
+              onAdd={handleAdd}
+              onEdit={handleEdit}
+              onDelete={handleDeleteClick}
+              canEdit={selectedRowIds.length === 1}
+              canDelete={selectedRowIds.length >= 1}
+              labels={{
+                add: t('add'),
+                edit: t('edit'),
+                delete: t('delete'),
+              }}
+            />
+          </div>
           {isLoading ? (
             <ContentListSkeleton count={8} />
           ) : isError ? (
@@ -571,31 +515,19 @@ export default function DashboardUI() {
           })()}
         />
         {/* 삭제 확인 다이얼로그 */}
-        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t('deleteConfirmTitle', { defaultValue: '삭제 확인' })}</DialogTitle>
-              <DialogDescription />
-            </DialogHeader>
-            <div className="py-4">
-              {t('deleteConfirm', { defaultValue: '정말로 삭제하시겠습니까?' })}
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsDeleteDialogOpen(false)}
-                disabled={isDeleting}
-              >
-                {t('cancel', { defaultValue: '취소' })}
-              </Button>
-              <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-                {isDeleting
-                  ? t('deleting', { defaultValue: '삭제 중...' })
-                  : t('confirm', { defaultValue: '확인' })}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <DeleteConfirmDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+          onConfirm={handleDelete}
+          isDeleting={isDeleting}
+          labels={{
+            title: t('deleteConfirmTitle', { defaultValue: '삭제 확인' }),
+            message: t('deleteConfirm', { defaultValue: '정말로 삭제하시겠습니까?' }),
+            cancel: t('cancel', { defaultValue: '취소' }),
+            confirm: t('confirm', { defaultValue: '확인' }),
+            deleting: t('deleting', { defaultValue: '삭제 중...' }),
+          }}
+        />
       </section>
     </div>
   );

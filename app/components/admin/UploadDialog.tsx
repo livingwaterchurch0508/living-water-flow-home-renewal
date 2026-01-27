@@ -105,11 +105,11 @@ export type FileItem = {
   preview: string;
 };
 
-// enum -> [{ value, label }] 변환 유틸
+// enum -> [{ value, label }] 변환 유틸 (라벨이 정의된 값만 포함)
 function enumToOptions<T extends object>(enm: T, labelMap: Record<number, string>) {
   return Object.entries(enm)
-    .filter(([, v]) => typeof v === 'number')
-    .map(([, v]) => ({ value: v as number, label: labelMap[v as number] || String(v) }));
+    .filter(([, v]) => typeof v === 'number' && labelMap[v as number] !== undefined)
+    .map(([, v]) => ({ value: v as number, label: labelMap[v as number] }));
 }
 
 const SortablePhotoItem = ({
@@ -410,7 +410,7 @@ export default function UploadDialog({
               ? SERMON_TAB.RHEMA
               : tabType === 'hymn'
                 ? HYMN_TAB.HYMN
-                : NEWS_TYPES.ALL,
+                : NEWS_TYPES.SERVICE,
           soulType: 0,
           name: '',
           nameEn: '',
@@ -469,7 +469,7 @@ export default function UploadDialog({
     onSubmit(finalData);
     setIsSubmitting(false);
     onClose();
-  }, [form, files, onSubmit, onClose, tabType, t]);
+  }, [form, files, deletedFiles, onSubmit, onClose, tabType, t]);
 
   const getDialogTitle = () => {
     let label = '';

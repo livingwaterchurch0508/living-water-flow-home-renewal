@@ -14,6 +14,7 @@ import {
 import { db } from '@/lib/db/postgres/dbConnection';
 import { communities, files as filesTable } from '@/lib/db/postgres/schema';
 import { storageClient } from '@/lib/fetch/storage';
+import { validateFiles, isAdminAuthenticated, FILE_UPLOAD_CONFIG } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 
@@ -105,8 +106,28 @@ export type CommunitiesGetResponse = ApiResponse<CommunitiesResponse>;
 
 export async function POST(req: NextRequest) {
   try {
+    // 인증 확인
+    const isAuthenticated = await isAdminAuthenticated();
+    if (!isAuthenticated) {
+      return NextResponse.json(
+        { error: 'Unauthorized', status: 'error' },
+        { status: 401 }
+      );
+    }
+
     const formData = await req.formData();
     const files = formData.getAll('files').filter((f): f is File => f instanceof File);
+
+    // 파일 검증
+    if (files.length > 0) {
+      const fileValidation = validateFiles(files);
+      if (!fileValidation.valid) {
+        return NextResponse.json(
+          { error: fileValidation.error, status: 'error' },
+          { status: 400 }
+        );
+      }
+    }
 
     const parsedData = {
       name: formData.get('name') as string,
@@ -132,7 +153,10 @@ export async function POST(req: NextRequest) {
       .returning({ id: communities.id });
 
     if (!newCommunity || !newCommunity.id) {
-      throw new Error('Failed to create community post.');
+      return NextResponse.json(
+        { error: 'Failed to create community post.', status: 'error' },
+        { status: 500 }
+      );
     }
 
     // 2. 파일 GCS에 업로드 및 files 테이블에 정보 저장
@@ -141,7 +165,13 @@ export async function POST(req: NextRequest) {
       const datePath = parsedData.date.split('-').join('/');
 
       const uploadPromises = files.map(async (file, index) => {
-        const fileExtension = path.extname(file.name) || '.jpg';
+        // 안전한 확장자 추출
+        const originalExt = path.extname(file.name).toLowerCase();
+        const fileExtension = FILE_UPLOAD_CONFIG.ALLOWED_EXTENSIONS.includes(
+          originalExt as (typeof FILE_UPLOAD_CONFIG.ALLOWED_EXTENSIONS)[number]
+        )
+          ? originalExt
+          : '.jpg';
         const gcsPath = `${datePath}/${index + 1}${fileExtension}`;
 
         const buffer = Buffer.from(await file.arrayBuffer());

@@ -5,26 +5,21 @@ import { QueryParams } from '@/lib/api-utils';
 import { IHymn } from '@/variables/types/hymn.types';
 
 async function fetchHymns({ page = 1, limit = 1000, type = 0 }: Partial<QueryParams>) {
-  try {
-    const params = new URLSearchParams();
+  const params = new URLSearchParams();
 
-    // 모든 파라미터를 숫자로 변환하여 추가
-    params.append('page', String(page));
-    params.append('limit', String(limit));
-    params.append('type', String(type));
+  // 모든 파라미터를 숫자로 변환하여 추가
+  params.append('page', String(page));
+  params.append('limit', String(limit));
+  params.append('type', String(type));
 
-    const response = await fetch(`/api/hymns?${params}`);
+  const response = await fetch(`/api/hymns?${params}`);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to fetch hymns');
-    }
-
-    return response.json() as Promise<HymnsGetResponse>;
-  } catch (error) {
-    console.error('Fetch hymns error:', error);
-    throw error;
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || 'Failed to fetch hymns');
   }
+
+  return response.json() as Promise<HymnsGetResponse>;
 }
 
 interface HymnsResponse {
@@ -48,30 +43,24 @@ const fetchHymnsInfinite = async ({
   search,
   type,
 }: InfiniteHymnParams & { pageParam?: number }): Promise<HymnsResponse> => {
-  try {
-    const params = new URLSearchParams();
+  const params = new URLSearchParams();
 
-    // 모든 파라미터를 문자열로 변환하여 추가
-    params.append('page', String(pageParam));
-    params.append('limit', String(limit));
-    params.append('type', String(type));
+  params.append('page', String(pageParam));
+  params.append('limit', String(limit));
+  params.append('type', String(type));
 
-    if (search) {
-      params.append('search', search);
-    }
-
-    const response = await fetch(`/api/hymns?${params.toString()}`);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to fetch hymns');
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Fetch infinite hymns error:', error);
-    return { status: 'error', payload: { items: [], total: 0, totalPages: 0 } };
+  if (search) {
+    params.append('search', search);
   }
+
+  const response = await fetch(`/api/hymns?${params.toString()}`);
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to fetch hymns');
+  }
+
+  return response.json();
 };
 
 export const useInfiniteHymns = ({ limit, search, type }: InfiniteHymnParams) => {

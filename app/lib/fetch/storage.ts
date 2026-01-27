@@ -37,27 +37,21 @@ class StorageClient {
           process.env.STORAGE_BUCKET_NAME || process.env.GOOGLE_CLOUD_BUCKET || ''
         );
         this.initialized = true;
-        console.log('[STORAGE] Initialized with base64 credentials');
       }
       // Try to read from Vercel paths
       else if (process.env.VERCEL) {
         let credentials: Credentials | null = null;
         const paths = ['/var/task/livingwater.json', '/vercel/path0/livingwater.json'];
 
-        for (const path of paths) {
+        for (const credPath of paths) {
           try {
-            if (fs.existsSync(path)) {
-              const jsonContent = fs.readFileSync(path, 'utf8');
+            if (fs.existsSync(credPath)) {
+              const jsonContent = fs.readFileSync(credPath, 'utf8');
               credentials = JSON.parse(jsonContent);
-              console.log('[STORAGE] Found credentials at:', path);
               break;
             }
-          } catch (error: unknown) {
-            console.warn(
-              '[STORAGE] Failed to read from:',
-              path,
-              error instanceof Error ? error.message : 'Unknown error'
-            );
+          } catch {
+            // 파일 읽기 실패 시 다음 경로 시도
           }
         }
 
@@ -72,7 +66,6 @@ class StorageClient {
             process.env.STORAGE_BUCKET_NAME || process.env.GOOGLE_CLOUD_BUCKET || ''
           );
           this.initialized = true;
-          console.log('[STORAGE] Initialized with file credentials in Vercel');
         }
       }
       // Fallback to application default credentials (for local development)
@@ -82,22 +75,14 @@ class StorageClient {
           process.env.STORAGE_BUCKET_NAME || process.env.GOOGLE_CLOUD_BUCKET || ''
         );
         this.initialized = true;
-        console.log('[STORAGE] Initialized with application default credentials');
-      } else {
-        console.warn('[STORAGE] No credentials provided');
       }
+      // 환경 변수가 없으면 초기화하지 않음 (로컬 개발 환경 등)
     } catch (error: unknown) {
-      console.error('[STORAGE_ERROR] Failed to initialize storage client:', {
-        hasProject: !!process.env.GOOGLE_CLOUD_PROJECT,
-        hasBucket: !!(process.env.GOOGLE_CLOUD_BUCKET || process.env.STORAGE_BUCKET_NAME),
-        hasCredentials: !!(
-          process.env.GOOGLE_CREDENTIALS_JSON_BASE64 || process.env.GOOGLE_APPLICATION_CREDENTIALS
-        ),
-        isVercel: !!process.env.VERCEL,
-        projectId: process.env.GOOGLE_CLOUD_PROJECT || 'not-set',
-        bucketName: process.env.STORAGE_BUCKET_NAME || process.env.GOOGLE_CLOUD_BUCKET || 'not-set',
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
+      // 초기화 실패 - 민감 정보 없이 에러만 로깅
+      console.error(
+        '[STORAGE_ERROR] Failed to initialize storage client:',
+        error instanceof Error ? error.message : 'Unknown error'
+      );
     }
   }
 

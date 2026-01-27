@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { BookOpenIcon } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 
 import { ContentCard } from '@/components/cards/ContentCard';
 import { SermonCard } from '@/components/cards/SermonCard';
@@ -17,9 +15,20 @@ import { DetailSkeleton } from '@/components/ui/detail-skeleton';
 import { MotionEffect } from '@/components/animate-ui/effects/motion-effect';
 
 import { useInfiniteSermons } from '@/hooks/use-sermons';
+import { useUrlParams } from '@/hooks/use-url-params';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useSelectedItem } from '@/hooks/use-selected-item';
 import { cn } from '@/lib/utils';
-import { SERMON_TAB, SOUL_TYPE } from '@/variables/enums';
+import { localizeContentList, localizeContent } from '@/lib/locale-utils';
+import { SERMON_TAB } from '@/variables/enums';
 import { SECTION_WIDTH } from '@/variables/constants';
+import {
+  calculateGridSpan,
+  SOUL_GRADIENT_MAP,
+  SOUL_COLOR_MAP,
+  QUERY_DEFAULTS,
+  getSoulTypeLabel,
+} from '@/variables/ui-constants';
 import type { ISermon } from '@/variables/types/sermon.types';
 
 interface SermonsClientProps {
@@ -27,73 +36,30 @@ interface SermonsClientProps {
   selectedSermon: ISermon | null;
 }
 
-// URL 파라미터에서 특정 param을 제거하고 /sermons로 push하는 함수
-function removeParamAndPush(
-  param: string,
-  searchParams: URLSearchParams,
-  router: ReturnType<typeof useRouter>
-) {
-  const params = new URLSearchParams(searchParams);
-  params.delete(param);
-  router.push(`/sermons?${params.toString()}`, { scroll: false });
-}
-
 const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSermon }) => {
   const t = useTranslations('Main');
   const menuT = useTranslations('Menu');
+  const sermonT = useTranslations('Menu.Sermon');
   const searchT = useTranslations('Search');
   const locale = useLocale();
   const { state } = useSidebar();
-  const router = useRouter();
-  const nextSearchParams = useSearchParams();
+  const { removeParam, closeDialog, setParam } = useUrlParams('/sermons');
   const currentType = searchParams.type ?? SERMON_TAB.RHEMA.toString();
   const currentTypeNumber = Number(currentType);
   const selectedId = searchParams.id;
-  const observerTarget = useRef<HTMLDivElement>(null);
   const [selectedSermonState, setSelectedSermonState] = useState<ISermon | null>(null);
 
-  const typeColorMap: Record<number, string> = {
-    0: 'text-blue-600 dark:text-blue-400',
-    1: 'text-green-600 dark:text-green-400',
-    2: 'text-purple-600 dark:text-purple-400',
-  };
-  const typeLabel = (sermonType?: SOUL_TYPE | null) => {
-    switch (sermonType) {
-      case SOUL_TYPE.INTRODUCE:
-        return menuT('Sermon.introduce');
-      case SOUL_TYPE.MISSION:
-        return menuT('Sermon.mission');
-      case SOUL_TYPE.SPIRIT:
-        return menuT('Sermon.spirit');
-      default:
-        return '';
-    }
-  };
+  // 공유 상수 사용
+  const typeColorMap = SOUL_COLOR_MAP;
+  const typeLabel = (sermonType?: number | null) => getSoulTypeLabel(sermonType ?? null, sermonT);
 
   // 선택된 설교 데이터를 가져오는 쿼리 (id가 있을 때만)
-  const { data: selectedSermonData, isLoading: isLoadingSermon } = useQuery({
-    queryKey: ['sermon', selectedId],
-    queryFn: async () => {
-      if (!selectedId) return null;
-      try {
-        const response = await fetch(`/api/sermons/${selectedId}`);
-        if (!response.ok) {
-          removeParamAndPush('id', nextSearchParams, router);
-          return null;
-        }
-        const data = await response.json();
-        if (data.status === 'error' || !data.payload) {
-          removeParamAndPush('id', nextSearchParams, router);
-          return null;
-        }
-        return data.payload;
-      } catch {
-        removeParamAndPush('id', nextSearchParams, router);
-        return null;
-      }
-    },
-    enabled: !!selectedId,
-    initialData: selectedSermon || undefined,
+  const { data: selectedSermonData, isLoading: isLoadingSermon } = useSelectedItem<ISermon>({
+    selectedId,
+    endpoint: '/api/sermons',
+    queryKey: 'sermon',
+    onInvalidId: () => removeParam('id'),
+    initialData: selectedSermon,
   });
 
   // searchParams에 id가 없을 때만 state로 다이얼로그 관리
@@ -104,45 +70,28 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
   }, [selectedId]);
 
   // Dialog 닫을 때 id 파라미터 제거
-  const handleCloseDialog = () => {
-    removeParamAndPush('id', nextSearchParams, router);
-  };
+  const handleCloseDialog = closeDialog;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
     useInfiniteSermons({
-      limit: 12,
+      limit: QUERY_DEFAULTS.INFINITE_PAGE_SIZE,
       type: currentTypeNumber,
     });
 
   const sermons = (data?.pages ?? []).flatMap((page) => page.payload.items);
 
   // sermons 다국어 변환 useMemo 적용
-  const sermonsForRender = useMemo(() => {
-    return sermons.map((sermon) => ({
-      ...sermon,
-      name: locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || '',
-      desc: locale === 'en' ? sermon.descEn || sermon.desc || '' : sermon.desc || '',
-    }));
-  }, [sermons, locale]);
+  const sermonsForRender = useMemo(
+    () => localizeContentList(sermons, locale),
+    [sermons, locale]
+  );
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1, rootMargin: '100px' }
-    );
-
-    const target = observerTarget.current;
-    if (target) observer.observe(target);
-
-    return () => {
-      if (target) observer.unobserve(target);
-      observer.disconnect();
-    };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  // 무한 스크롤 훅 사용
+  const observerTarget = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
   const renderContent = () => {
     if (isError) {
@@ -172,28 +121,15 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
           <MasonryGrid className="gap-2 sm:gap-3 md:gap-4">
             {sermonsForRender.map((sermon) => {
               const contentLength = (sermon.name?.length || 0) + (sermon.desc?.length || 0);
-              let span = 6;
-
-              if (contentLength > 200) {
-                span = 12;
-              } else if (contentLength > 100) {
-                span = 9;
-              } else if (contentLength < 50) {
-                span = 5;
-              }
-
-              const gradientMap: Record<number, string> = {
-                0: 'bg-gradient-to-br from-blue-200/30 to-blue-100/10 dark:from-blue-500/20 dark:to-blue-400/10',
-                1: 'bg-gradient-to-br from-green-200/30 to-green-100/10 dark:from-green-500/20 dark:to-green-400/10',
-                2: 'bg-gradient-to-br from-purple-200/30 to-purple-100/10 dark:from-purple-500/20 dark:to-purple-400/10',
-              };
-              const gradientClass = gradientMap[sermon.viewCount ?? 0];
+              const span = calculateGridSpan(contentLength);
+              const gradientClass = SOUL_GRADIENT_MAP[sermon.viewCount ?? 0];
 
               return (
                 <MasonryItem key={sermon.id} span={span}>
                   <button
                     data-testid="sermon-card-button"
                     onClick={() => setSelectedSermonState(sermon)}
+                    aria-label={`${typeLabel(sermon.viewCount)}: ${sermon.name}`}
                     className={cn(
                       'group relative block h-full w-full p-2.5 sm:p-3 md:p-4 rounded-lg transition-all duration-300',
                       gradientClass,
@@ -281,11 +217,7 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
           { id: SERMON_TAB.SOUL.toString(), label: menuT('Sermon.soul') },
         ]}
         activeTab={currentType}
-        onTabChange={(tabId: string) => {
-          const params = new URLSearchParams(nextSearchParams);
-          params.set('type', tabId);
-          router.push(`/sermons?${params.toString()}`);
-        }}
+        onTabChange={(tabId: string) => setParam('type', tabId)}
         accentColor="bg-blue-500"
       />
 
@@ -300,49 +232,32 @@ const SermonsClient: React.FC<SermonsClientProps> = ({ searchParams, selectedSer
       </section>
 
       {/* 선택된 설교 Dialog */}
-      {selectedId && selectedSermonData && (
-        <>
-          {isLoadingSermon ? (
-            <DetailSkeleton />
-          ) : currentTypeNumber === SERMON_TAB.SOUL ? (
-            <SermonCard
-              name={
-                locale === 'en'
-                  ? selectedSermonData.nameEn || selectedSermonData.name
-                  : selectedSermonData.name
-              }
-              desc={
-                locale === 'en'
-                  ? selectedSermonData.descEn || selectedSermonData.desc
-                  : selectedSermonData.desc
-              }
-              sermonType={selectedSermonData.viewCount}
-              autoOpen={true}
-              onDialogClose={handleCloseDialog}
-              id={selectedSermonData.id.toString()}
-            />
-          ) : (
-            <ContentCard
-              name={
-                locale === 'en'
-                  ? selectedSermonData.nameEn || selectedSermonData.name
-                  : selectedSermonData.name
-              }
-              desc={
-                locale === 'en'
-                  ? selectedSermonData.descEn || selectedSermonData.desc
-                  : selectedSermonData.desc
-              }
-              url={selectedSermonData.url}
-              createdAt={selectedSermonData.createdAt}
-              autoOpen={true}
-              onDialogClose={handleCloseDialog}
-              type="sermon"
-              id={selectedSermonData.id.toString()}
-            />
-          )}
-        </>
-      )}
+      {selectedId && selectedSermonData && (() => {
+        const localized = localizeContent(selectedSermonData, locale);
+        return isLoadingSermon ? (
+          <DetailSkeleton />
+        ) : currentTypeNumber === SERMON_TAB.SOUL ? (
+          <SermonCard
+            name={localized.name}
+            desc={localized.desc}
+            sermonType={selectedSermonData.viewCount}
+            autoOpen={true}
+            onDialogClose={handleCloseDialog}
+            id={selectedSermonData.id.toString()}
+          />
+        ) : (
+          <ContentCard
+            name={localized.name}
+            desc={localized.desc}
+            url={selectedSermonData.url || ''}
+            createdAt={selectedSermonData.createdAt || ''}
+            autoOpen={true}
+            onDialogClose={handleCloseDialog}
+            type="sermon"
+            id={selectedSermonData.id.toString()}
+          />
+        );
+      })()}
     </div>
   );
 };

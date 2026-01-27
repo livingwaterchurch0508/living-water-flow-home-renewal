@@ -139,8 +139,12 @@
     "initial": "Enter a search term"
   },
   "Error": {
+    "title": "Something went wrong",
+    "description": "There was a problem loading this page. Please try again later.",
+    "retry": "Try again",
     "fetchFailed": "Failed to load data. Please try again.",
-    "loadMore": "Failed to load more items. Please try again."
+    "loadMore": "Failed to load more items. Please try again.",
+    "tryAgain": "Please try again later."
   },
   "time": {
     "years": "years ago",

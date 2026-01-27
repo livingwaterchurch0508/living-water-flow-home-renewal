@@ -6,6 +6,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
 import { storageClient } from '@/lib/fetch/storage';
+import { isAdminAuthenticated, FILE_UPLOAD_CONFIG } from '@/lib/security';
 
 // Create a new cache instance (TTL: 3600 seconds, 1 hour)
 const cache = new NodeCache({ stdTTL: 3600 });
@@ -28,10 +29,8 @@ interface ImageOptions {
 export async function GET(req: NextRequest) {
   try {
     const imageName = req.nextUrl.searchParams.get('imageName');
-    console.log('[GET_IMAGE] Requested image:', imageName);
 
     if (!imageName) {
-      console.warn('[GET_IMAGE] No image name provided');
       return NextResponse.json({ error: 'Image name not provided' }, { status: 400 });
     }
 
@@ -40,7 +39,6 @@ export async function GET(req: NextRequest) {
     const cacheKey = imageName + (size || '');
     const cachedBuffer = cache.get<Buffer>(cacheKey);
     if (cachedBuffer) {
-      console.log('[GET_IMAGE] Serving cached image:', imageName);
       return new Response(new Uint8Array(cachedBuffer), {
         headers: {
           'Content-Type': 'image/webp',
@@ -51,7 +49,6 @@ export async function GET(req: NextRequest) {
 
     // Check if storage client is initialized
     if (!storageClient.isInitialized()) {
-      console.warn('[GET_IMAGE] Storage client not initialized, using fallback image');
       const fallbackBuffer = await getLocalFallbackImage();
       return new Response(new Uint8Array(fallbackBuffer), {
         headers: {
@@ -62,13 +59,11 @@ export async function GET(req: NextRequest) {
     }
 
     // Get the file from Google Cloud Storage
-    console.log('[GET_IMAGE] Fetching from storage:', imageName);
     const bucket = storageClient.getBucket();
     const file = bucket.file(imageName);
 
     const [exists] = await file.exists();
     if (!exists) {
-      console.warn('[GET_IMAGE] Image not found:', imageName);
       const fallbackBuffer = await getLocalFallbackImage();
       return new Response(new Uint8Array(fallbackBuffer), {
         headers: {
@@ -106,12 +101,6 @@ export async function GET(req: NextRequest) {
 
     // 이미지 메타데이터 확인
     const imageMetadata = await image.metadata();
-    console.log('[IMAGE_METADATA]', {
-      width: imageMetadata.width,
-      height: imageMetadata.height,
-      orientation: imageMetadata.orientation,
-      format: imageMetadata.format,
-    });
 
     // orientation에 따른 회전 각도 설정
     let rotationAngle = 0;
@@ -147,15 +136,6 @@ export async function GET(req: NextRequest) {
       processedBuffer = fileContent;
     }
 
-    // 처리된 이미지 메타데이터 확인
-    const processedMetadata = await sharp(processedBuffer).metadata();
-    console.log('[PROCESSED_IMAGE_METADATA]', {
-      width: processedMetadata.width,
-      height: processedMetadata.height,
-      orientation: processedMetadata.orientation,
-      format: processedMetadata.format,
-    });
-
     // Cache the processed image
     cache.set(cacheKey, processedBuffer);
 
@@ -185,6 +165,15 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // 인증 확인
+    const isAuthenticated = await isAdminAuthenticated();
+    if (!isAuthenticated) {
+      return NextResponse.json(
+        { error: 'Unauthorized', status: 'error' },
+        { status: 401 }
+      );
+    }
+
     if (!storageClient.isInitialized()) {
       return NextResponse.json({ error: 'Storage client not initialized' }, { status: 500 });
     }
@@ -197,9 +186,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Content type 검증
+    if (!FILE_UPLOAD_CONFIG.ALLOWED_TYPES.includes(contentType as (typeof FILE_UPLOAD_CONFIG.ALLOWED_TYPES)[number])) {
+      return NextResponse.json(
+        { error: `Invalid content type. Allowed: ${FILE_UPLOAD_CONFIG.ALLOWED_TYPES.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
     // Sanitize file name and create a unique path
     const cleanFileName = path.basename(fileName);
-    const extension = path.extname(cleanFileName);
+    const originalExt = path.extname(cleanFileName).toLowerCase();
+    // 안전한 확장자만 허용
+    const extension = FILE_UPLOAD_CONFIG.ALLOWED_EXTENSIONS.includes(
+      originalExt as (typeof FILE_UPLOAD_CONFIG.ALLOWED_EXTENSIONS)[number]
+    )
+      ? originalExt
+      : '.jpg';
     const uniqueFileName = `${uuidv4()}${extension}`;
     const filePath = `news/${uniqueFileName}`;
 
@@ -220,10 +223,9 @@ export async function POST(req: NextRequest) {
       filePath, // The path to be stored in the database
     });
   } catch (error) {
-    console.error('[GET_SIGNED_URL_ERROR]', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error('[GET_SIGNED_URL_ERROR]', error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json(
-      { error: 'Failed to get signed URL', details: errorMessage },
+      { error: 'Failed to get signed URL' },
       { status: 500 }
     );
   }

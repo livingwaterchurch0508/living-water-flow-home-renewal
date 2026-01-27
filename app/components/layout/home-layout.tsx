@@ -19,7 +19,13 @@ import { MotionEffect } from '@/components/animate-ui/effects/motion-effect';
 
 import { cn } from '@/lib/utils';
 import { YOUTUBE_URL, ROUTER_PATHS } from '@/variables/constants';
-import { MENU_TAB, INTRODUCE_TAB, SOUL_TYPE } from '@/variables/enums';
+import { MENU_TAB, INTRODUCE_TAB } from '@/variables/enums';
+import {
+  calculateGridSpan,
+  SOUL_GRADIENT_MAP,
+  SOUL_COLOR_DIALOG_MAP,
+  getSoulTypeLabel,
+} from '@/variables/ui-constants';
 import type { ISermon } from '@/variables/types/sermon.types';
 import type { IHymn } from '@/variables/types/hymn.types';
 import type { ICommunity } from '@/variables/types/community.types';
@@ -37,25 +43,12 @@ interface HomeClientProps {
 export default function HomeLayout({ locale, hymns }: HomeClientProps) {
   const t = useTranslations('Main');
   const menuT = useTranslations('Menu');
+  const sermonT = useTranslations('Menu.Sermon');
   const [selectedSermon, setSelectedSermon] = useState<ISermon | null>(null);
 
-  const typeColorMap: Record<number, string> = {
-    0: 'text-blue-600 dark:text-blue-400',
-    1: 'text-green-600 dark:text-green-400',
-    2: 'text-purple-600 dark:text-purple-400',
-  };
-  const typeLabel = (sermonType?: SOUL_TYPE | null) => {
-    switch (sermonType) {
-      case SOUL_TYPE.INTRODUCE:
-        return menuT('Sermon.introduce');
-      case SOUL_TYPE.MISSION:
-        return menuT('Sermon.mission');
-      case SOUL_TYPE.SPIRIT:
-        return menuT('Sermon.spirit');
-      default:
-        return '';
-    }
-  };
+  // 공유 상수 사용
+  const typeColorMap = SOUL_COLOR_DIALOG_MAP;
+  const typeLabel = (sermonType?: number | null) => getSoulTypeLabel(sermonType ?? null, sermonT);
 
   // Sermons lazy fetch
   const { ref: sermonRef, inView: sermonInView } = useInView({ triggerOnce: true });
@@ -259,20 +252,8 @@ export default function HomeLayout({ locale, hymns }: HomeClientProps) {
               <MasonryGrid className="gap-2 sm:gap-3 md:gap-4">
                 {type1Sermons.map((sermon: ISermon) => {
                   const contentLength = (sermon.name?.length || 0) + (sermon.desc?.length || 0);
-                  let span = 6;
-                  if (contentLength > 200) {
-                    span = 12;
-                  } else if (contentLength > 100) {
-                    span = 9;
-                  } else if (contentLength < 50) {
-                    span = 5;
-                  }
-                  const gradientMap: Record<number, string> = {
-                    0: 'bg-gradient-to-br from-blue-200/30 to-blue-100/10 dark:from-blue-500/20 dark:to-blue-400/10',
-                    1: 'bg-gradient-to-br from-green-200/30 to-green-100/10 dark:from-green-500/20 dark:to-green-400/10',
-                    2: 'bg-gradient-to-br from-purple-200/30 to-purple-100/10 dark:from-purple-500/20 dark:to-purple-400/10',
-                  };
-                  const gradientClass = gradientMap[sermon.viewCount ?? 0];
+                  const span = calculateGridSpan(contentLength);
+                  const gradientClass = SOUL_GRADIENT_MAP[sermon.viewCount ?? 0];
                   const name =
                     locale === 'en' ? sermon.nameEn || sermon.name || '' : sermon.name || '';
                   const desc =

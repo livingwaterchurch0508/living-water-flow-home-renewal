@@ -10,6 +10,7 @@ import {
   ApiResponse,
 } from '@/lib/api-utils';
 import { ISermonsResponse } from '@/variables/types/sermon.types';
+import { isAdminAuthenticated } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 
@@ -111,6 +112,15 @@ export type SermonsGetResponse = ApiResponse<SermonsResponse>;
 // POST: 설교 추가
 export async function POST(req: NextRequest) {
   try {
+    // 인증 확인
+    const isAuthenticated = await isAdminAuthenticated();
+    if (!isAuthenticated) {
+      return NextResponse.json(
+        { error: 'Unauthorized', status: 'error' },
+        { status: 401 }
+      );
+    }
+
     const data = await req.json();
     // Zod 유효성 검사 (BaseItemSchema 활용)
     const SermonCreateSchema = BaseItemSchema.extend({
@@ -164,6 +174,15 @@ export async function POST(req: NextRequest) {
 // DELETE: 여러 개 id 받아 일괄 삭제
 export async function DELETE(req: NextRequest) {
   try {
+    // 인증 확인
+    const isAuthenticated = await isAdminAuthenticated();
+    if (!isAuthenticated) {
+      return NextResponse.json(
+        { error: 'Unauthorized', status: 'error' },
+        { status: 401 }
+      );
+    }
+
     const data = await req.json();
     const IdsSchema = z.object({ ids: z.array(z.number()) });
     const parsed = IdsSchema.safeParse(data);

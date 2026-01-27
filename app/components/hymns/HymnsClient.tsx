@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { useSearchParams, useRouter } from 'next/navigation';
 import { MusicIcon } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 
 import { useSidebar } from '@/components/ui/sidebar';
 import { HeroSection } from '@/components/layout/hero-section';
@@ -15,7 +13,11 @@ import { DetailSkeleton } from '@/components/ui/detail-skeleton';
 import { MotionEffect } from '@/components/animate-ui/effects/motion-effect';
 
 import { useInfiniteHymns } from '@/hooks/use-hymns';
+import { useUrlParams } from '@/hooks/use-url-params';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useSelectedItem } from '@/hooks/use-selected-item';
 import { cn } from '@/lib/utils';
+import { localizeContentList, localizeContent } from '@/lib/locale-utils';
 import { HYMN_TAB } from '@/variables/enums';
 import { SECTION_WIDTH } from '@/variables/constants';
 import type { IHymn } from '@/variables/types/hymn.types';
@@ -25,54 +27,27 @@ interface HymnsClientProps {
   selectedHymn: IHymn | null;
 }
 
-// URL 파라미터에서 특정 param을 제거하고 /hymns로 push하는 함수
-function removeParamAndPush(
-  param: string,
-  searchParams: URLSearchParams,
-  router: ReturnType<typeof useRouter>
-) {
-  const params = new URLSearchParams(searchParams);
-  params.delete(param);
-  router.push(`/hymns?${params.toString()}`, { scroll: false });
-}
-
 const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn }) => {
   const menuT = useTranslations('Menu');
   const searchT = useTranslations('Search');
   const errorT = useTranslations('Error');
   const locale = useLocale();
   const { state } = useSidebar();
-  const router = useRouter();
-  const nextSearchParams = useSearchParams();
+  const { removeParam, closeDialog, setParam } = useUrlParams('/hymns');
   const currentType = Number(searchParams.type) || HYMN_TAB.HYMN;
   const selectedId = searchParams.id;
-  const observerTarget = useRef<HTMLDivElement>(null);
 
   // 선택된 찬양 데이터를 가져오는 쿼리
-  const { data: selectedHymnData, isLoading: isLoadingHymn } = useQuery({
-    queryKey: ['hymn', selectedId],
-    queryFn: async () => {
-      if (!selectedId) return null;
-      const response = await fetch(`/api/hymns/${selectedId}`);
-      if (!response.ok) {
-        removeParamAndPush('id', nextSearchParams, router);
-        return null;
-      }
-      const data = await response.json();
-      if (data.status === 'error' || !data.payload) {
-        removeParamAndPush('id', nextSearchParams, router);
-        return null;
-      }
-      return data.payload;
-    },
-    enabled: !!selectedId,
-    initialData: selectedHymn || undefined,
+  const { data: selectedHymnData, isLoading: isLoadingHymn } = useSelectedItem<IHymn>({
+    selectedId,
+    endpoint: '/api/hymns',
+    queryKey: 'hymn',
+    onInvalidId: () => removeParam('id'),
+    initialData: selectedHymn,
   });
 
   // Dialog 닫을 때 id 파라미터 제거
-  const handleCloseDialog = () => {
-    removeParamAndPush('id', nextSearchParams, router);
-  };
+  const handleCloseDialog = closeDialog;
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } =
     useInfiniteHymns({
@@ -82,36 +57,19 @@ const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn })
 
   const hymns = (data?.pages ?? []).flatMap((page) => page.payload.items);
 
-  const hymnsForRender = useMemo(() => {
-    return hymns.map((hymn) => ({
-      ...hymn,
-      name: locale === 'en' ? hymn.nameEn || hymn.name || '' : hymn.name || '',
-      desc: locale === 'en' ? hymn.descEn || hymn.desc || '' : hymn.desc || '',
-    }));
-  }, [hymns, locale]);
+  const hymnsForRender = useMemo(
+    () => localizeContentList(hymns, locale),
+    [hymns, locale]
+  );
 
-  useEffect(() => {
-    if (!observerTarget.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(observerTarget.current);
+  // 무한 스크롤 훅 사용
+  const observerTarget = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, observerTarget]);
-
-  const handleTabChange = (value: string) => {
-    const params = new URLSearchParams(nextSearchParams);
-    params.set('type', value);
-    router.push(`/hymns?${params.toString()}`);
-  };
+  const handleTabChange = (value: string) => setParam('type', value);
 
   return (
     <div className="min-h-screen py-10 pb-20 px-6">
@@ -194,32 +152,23 @@ const HymnsClient: React.FC<HymnsClientProps> = ({ searchParams, selectedHymn })
       </section>
 
       {/* 선택된 찬양 Dialog */}
-      {selectedId && selectedHymnData && (
-        <>
-          {isLoadingHymn ? (
-            <DetailSkeleton />
-          ) : (
-            <ContentCard
-              name={
-                locale === 'en'
-                  ? selectedHymnData.nameEn || selectedHymnData.name
-                  : selectedHymnData.name
-              }
-              desc={
-                locale === 'en'
-                  ? selectedHymnData.descEn || selectedHymnData.desc
-                  : selectedHymnData.desc
-              }
-              url={selectedHymnData.url}
-              createdAt={selectedHymnData.createdAt}
-              autoOpen={true}
-              onDialogClose={handleCloseDialog}
-              type="hymn"
-              id={selectedHymnData.id.toString()}
-            />
-          )}
-        </>
-      )}
+      {selectedId && selectedHymnData && (() => {
+        const localized = localizeContent(selectedHymnData, locale);
+        return isLoadingHymn ? (
+          <DetailSkeleton />
+        ) : (
+          <ContentCard
+            name={localized.name}
+            desc={localized.desc}
+            url={selectedHymnData.url || ''}
+            createdAt={selectedHymnData.createdAt || ''}
+            autoOpen={true}
+            onDialogClose={handleCloseDialog}
+            type="hymn"
+            id={selectedHymnData.id.toString()}
+          />
+        );
+      })()}
     </div>
   );
 };

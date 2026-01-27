@@ -1,42 +1,42 @@
 import { NextResponse } from 'next/server';
-import { getSermons } from '@/lib/db/postgres/sermons';
-import { getHymns } from '@/lib/db/postgres/hymns';
-import { getCommunities } from '@/lib/db/postgres/communities';
-import { SERMON_TAB, HYMN_TAB, NEWS_TYPES } from '@/variables/enums';
+import { unstable_cache } from 'next/cache';
+import { getContentStats } from '@/lib/db/postgres/stats';
+import { CACHE_REVALIDATE } from '@/variables/ui-constants';
 
-function getTotal(result: unknown): number {
-  return result &&
-    typeof result === 'object' &&
-    'total' in result &&
-    typeof (result as { total: unknown }).total === 'number'
-    ? (result as { total: number }).total
-    : 0;
-}
+/**
+ * 캐시된 통계 조회 함수
+ * - 60초 동안 캐시 유지
+ * - 'admin-stats' 태그로 필요시 수동 무효화 가능
+ */
+const getCachedStats = unstable_cache(
+  async () => getContentStats(),
+  ['admin-stats'],
+  {
+    revalidate: CACHE_REVALIDATE.STATS,
+    tags: ['admin-stats'],
+  }
+);
 
 export async function GET() {
-  // 각 타입별 카운트 집계
-  const [sermonRhema, sermonSoul, hymnHymn, hymnSong, newsService, newsEvent, newsStory] = await Promise.all([
-    getSermons({ limit: 1, offset: 0, type: SERMON_TAB.RHEMA }),
-    getSermons({ limit: 1, offset: 0, type: SERMON_TAB.SOUL }),
-    getHymns({ limit: 1, offset: 0, type: HYMN_TAB.HYMN }),
-    getHymns({ limit: 1, offset: 0, type: HYMN_TAB.SONG }),
-    getCommunities({ limit: 1, offset: 0, type: NEWS_TYPES.SERVICE }),
-    getCommunities({ limit: 1, offset: 0, type: NEWS_TYPES.EVENT }),
-    getCommunities({ limit: 1, offset: 0, type: NEWS_TYPES.STORY }),
-  ]);
-  const sermonCount = getTotal(sermonRhema) + getTotal(sermonSoul);
-  const hymnCount = getTotal(hymnHymn) + getTotal(hymnSong);
-  const newsCount = getTotal(newsService) + getTotal(newsEvent) + getTotal(newsStory);
-  return NextResponse.json({
-    sermonCount,
-    hymnCount,
-    newsCount,
-    sermonRhema: getTotal(sermonRhema),
-    sermonSoul: getTotal(sermonSoul),
-    hymnHymn: getTotal(hymnHymn),
-    hymnSong: getTotal(hymnSong),
-    newsService: getTotal(newsService),
-    newsEvent: getTotal(newsEvent),
-    newsStory: getTotal(newsStory),
-  });
-} 
+  try {
+    const stats = await getCachedStats();
+    return NextResponse.json(stats);
+  } catch (error) {
+    console.error('[STATS_API_ERROR]', error instanceof Error ? error.message : 'Unknown error');
+    return NextResponse.json(
+      {
+        sermonCount: 0,
+        hymnCount: 0,
+        newsCount: 0,
+        sermonRhema: 0,
+        sermonSoul: 0,
+        hymnHymn: 0,
+        hymnSong: 0,
+        newsService: 0,
+        newsEvent: 0,
+        newsStory: 0,
+      },
+      { status: 500 }
+    );
+  }
+}

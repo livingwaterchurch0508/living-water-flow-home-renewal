@@ -90,6 +90,7 @@ export function Nav() {
               variant="outline"
               className="relative h-8 w-full max-w-[600px] justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64"
               onClick={() => setOpenSearch(true)}
+              aria-label={tSearch('placeholder')}
             >
               <span className="hidden lg:inline-flex">{tSearch('placeholder')}</span>
               <span className="inline-flex lg:hidden">{tSearch('shortPlaceholder')}</span>
@@ -107,6 +108,7 @@ export function Nav() {
                     <Button
                       variant="outline"
                       size="icon"
+                      aria-label={t('language')}
                       className={cn(
                         buttonVariants({
                           variant: 'outline',
@@ -115,7 +117,7 @@ export function Nav() {
                       )}
                     >
                       <Languages className="h-[1.2rem] w-[1.2rem]" />
-                      <span className="sr-only">Change Language</span>
+                      <span className="sr-only">{t('language')}</span>
                     </Button>
                   </DropdownMenuTrigger>
                 </TooltipTrigger>
@@ -153,6 +155,7 @@ export function Nav() {
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={t('youtube')}
                 >
                   <Youtube className="h-[1.2rem] w-[1.2rem]" />
                   <span className="sr-only">{t('youtube')}</span>
@@ -174,9 +177,9 @@ export function Nav() {
           }}
         >
           <motion.div
-            className="absolute bottom-0 left-0 right-0 h-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-orange-500"
+            className="absolute bottom-0 left-0 right-0 h-full bg-gradient-to-r from-slate-400 via-blue-400 to-teal-400 dark:from-slate-500 dark:via-blue-500 dark:to-cyan-500"
             style={{
-              scaleX: scrollYProgress,
+              scaleX: scrollYProgress as unknown as number,
               transformOrigin: '0%',
             }}
           />

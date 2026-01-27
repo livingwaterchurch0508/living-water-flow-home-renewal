@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Living Water Home
 
-## Getting Started
+생수의강 교회 웹사이트 프로젝트입니다. Next.js 15 App Router 기반으로 한국어/영어 다국어를 지원합니다.
 
-First, run the development server:
+## 주요 기능
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **설교 관리** - 레마/소울 설교 영상 관리 및 조회
+- **찬양 관리** - 찬송가/복음성가 영상 관리
+- **소식 관리** - 예배/행사/이야기 게시물 및 이미지 관리
+- **관리자 대시보드** - 콘텐츠 CRUD, 통계 조회
+- **다국어 지원** - 한국어(기본)/영어 자동 라우팅
+- **통합 검색** - 설교, 찬양, 소식 전체 검색
+
+## 기술 스택
+
+- **프레임워크**: Next.js 15, React 19, TypeScript
+- **데이터베이스**: PostgreSQL (Neon Serverless) + Drizzle ORM
+- **스타일링**: Tailwind CSS 4, Radix UI
+- **다국어**: next-intl
+- **데이터 페칭**: TanStack React Query
+- **스토리지**: Google Cloud Storage
+- **테스트**: Playwright
+
+## 시작하기
+
+### 환경 변수 설정
+
+`.env.local` 파일을 생성하고 필요한 환경 변수를 설정합니다:
+
+```env
+DATABASE_URL=your_neon_database_url
+GOOGLE_CLOUD_PROJECT_ID=your_project_id
+GOOGLE_CLOUD_BUCKET_NAME=your_bucket_name
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 설치 및 실행
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# 의존성 설치
+yarn install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 개발 서버 실행
+yarn dev
 
-## Learn More
+# 프로덕션 빌드
+yarn build
 
-To learn more about Next.js, take a look at the following resources:
+# 프로덕션 서버 실행
+yarn start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+개발 서버 실행 후 [http://localhost:3000](http://localhost:3000)에서 확인할 수 있습니다.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 스크립트
 
-## Deploy on Vercel
+| 명령어 | 설명 |
+|--------|------|
+| `yarn dev` | 개발 서버 실행 (Turbopack) |
+| `yarn build` | 프로덕션 빌드 |
+| `yarn start` | 프로덕션 서버 실행 |
+| `yarn lint` | ESLint 검사 |
+| `yarn pretty` | Prettier 포맷팅 |
+| `yarn playwright test` | Playwright 테스트 실행 |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 프로젝트 구조
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/
+├── [locale]/           # 다국어 라우팅 (ko, en)
+│   ├── admin/          # 관리자 페이지
+│   ├── sermons/        # 설교 페이지
+│   ├── hymns/          # 찬양 페이지
+│   ├── news/           # 소식 페이지
+│   ├── introduces/     # 교회 소개 페이지
+│   └── infos/          # 오시는 길 페이지
+├── api/                # API 라우트
+├── components/         # React 컴포넌트
+├── hooks/              # 커스텀 훅
+├── lib/                # 유틸리티 및 DB 로직
+└── variables/          # 상수, 열거형, 타입
+messages/               # 다국어 번역 파일
+```
+
+## 배포
+
+Vercel을 통해 배포할 수 있습니다.
+
+```bash
+vercel deploy
+```
+
+## 라이선스
+
+Private

@@ -8,6 +8,7 @@ import { BaseItemSchema, handleApiError, ApiResponse } from '@/lib/api-utils';
 import { db } from '@/lib/db/postgres/dbConnection';
 import { communities, files as filesTable } from '@/lib/db/postgres/schema';
 import { storageClient } from '@/lib/fetch/storage';
+import { isAdminAuthenticated, validateFiles, FILE_UPLOAD_CONFIG } from '@/lib/security';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,12 +83,32 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 인증 확인
+    const isAuthenticated = await isAdminAuthenticated();
+    if (!isAuthenticated) {
+      return NextResponse.json(
+        { error: 'Unauthorized', status: 'error' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     const communityId = parseInt(id, 10);
     const formData = await req.formData();
     const newFiles = formData.getAll('files').filter((f): f is File => f instanceof File);
     const deletedFilesStr = formData.get('deletedFiles') as string | null;
     const deletedFiles: string[] = deletedFilesStr ? JSON.parse(deletedFilesStr) : [];
+
+    // 파일 검증
+    if (newFiles.length > 0) {
+      const fileValidation = validateFiles(newFiles);
+      if (!fileValidation.valid) {
+        return NextResponse.json(
+          { error: fileValidation.error, status: 'error' },
+          { status: 400 }
+        );
+      }
+    }
 
     // 1. Update text data in 'communities' table
     const textData = {
@@ -124,7 +145,13 @@ export async function PUT(
         });
 
         const uploadPromises = newFiles.map(async (file, i) => {
-          const ext = path.extname(file.name) || '.jpg';
+          // 안전한 확장자 추출
+          const originalExt = path.extname(file.name).toLowerCase();
+          const ext = FILE_UPLOAD_CONFIG.ALLOWED_EXTENSIONS.includes(
+            originalExt as (typeof FILE_UPLOAD_CONFIG.ALLOWED_EXTENSIONS)[number]
+          )
+            ? originalExt
+            : '.jpg';
           const newPath = `${directoryPath}${maxIndex + 1 + i}${ext}`;
           const buffer = Buffer.from(await file.arrayBuffer());
           return bucket.file(newPath).save(buffer, { contentType: file.type });
@@ -158,6 +185,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 인증 확인
+    const isAuthenticated = await isAdminAuthenticated();
+    if (!isAuthenticated) {
+      return NextResponse.json(
+        { error: 'Unauthorized', status: 'error' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
     const communityId = parseInt(id, 10);
 
